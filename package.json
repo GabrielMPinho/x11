@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node server.js",
-    "dev": "node --watch server.js",
+    "dev": "node --watch-path=server.js --watch-path=server server.js",
     "build": "vite build"
   },
   "dependencies": {
