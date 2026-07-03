@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#161616"/>
+  <path d="M240 110 h120 v50 l60 30 v90 l-40 20 v220 h-160 v-220 l-40 -20 v-90 l60 -30 z" fill="#232323" stroke="#ff5000" stroke-width="3"/>
+  <text x="300" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" letter-spacing="3" fill="#ff5000" font-weight="bold">SEGUNDA PELE</text>
+</svg>

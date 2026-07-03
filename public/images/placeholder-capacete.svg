@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#161616"/>
+  <circle cx="300" cy="330" r="150" fill="#232323" stroke="#ff5000" stroke-width="3"/>
+  <path d="M150 330 a150 150 0 0 1 300 0 v40 h-300 z" fill="#2b2b2b"/>
+  <rect x="150" y="330" width="300" height="60" rx="16" fill="#1a1a1a" stroke="#ff5000" stroke-width="3"/>
+  <rect x="205" y="300" width="190" height="55" rx="10" fill="#0d0d0d" stroke="#ff5000" stroke-width="2"/>
+  <circle cx="440" cy="300" r="10" fill="#ff5000"/>
+  <text x="300" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" letter-spacing="4" fill="#ff5000" font-weight="bold">CAPACETE</text>
+</svg>

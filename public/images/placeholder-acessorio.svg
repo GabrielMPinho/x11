@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#161616"/>
+  <rect x="180" y="220" width="240" height="220" rx="18" fill="#232323" stroke="#ff5000" stroke-width="3"/>
+  <path d="M240 220 v-40 a60 60 0 0 1 120 0 v40" fill="none" stroke="#ff5000" stroke-width="10"/>
+  <text x="300" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" letter-spacing="4" fill="#ff5000" font-weight="bold">ACESSORIO</text>
+</svg>

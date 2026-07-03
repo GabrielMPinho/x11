@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#161616"/>
+  <path d="M220 120 h160 l14 200 40 160 h-70 l-64 -190 -64 190 h-70 l40 -160 z" fill="#232323" stroke="#ff5000" stroke-width="3"/>
+  <rect x="220" y="120" width="160" height="36" rx="8" fill="#0d0d0d" stroke="#ff5000" stroke-width="2"/>
+  <line x1="300" y1="160" x2="300" y2="310" stroke="#ff5000" stroke-width="2" stroke-dasharray="6 6"/>
+  <text x="300" y="530" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" letter-spacing="4" fill="#ff5000" font-weight="bold">CALCA</text>
+</svg>
