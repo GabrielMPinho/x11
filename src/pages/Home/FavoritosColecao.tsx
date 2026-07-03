@@ -4,7 +4,7 @@ import ProductCard from '../../components/ProductCard';
 export default function FavoritosColecao({ favoritos }: { favoritos: Produto[] }) {
   return (
     <section className="section">
-      <div className="container">
+      <div className="container-x11">
         <div className="section-head">
           <span className="eyebrow">Seleção</span>
           <h2>Favoritos da Coleção</h2>

@@ -39,14 +39,14 @@ export default function Produto() {
     if (produto) document.title = `${produto.nome} · X11 Expert Riders`;
   }, [produto]);
 
-  if (erro) return <div className="container section"><p className="sem-resultados">Produto não encontrado.</p></div>;
+  if (erro) return <div className="container-x11 section"><p className="text-center py-[60px] text-gray-2">Produto não encontrado.</p></div>;
   if (!produto || !categoria || !guiaTamanhos) return null;
 
   return (
-    <div className="container" style={{ paddingTop: 24 }}>
+    <div className="container-x11 pt-6">
       <Breadcrumb categoria={categoria} produto={produto} />
 
-      <div className="produto-topo">
+      <div className="grid grid-cols-[90px_1fr_1fr] max-[980px]:grid-cols-1 gap-6 mb-[50px]">
         <Galeria imagens={produto.imagens} nome={produto.nome} />
         <InfoProduto produto={produto} onAbrirGuia={() => setModalAberto(true)} />
       </div>

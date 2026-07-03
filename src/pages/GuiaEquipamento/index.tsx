@@ -14,33 +14,36 @@ export default function GuiaEquipamento() {
 
   return (
     <>
-      <section className="cat-hero" style={{ backgroundImage: "url('/images/colecao-hero.jpg')" }}>
-        <div className="container">
+      <section
+        className="relative h-[260px] flex items-end bg-cover bg-center py-[30px] before:content-[''] before:absolute before:inset-0 before:bg-black/55"
+        style={{ backgroundImage: "url('/images/colecao-hero.jpg')" }}
+      >
+        <div className="container-x11 relative">
           <span className="eyebrow">Encontre o caimento certo</span>
           <h1>Guia de Equipamento</h1>
         </div>
       </section>
 
-      <div className="container section">
-        <p style={{ color: 'var(--gray-1)', maxWidth: 640, marginBottom: 40 }}>
+      <div className="container-x11 section">
+        <p className="text-gray-1 max-w-[640px] mb-10">
           Meça-se antes de escolher o tamanho: use uma fita métrica sem apertar e compare com as tabelas abaixo.
           Em caso de medida entre dois tamanhos, prefira o maior.
         </p>
 
         {Object.values(tabelas).map((tab) => (
-          <div className="ficha-tecnica" key={tab.titulo}>
+          <div className="my-[60px]" key={tab.titulo}>
             <h2>{tab.titulo}</h2>
-            <table>
+            <table className="w-full border-collapse">
               <thead>
                 <tr>
                   {tab.colunas.map((c) => (
-                    <th key={c} style={{ color: 'var(--orange)', textTransform: 'uppercase', fontSize: '0.75rem', textAlign: 'left', padding: 10 }}>{c}</th>
+                    <th key={c} className="text-orange uppercase text-[0.75rem] text-left p-2.5">{c}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {tab.linhas.map((linha, i) => (
-                  <tr key={i}>{linha.map((v, j) => <td key={j}>{v}</td>)}</tr>
+                  <tr key={i}>{linha.map((v, j) => <td key={j} className="p-2.5 border-b border-border text-[0.9rem]">{v}</td>)}</tr>
                 ))}
               </tbody>
             </table>

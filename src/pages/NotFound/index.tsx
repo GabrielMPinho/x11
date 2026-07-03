@@ -7,10 +7,10 @@ export default function NotFound() {
   }, []);
 
   return (
-    <div className="container section" style={{ textAlign: 'center', padding: '120px 0' }}>
+    <div className="container-x11 section text-center py-[120px]">
       <span className="eyebrow">Erro 404</span>
       <h1>Página não encontrada</h1>
-      <p style={{ color: 'var(--gray-2)', marginBottom: 24 }}>A página que você procura não existe ou foi movida.</p>
+      <p className="text-gray-2 mb-6">A página que você procura não existe ou foi movida.</p>
       <Link to="/" className="btn btn-primary">Voltar para a Home</Link>
     </div>
   );

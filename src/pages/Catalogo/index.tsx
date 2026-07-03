@@ -72,14 +72,14 @@ export default function Catalogo() {
     setSearchParams(novo);
   }
 
-  if (erro) return <div className="container section"><p className="sem-resultados">Categoria não encontrada.</p></div>;
+  if (erro) return <div className="container-x11 section"><p className="text-center py-[60px] text-gray-2">Categoria não encontrada.</p></div>;
   if (!categoria) return null;
 
   return (
     <>
       <CatHero categoria={categoria} />
 
-      <div className="container" style={{ paddingTop: 30 }}>
+      <div className="container-x11 pt-[30px]">
         <Breadcrumb categoria={categoria} />
 
         <EstiloTabs
@@ -87,7 +87,7 @@ export default function Catalogo() {
           onSelecionar={(estilo) => atualizarParam('estilo', estilo || null)}
         />
 
-        <div className="catalogo-layout">
+        <div className="grid grid-cols-[240px_1fr] gap-10 items-start max-[980px]:grid-cols-1">
           <FiltrosSidebar
             tamanhos={tamanhos}
             cores={cores}
@@ -102,11 +102,12 @@ export default function Catalogo() {
           />
 
           <div>
-            <div className="catalogo-toolbar">
-              <span className="eyebrow" style={{ margin: 0 }}>Em destaque</span>
+            <div className="flex justify-between items-center mb-5">
+              <span className="eyebrow mb-0">Em destaque</span>
               <select
                 value={searchParams.get('ordenar') || 'destaque'}
                 onChange={(e) => atualizarParam('ordenar', e.target.value)}
+                className="bg-bg-card text-white border border-border px-3 py-2 rounded"
               >
                 <option value="destaque">Em destaque</option>
                 <option value="preco-asc">Preço: menor para maior</option>

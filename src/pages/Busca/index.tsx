@@ -17,16 +17,16 @@ export default function Busca() {
   }, [q]);
 
   return (
-    <div className="container section">
+    <div className="container-x11 section">
       <div className="section-head">
         <span className="eyebrow">Resultado da busca</span>
         <h2>{carregando ? 'Buscando...' : `${resultados.length} resultado(s) para "${q}"`}</h2>
       </div>
 
       {!carregando && resultados.length === 0 ? (
-        <div className="sem-resultados">Nenhum produto encontrado. Tente outro termo (mínimo 3 letras).</div>
+        <div className="text-center py-[60px] text-gray-2">Nenhum produto encontrado. Tente outro termo (mínimo 3 letras).</div>
       ) : (
-        <div className="busca-resultados-grid">
+        <div className="grid-3">
           {resultados.map((p) => <ProductCard key={p.id} produto={p} />)}
         </div>
       )}

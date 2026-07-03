@@ -7,12 +7,12 @@ const MARCOS = [
 
 export default function Timeline() {
   return (
-    <div className="timeline">
+    <div className="grid grid-cols-4 max-[980px]:grid-cols-2 gap-5 text-center my-[50px]">
       {MARCOS.map((m) => (
         <div key={m.ano}>
-          <div className="ano">{m.ano}</div>
-          <div className="titulo">{m.titulo}</div>
-          <p>{m.texto}</p>
+          <div className="text-orange text-[2rem] font-bold" style={{ fontFamily: 'var(--font-head)' }}>{m.ano}</div>
+          <div className="uppercase text-[0.85rem] my-1.5 mt-1.5 mb-2" style={{ fontFamily: 'var(--font-head)' }}>{m.titulo}</div>
+          <p className="text-gray-2 text-[0.82rem]">{m.texto}</p>
         </div>
       ))}
     </div>

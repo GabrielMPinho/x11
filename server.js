@@ -23,7 +23,7 @@ async function start() {
   } else {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      configFile: path.join(__dirname, 'vite.config.ts'),
+      configFile: path.join(__dirname, 'vite.config.mts'),
       server: { middlewareMode: true },
       appType: 'custom',
     });

@@ -7,19 +7,20 @@ export default function Galeria({ imagens, nome }: { imagens: string[]; nome: st
 
   return (
     <>
-      <div className="galeria-thumbs">
+      <div className="flex flex-col gap-2.5 max-[980px]:flex-row max-[980px]:order-2 max-[980px]:overflow-x-auto">
         {imagens.map((img, i) => (
           <img
             key={img + i}
             src={img}
             alt={`${nome} ${i + 1}`}
-            className={i === imagemAtiva ? 'active' : ''}
+            className={`border rounded-[3px] cursor-pointer aspect-square object-cover ${i === imagemAtiva ? 'border-orange' : 'border-border'}`}
             onClick={() => { setImagemAtiva(i); setZoom(false); }}
           />
         ))}
       </div>
       <div
-        className={`galeria-principal${zoom ? ' zoom' : ''}`}
+        className="bg-bg-alt rounded overflow-hidden aspect-[4/5] relative max-[980px]:order-1"
+        style={{ cursor: zoom ? 'zoom-out' : 'zoom-in' }}
         onClick={() => setZoom((v) => !v)}
         onMouseMove={(e) => {
           if (!zoom) return;
@@ -32,7 +33,8 @@ export default function Galeria({ imagens, nome }: { imagens: string[]; nome: st
         <img
           src={imagens[imagemAtiva]}
           alt={nome}
-          style={{ transformOrigin: origemZoom }}
+          className="w-full h-full object-cover transition-transform duration-[250ms]"
+          style={{ transformOrigin: origemZoom, transform: zoom ? 'scale(1.8)' : undefined }}
         />
       </div>
     </>

@@ -24,10 +24,10 @@ export default function Pagina() {
   if (!pagina) return null;
 
   return (
-    <div className="container section" style={{ maxWidth: 760 }}>
+    <div className="section w-full max-w-[760px] mx-auto px-5">
       <h1>{pagina.titulo}</h1>
       {pagina.paragrafos.map((p, i) => (
-        <p key={i} style={{ color: 'var(--gray-1)', marginBottom: 16 }}>{p}</p>
+        <p key={i} className="text-gray-1 mb-4">{p}</p>
       ))}
     </div>
   );

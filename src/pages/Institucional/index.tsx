@@ -17,7 +17,7 @@ export default function Institucional() {
     <>
       <Hero />
 
-      <div className="container section">
+      <div className="container-x11 section">
         <QuemSomosIntro />
         <DiferenciaisIcons />
         <FeitaPorMotociclistas />
