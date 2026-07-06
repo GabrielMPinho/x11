@@ -1,0 +1,180 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+:root{
+  --laranja: #FF5000;
+  --branco: #ffffff;
+  --background_escuro: #181614;
+}
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+/* HEADER */
+header{
+  background-color: black;
+  height: 12vh;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 2vw;
+}
+header > nav{
+  display: flex;
+  align-items: center;
+  margin-left: 10vw;
+  gap: 6rem;
+}
+header > nav > a{
+  color: #afb3ae;
+  text-decoration: none;
+  font-size: medium;
+}
+header > img{
+  position: relative;
+  height: auto;
+  width: auto;
+  top: 2.9vh;
+  left: 4vw;
+  z-index: 1;
+}
+/* FIM HEADER */
+
+/* HERO */
+
+#escrito{
+  /* border: 2px solid red; */
+  height: auto;
+  width: 40vw;
+  position: relative;
+  top: 39vh;
+  left: 6vw;
+}
+.hero{
+  position: relative;
+  font-family: "Roboto", sans-serif;
+  z-index: -1;
+  background-image: url('../src/assets/images/hero-home.jpg');
+  background-size: cover;
+  background-position: center;
+  min-height: 88vh;
+  
+}
+.p_laranja{
+  color: var(--laranja);
+  font-size: 1.2rem;
+}
+#p_branco{
+  color: var(--branco);
+  position: relative;
+  top: 1vh;
+}
+.hero > #escrito > h1{
+  color: #ffffff;
+  font-size: 4rem;
+}
+#botoes{
+  /* border: 2px solid red; */
+  height: auto;
+  width: 30vw;
+  position: relative;
+  top: 42vh;
+  left: 5.5vw;
+  
+  
+}
+#botoes > button{
+  margin: 8px;
+  height: 7.3vh;
+  width: 14vw;
+  border: none;
+  outline: none;
+  font-size: small;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 92% 100%, 0 100%);
+}
+#botao_masculino{
+  background-color: var(--laranja);
+  color: var(--branco);
+  
+}
+#botao_feminino{
+  background-color: var(--branco);
+  color: var(--laranja);
+}
+/* FIM HOME */
+
+/* FAVORITOS */
+  /* ESCRITO */
+.favoritos{
+  min-height: 88vh;
+  background-color: var(--background_escuro);
+}
+#titulo{
+  /* border: 1px solid blue; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: 7vh;
+}
+#escrito_fav{
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+
+}
+.favoritos > #titulo > #escrito_fav > h2{
+  color: #ffffff;
+  font-size: 2.6rem;
+}
+  /* IMAGENS */
+
+#imagens {
+  padding-top: 11vh;
+  display: flex;
+  /* gap: 2vw; */
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  position: relative;
+  left: 7vw;
+}
+.nome{
+  padding-top: 1vh;
+  color: var(--laranja);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+.desc{
+  color: var(--branco);
+  font-size: small;
+  padding-top: .5vh;
+  font-weight: 200;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.card a{
+  margin-top: auto;
+  padding-top: 1vh;
+  text-decoration: none;
+  color: var(--laranja);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.85rem;
+}
+.card img {
+  width: 26vw;
+  height: 95vh;
+  object-fit: cover;
+}
