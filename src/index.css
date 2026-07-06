@@ -7,6 +7,7 @@
   --laranja: #FF5000;
   --branco: #ffffff;
   --background_escuro: #181614;
+  --background_claro: #E5E5E5;
 }
 body {
   font-family: "Roboto", sans-serif;
@@ -85,7 +86,7 @@ header > img{
   
   
 }
-#botoes > button{
+button{
   margin: 8px;
   height: 7.3vh;
   width: 14vw;
