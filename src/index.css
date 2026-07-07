@@ -58,7 +58,6 @@ header > img{
 }
 .hero{
   position: relative;
-  font-family: "Roboto", sans-serif;
   z-index: -1;
   background-image: url('../src/assets/images/hero-home.jpg');
   background-size: cover;
@@ -151,7 +150,7 @@ button{
   flex-direction: column;
   width: 30%;
   position: relative;
-  left: 7vw;
+  left: 6.6vw;
 }
 .nome{
   padding-top: 1vh;
@@ -189,7 +188,7 @@ button{
 /* ==================================================================== */
 
 /* ==================================================================== */
-/* LANÇAMENTO */
+/* LANÇAMENTO DESCONTO*/
 .lancamento_desconto{
   min-height: 88vh;
   height: 88vh;
@@ -216,12 +215,15 @@ button{
   height: auto;
   width: 96.5vh;
   position: relative;
-  left: 1vw;
+  left: 0.5vw;
   top: 1vh;
 
 }
 #texto .p_laranja{
   font-size: 1.3rem;
+}
+.p_preto{
+  color: black;
 }
 #titulo_principal{
   font-size: 4rem;
@@ -251,7 +253,7 @@ button{
   object-fit: cover;
 }
 
-/* FIM LANÇAMENTO */
+/* FIM LANÇAMENTO DESCONTO*/
 /* ==================================================================== */
 
 /* ==================================================================== */
@@ -312,7 +314,74 @@ button{
   line-height: 1.3;
 }
 
-
-
 /* FIM CATEGORIAS */
+/* ==================================================================== */
+
+/* ==================================================================== */
+/* LANÇAMENTO ESPECIAL */
+
+.lancamento_especial{
+  min-height: 75vh;
+  height: 80vh;
+  background-image: url("../src/assets/images/cat-aventura.jpg");
+  background-size: cover;
+  object-position: center; 
+  display: flex;
+  align-items: center;
+}
+.lancamento_especial{
+  position: relative;
+}
+
+.lancamento_especial::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+#container_texto{
+  /* border: 1px solid red; */
+  height: auto;
+  width: 70.5vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  left: 7vw;
+  gap: 10px;
+  z-index: 1;
+  top: 3vh;
+}
+
+
+#container_texto h1, p, button{
+  color: var(--branco);
+}
+#container_texto h1{ 
+  font-size: 4rem;
+}
+
+#container_texto button{
+  background-color: var(--laranja);
+  position: relative;
+  right: 1vw;
+  font-size: 1rem;
+  margin-top: 30px; /* ajusta o valor pra descer mais ou menos */
+
+
+
+}
+
+
+
+
+/* FIM LANÇAMENTO ESPECIAL */
 /* ==================================================================== */
