@@ -13,6 +13,7 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
+/* ==================================================================== */
 /* HEADER */
 header{
   background-color: black;
@@ -42,7 +43,9 @@ header > img{
   z-index: 1;
 }
 /* FIM HEADER */
+/* ==================================================================== */
 
+/* ==================================================================== */
 /* HERO */
 
 #escrito{
@@ -104,8 +107,10 @@ button{
   background-color: var(--branco);
   color: var(--laranja);
 }
-/* FIM HOME */
+/* FIM HERO */
+/* ==================================================================== */
 
+/* ==================================================================== */
 /* FAVORITOS */
   /* ESCRITO */
 .favoritos{
@@ -173,9 +178,77 @@ button{
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-size: 0.85rem;
+  padding-bottom: 8vh;
 }
 .card img {
   width: 26vw;
   height: 95vh;
   object-fit: cover;
 }
+/* FIM FAVORITO */
+/* ==================================================================== */
+
+/* ==================================================================== */
+/* LANÇAMENTO */
+.lancamento{
+  min-height: 88vh;
+  height: 88vh;
+  background-color: var(--background_claro);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+}
+#container_escrito{
+  grid-column: span 4 / span 4;
+  grid-row: span 5 / span 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+#texto{
+  /* border: 1px solid red; */
+  display: flex;
+  justify-content: center;
+  align-items:flex-start;
+  flex-direction: column;
+  height: auto;
+  width: 96.5vh;
+  position: relative;
+  left: 1vw;
+
+}
+#texto .p_laranja{
+  font-size: 1.3rem;
+}
+#titulo_principal{
+  font-size: 4rem;
+  padding-bottom: 2vh;
+}
+
+#texto button{
+  margin-top: 4vh;
+  position: relative;
+  right: 0.5vw;
+  background-color: var(--laranja);
+  color: var(--branco);
+  font-size: 1rem;
+}
+
+#container_imagem{
+  grid-column: span 3 / span 3;
+  grid-row: span 5 / span 5;
+  grid-column-start: 5;
+  min-height: 0;
+  overflow: hidden;
+
+}
+#imagem_lancamento{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* FIM LANÇAMENTO */
+/* ==================================================================== */
