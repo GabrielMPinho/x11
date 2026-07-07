@@ -117,7 +117,7 @@ button{
   min-height: 88vh;
   background-color: var(--background_escuro);
 }
-#titulo{
+.titulo{
   /* border: 1px solid blue; */
   display: flex;
   align-items: center;
@@ -125,7 +125,7 @@ button{
   position: relative;
   top: 7vh;
 }
-#escrito_fav{
+.escrito_fav{
   /* border: 1px solid red; */
   display: flex;
   flex-direction: column;
@@ -134,7 +134,7 @@ button{
   
 
 }
-.favoritos > #titulo > #escrito_fav > h2{
+.titulo > .escrito_fav > h2{
   color: #ffffff;
   font-size: 2.6rem;
 }
@@ -190,7 +190,7 @@ button{
 
 /* ==================================================================== */
 /* LANÇAMENTO */
-.lancamento{
+.lancamento_desconto{
   min-height: 88vh;
   height: 88vh;
   background-color: var(--background_claro);
@@ -217,6 +217,7 @@ button{
   width: 96.5vh;
   position: relative;
   left: 1vw;
+  top: 1vh;
 
 }
 #texto .p_laranja{
@@ -251,4 +252,67 @@ button{
 }
 
 /* FIM LANÇAMENTO */
+/* ==================================================================== */
+
+/* ==================================================================== */
+/* CATEGORIAS */
+
+.categorias{
+  background-color: var(--background_escuro);
+  min-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.escrito_cat{
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; 
+}
+.titulo > .escrito_cat > h2{
+  color: #ffffff;
+  font-size: 2.6rem;
+}
+#conteiner_categorias{
+  /* border: 1px solid white; */
+  width: 85vw;
+  height: 50vh;
+  position: relative;
+  top: 10.4vh;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  padding: 32px;
+}
+.card_categoria {
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 130px;
+  text-decoration: none;
+  color: #fff;
+}
+
+.icone_seta {
+  color: var(--branco);
+  font-size: 1.8rem;
+  position: relative;
+  bottom: 1.5vh;
+}
+
+.card_categoria p {
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+
+
+/* FIM CATEGORIAS */
 /* ==================================================================== */

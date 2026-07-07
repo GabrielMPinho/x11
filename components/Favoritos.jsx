@@ -5,8 +5,8 @@ import conj2 from "../src/assets/images/conjunto2_fav.jpg";
 export default function Favoritos(){
     return (
         <section className="favoritos">
-            <div id="titulo">
-                <div id="escrito_fav">
+            <div className="titulo">
+                <div className="escrito_fav">
                     <p className="p_laranja">SELEÇÃO</p>
                     <h2>FAVORITOS DA COLEÇÃO</h2>
                 </div>

@@ -2,7 +2,7 @@ import imagem from "../src/assets/images/imagem_lancamento.jpg"
 
 export default function Lancamento(){
     return (
-        <section className="lancamento">
+        <section className="lancamento_desconto">
             <div id="container_escrito">
                 <div id="texto">
                     <p className="p_laranja">LANÇAMENTO ESPECIAL</p>
