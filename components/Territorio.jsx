@@ -2,7 +2,7 @@ const cards = [
     {imagem: "../src/assets/images/cat-aventura.jpg", subtitulo: "EXPLORE SEM LIMITES", titulo: "AVENTURA"},
     {imagem: "../src/assets/images/cat-sport.jpg", subtitulo: "VELOCIDADE NA PISTA", titulo: "SPORT"},
     {imagem: "../src/assets/images/cat-urbano.jpg", subtitulo: "ESTILO NA CIDADE", titulo: "URBANO"},
-    {imagem: "../src/assets/images/colecao-hero.jpg", subtitulo: "SEGURANÇA NA ESTRADA", titulo: "TOURING"}
+    {imagem: "../src/assets/images/colecao-hero.jpg", subtitulo: "SEGURANÇA NA ESTRADA", titulo: "AVENTURA"}
 ]
 
 
