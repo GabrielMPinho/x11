@@ -14,7 +14,7 @@ export default function Territorio(){
                     <p className="p_laranja">SEU TERRITÓRIO</p>
                     <h2>ONDE VOCÊ PILOTA?</h2>
                 </div>
-                </div>
+            </div>
                 <div id="container_cards">
                     {
                         cards.map((card, index) => (

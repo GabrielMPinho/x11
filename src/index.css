@@ -46,6 +46,7 @@ header > img{
 /* FIM HEADER */
 /* ==================================================================== */
 
+
 /* ==================================================================== */
 /* HERO */
 
@@ -109,6 +110,7 @@ button{
 }
 /* FIM HERO */
 /* ==================================================================== */
+
 
 /* ==================================================================== */
 /* FAVORITOS */
@@ -188,6 +190,7 @@ button{
 /* FIM FAVORITO */
 /* ==================================================================== */
 
+
 /* ==================================================================== */
 /* LANÇAMENTO DESCONTO*/
 .lancamento_desconto{
@@ -257,6 +260,7 @@ button{
 /* FIM LANÇAMENTO DESCONTO*/
 /* ==================================================================== */
 
+
 /* ==================================================================== */
 /* CATEGORIAS */
 
@@ -317,6 +321,7 @@ button{
 
 /* FIM CATEGORIAS */
 /* ==================================================================== */
+
 
 /* ==================================================================== */
 /* LANÇAMENTO ESPECIAL */
@@ -503,8 +508,61 @@ button{
   margin: 0;
 }
 
-
-
-
 /* FIM DESTAQUES */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* HISTORIAS */
+.historias{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 88vh;
+  background-color: var(--background_escuro);
+
+}
+#container_historias{
+  height: auto;
+  width: 90vw;
+  margin-top: 11vh;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  /* margin-bottom: 7vh; */
+}
+.card_historia{
+  display: flex;
+  flex-direction: column;
+}
+
+.card_historia h3, .card_historia p{
+  color: var(--branco);
+}
+.card_historia p{
+  font-size: 0.9rem;
+  margin-bottom: 1.7vh;
+}
+.card_historia h3{
+  margin-bottom: 1vh;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.card_historia a{
+  color: var(--laranja);
+  text-decoration: none;
+  letter-spacing: 0.19rem;
+  margin-top: auto;
+}
+.card_historia img{
+  width: 29vw;
+  height: 40vh;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background-color: #e8e8e8;
+  margin-bottom: 3vh;
+}
+/* FIM HISTORIAS */
 /* ==================================================================== */
