@@ -8,6 +8,7 @@ import Lancamento_especial from "../components/Lancamento_especial";
 import Territorio from "../components/Territorio";
 import Destaques from "../components/Destaques";
 import Historias from "../components/Historias";
+import Banner from "../components/Banner";
 
 export default function App(){
     return (
@@ -22,6 +23,7 @@ export default function App(){
                 <Territorio />
                 <Destaques />
                 <Historias />
+                <Banner />
             </main>
         </>
     )

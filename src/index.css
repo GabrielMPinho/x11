@@ -566,3 +566,35 @@ button{
 }
 /* FIM HISTORIAS */
 /* ==================================================================== */
+/* ==================================================================== */
+/* BANNER */
+
+.banner{
+  min-height: 55vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background_cinza);
+  border-top: 1px solid rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+}
+#texto_banner{
+  /* border: 1px solid red; */
+  height: 30vh;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+}
+.banner h1{
+  color: var(--branco);
+  text-align: center;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+
+  font-size: 5rem;
+}
+/* FIM BANNER */
+/* ==================================================================== */
