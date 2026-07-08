@@ -379,9 +379,62 @@ button{
 
 
 }
-
-
-
-
 /* FIM LANÇAMENTO ESPECIAL */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* TERRITÓRIO */
+
+.territorio{
+  background-color: var(--background_escuro);
+  min-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#container_cards{
+  /* border: 1px solid red; */
+  height: auto;
+  width: 90vw;
+  margin-top: 11vh;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 7vh;
+}
+.card_territorio {
+    display: flex;
+    flex-direction: column;
+}
+
+.imagem_territorio {
+    width: 100%;
+    height: 76vh;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+
+
+.card_territorio h3 {
+    color: var(--branco);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* FIM TERRITÓRIO */
 /* ==================================================================== */
