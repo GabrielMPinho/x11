@@ -10,6 +10,8 @@ import Destaques from "../components/Destaques";
 import Historias from "../components/Historias";
 import Banner from "../components/Banner";
 
+import Footer from "../components/Footer";
+
 export default function App(){
     return (
         <>
@@ -25,6 +27,7 @@ export default function App(){
                 <Historias />
                 <Banner />
             </main>
+            <Footer />
         </>
     )
 }
