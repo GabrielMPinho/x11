@@ -6,6 +6,23 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
 ## Objetivo geral do projeto
 - **Manter 100% do visual já feito.** Nada da aparência atual em desktop pode
   mudar. Esta é a regra mais importante.
+- **Refinamento (2026-07-09):** só o **desktop full (> 1024px)** precisa ficar
+  intacto. Nos **demais viewports (≤ 1024px) há liberdade total** de layout —
+  desde que se preserve a **estética e o conteúdo** do site (mesmas cores,
+  tipografia, textos, imagens, botões com corte diagonal; **sem inventar
+  seções/componentes novos**) e se priorize uma **UI/UX agradável**.
+- **Design novo de mobile (2026-07-09):** o dono quer um **design NOVO para o
+  mobile** (não mais "desktop empilhado", e sim uma linguagem própria e coesa),
+  com os **demais viewports transicionando gradualmente** até o desktop. Mantendo
+  estética e conteúdo já presentes.
+- **Fronteira do desktop intocado = > 1280px (2026-07-09):** o desktop original
+  só "cabe" a partir de ~1360px e estoura entre ~1025–1280px. Por isso o design
+  responsivo novo passa a cobrir **até 1280px**, e o **desktop full intocado vale
+  acima de 1280px** (antes era 1024px). Regra de ouro do "não mudar o desktop"
+  agora se refere a **> 1280px**.
+- **Conferência visual:** sempre **validar nos 5 viewports** (390/768/1024/1280/
+  1440) por screenshot e **apagar os prints** depois (economia de espaço). Método
+  em `reference` da memória / CHANGELOG (Docker rootless + Playwright).
 - Deixar a página **o mais "automática" possível** e **tirar o tipo estático**:
   conteúdo data-driven, componentes reutilizáveis, sem repetição / hardcode.
 - **Movimento moderno com estética de moto**: animações, hover, micro-interações.
@@ -18,6 +35,15 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   aguardar o sinal verde do dono antes de commitar**.
 - Ao final de cada alteração, **resumir o que foi feito e por quê** para consulta
   futura de outras IAs, e **atualizar TODOS os documentos** afetados.
+- **O Opus nunca edita o código diretamente** (decisão do dono, 2026-07-09):
+  sempre **apaga o arquivo atual** de `sonnet/fazer/` e escreve um novo com
+  **contexto completo + prompt de ação**, e **sempre entrega ao dono um prompt
+  curto de arranque** para colar no Sonnet. Ver `opus/README.md`.
+- **O Opus define o design explicitamente, mas NÃO escreve código** (decisão do
+  dono, 2026-07-09): a instrução diz **exatamente o que fazer e como deve ficar**
+  (elementos, comportamento, valores-alvo, porquê) em forma de diretiva — **nunca**
+  blocos de CSS/código prontos. O Opus **decide todo o design**; o **Sonnet
+  escreve todo o código**.
 
 ## Decisões técnicas travadas (via perguntas ao dono)
 - **Animações:** usar **Framer Motion** (pacote `motion`).

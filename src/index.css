@@ -61,11 +61,12 @@ header > img{
 .hero{
   position: relative;
   z-index: -1;
-  background-image: url('../src/assets/images/hero-home.jpg');
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
   min-height: 88vh;
-  
+  /* Fase 3: o background-image foi para a camada .hero_bg (mesmo asset,
+     mesmo size/position) para permitir o parallax em transform. Resultado
+     visual em repouso é idêntico; overflow:hidden contém o leve
+     deslocamento do parallax dentro dos limites da seção. */
 }
 .p_laranja{
   color: var(--laranja);
@@ -78,7 +79,7 @@ header > img{
 }
 .hero > #escrito > h1{
   color: #ffffff;
-  font-size: 4rem;
+  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
 }
 #botoes{
   /* border: 2px solid red; */
@@ -138,7 +139,7 @@ button{
 }
 .titulo > .escrito_fav > h2{
   color: #ffffff;
-  font-size: 2.6rem;
+  font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem);
 }
   /* IMAGENS */
 
@@ -181,6 +182,7 @@ button{
   letter-spacing: 0.1em;
   font-size: 0.85rem;
   padding-bottom: 8vh;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card img {
   width: 26vw;
@@ -230,7 +232,7 @@ button{
   color: black;
 }
 #titulo_principal{
-  font-size: 4rem;
+  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
   padding-bottom: 2vh;
 }
 
@@ -280,7 +282,7 @@ button{
 }
 .titulo > .escrito_cat > h2{
   color: #ffffff;
-  font-size: 2.6rem;
+  font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem);
 }
 #conteiner_categorias{
   /* border: 1px solid white; */
@@ -371,8 +373,8 @@ button{
 #container_texto h1, p, button{
   color: var(--branco);
 }
-#container_texto h1{ 
-  font-size: 4rem;
+#container_texto h1{
+  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
 }
 
 #container_texto button{
@@ -555,6 +557,7 @@ button{
   text-decoration: none;
   letter-spacing: 0.19rem;
   margin-top: auto;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card_historia img{
   width: 29vw;
@@ -585,7 +588,7 @@ button{
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
 }
 .banner h1{
   color: var(--branco);
@@ -593,8 +596,8 @@ button{
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: 0.5px;
-  
-  font-size: 5rem;
+
+  font-size: clamp(2.2rem, 6vw + 1.16rem, 5rem);
 }
 /* FIM BANNER */
 /* ==================================================================== */
@@ -675,4 +678,318 @@ button{
 
 
 /* FIM FOOTER */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* FASE 3 — ANIMAÇÕES: elementos/estilos novos (valem em toda largura) */
+/* Só opacity/transform são animados (ver src/lib/motion.js, src/lib/
+   Revela.jsx e os componentes); as regras abaixo são estruturais
+   (position/overflow/display) e usam seletores NOVOS — não mudam o valor
+   de nenhuma regra existente, exceto onde comentado. */
+
+/* Header flutuante (fixo) — só existe fora do estado "completo" (JS
+   controla via classe). Em "completo" (Hero/topo) o header segue em fluxo
+   normal, exatamente como o desktop original; o position:fixed só entra
+   quando o usuário já rolou passado o Hero, então não desloca nada da
+   renderização de repouso. */
+.header_flutuante{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+}
+/* Versão compacta do header (aparece ao rolar pra cima, abaixo do Hero) —
+   menor, logo pequeno, nav enxuta. Especificidade de classe vence a regra
+   base `header{height:12vh}` independente de breakpoint. */
+.header_compacto{
+  height: 64px;
+  padding: 0 20px;
+  background-color: black;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.header_compacto > img{
+  width: 80px;
+  height: auto;
+}
+.header_compacto > nav{
+  margin-left: 0;
+  gap: 1.25rem;
+}
+.header_compacto > nav > a{
+  font-size: 0.8rem;
+}
+
+/* Botão cortado com preenchimento animado no hover (Hero, Lançamento
+   desconto/especial) — ver components/BotaoCortado.jsx. O clip-path do
+   botão (regra base `button`) recorta a camada de preenchimento também. */
+.botao_cortado{
+  position: relative;
+  overflow: hidden;
+}
+.preenchimento_botao{
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.14);
+  transform-origin: left;
+  pointer-events: none;
+}
+.texto_botao{
+  position: relative;
+  z-index: 1;
+}
+
+/* Moldura com overflow:hidden pro zoom da imagem no hover não vazar do card
+   (Favoritos, Território, Histórias, Destaques). Hover em CSS puro (não
+   Framer) — ver regras por seção mais abaixo. `display:block` + `line-
+   height:0` na imagem fecham o espaço fantasma que `<img>` (inline por
+   padrão) deixa embaixo dentro de um contêiner de bloco — sem isso, cada
+   card ficava ~4px mais alto que o original (achado na conferência visual). */
+.zoom_imagem{
+  display: block;
+  overflow: hidden;
+  line-height: 0;
+}
+.zoom_imagem img{
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.icone_seta{
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Hover só em dispositivos com ponteiro de verdade (evita "hover preso"
+   depois de tocar em telas sensíveis ao toque). Zoom na imagem + CTA/seta
+   deslizando, disparados pelo hover do CARD inteiro (não só da imagem/CTA). */
+@media (hover: hover) and (pointer: fine){
+  .card:hover .zoom_imagem img,
+  .card_territorio:hover .zoom_imagem img,
+  .card_historia:hover .zoom_imagem img,
+  .card_produto:hover .zoom_imagem img{
+    transform: scale(1.03);
+  }
+  .card:hover > a,
+  .card_historia:hover > a{
+    transform: translateX(6px);
+  }
+  .card_categoria:hover .icone_seta{
+    transform: translateX(6px);
+  }
+}
+
+/* Camada de fundo do Hero (parallax) — assume o background-image que antes
+   estava direto em `.hero`, agora numa camada própria atrás do conteúdo
+   pra poder se mover em `transform` independente do scroll da página. */
+.hero_bg{
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('../src/assets/images/hero-home.jpg');
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+/* FIM FASE 3 — ANIMAÇÕES (base) */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* ==================================================================== */
+/* RESPONSIVIDADE (FASE 2) — NOVO SISTEMA DE DESIGN MOBILE */
+/* Desktop > 1280px = INTOCADO. Todo o design abaixo vive em @media
+   (max-width) ou em elementos novos ocultos por padrão. O novo sistema
+   (cabeçalho com barra laranja + tokens de espaçamento) vale de 1280px
+   para baixo; ao cruzar 1280px a página volta a ser o desktop atual.
+   Breakpoint superior subido de 1024→1280px (Fase 2, parte A): entre
+   ~1025 e ~1280px o desktop original só "cabe" a partir de ~1360px
+   (logo em tamanho natural + nav larga estouravam) — a faixa responsiva
+   foi estendida até 1280px para cobrir esse intervalo sem overflow. */
+
+/* ---------- Elementos novos do menu mobile (ocultos por padrão) ---------- */
+#botao_hamburguer{
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px; height: 20px;
+  padding: 0; margin: 0;
+  background: transparent; border: none; outline: none;
+  clip-path: none; cursor: pointer; z-index: 20;
+}
+#botao_hamburguer span{ display: block; width: 100%; height: 2px; background-color: var(--branco); }
+.overlay_menu{ display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.6); z-index: 90; }
+#drawer_menu{
+  display: none; position: fixed; top: 0; right: 0;
+  height: 100vh; width: min(78vw, 320px);
+  background-color: var(--background_escuro);
+  z-index: 100; flex-direction: column; gap: 2rem; padding: 96px 32px 32px;
+}
+#drawer_menu a{ color: var(--branco); text-decoration: none; font-size: 1.1rem; letter-spacing: 0.05em; }
+#drawer_menu a:hover{ color: var(--laranja); }
+
+
+/* ==================================================================== */
+/* ---- TABLET + base do novo design (<= 1280px) ---- */
+@media (max-width: 1280px){
+  body{ overflow-x: hidden; }
+
+  /* HEADER — nav horizontal ainda ativa (hambúrguer só <=768px), bem mais
+     enxuta; LARGURA do logo restrita de forma explícita (não só a altura —
+     a imagem original é 308×130px; height:36px sozinho não impedia o
+     navegador de manter a largura próxima do natural em algumas condições
+     de medição) e sem os offsets de desktop (top/left). */
+  header > nav{ margin-left: 2vw; gap: 1.25rem; }
+  header > nav > a{ font-size: 0.85rem; }
+  header > img{ position: static; top: auto; left: auto; width: 110px; height: auto; }
+
+  /* ---- CABEÇALHO DE SEÇÃO: padrão único (esquerda + barra laranja) ---- */
+  .titulo{
+    position: static; top: auto;
+    justify-content: flex-start;
+    padding: 0 20px;
+    margin-bottom: 28px;
+  }
+  .escrito_fav, .escrito_cat{ align-items: flex-start; text-align: left; }
+  .escrito_fav h2::after,
+  .escrito_cat h2::after,
+  #titulo_destaque h3::after{
+    content: ""; display: block;
+    width: 44px; height: 3px;
+    background: var(--laranja);
+    margin-top: 12px;
+  }
+
+  /* ---- HERO: sai do posicionamento absoluto já no tablet ---- */
+  .hero{
+    min-height: 78vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 96px 20px 56px;
+  }
+  #escrito{ position: static; top: auto; left: auto; width: 100%; }
+  #botoes{ position: static; top: auto; left: auto; width: auto; }
+
+  /* CTAs de Lançamento desconto/especial: largura por conteúdo, texto inteiro */
+  #texto button,
+  #container_texto button{
+    width: auto;
+    height: 48px;
+    padding: 0 30px 0 22px;
+    white-space: nowrap;
+  }
+
+  /* ---- LANÇAMENTO DESCONTO: empilha texto + imagem ---- */
+  .lancamento_desconto{ height: auto; min-height: 0; grid-template-columns: 1fr; grid-template-rows: auto; }
+  #container_escrito{ grid-column: 1 / -1; grid-row: auto; padding: 64px 20px; }
+  #texto{ width: 100%; left: 0; top: 0; }
+  #container_imagem{ grid-column: 1 / -1; grid-column-start: auto; grid-row: auto; aspect-ratio: 4/3; height: auto; }
+
+  /* ---- FAVORITOS: 3 colunas (tablet) ---- */
+  .favoritos{ min-height: 0; padding: 64px 0; }
+  #imagens{ padding: 0 20px; gap: 20px; }
+  .card{ width: auto; flex: 1 1 0; min-width: 0; left: 0; }
+  .card img{ width: 100%; height: auto; aspect-ratio: 4/5; }
+  .card a{ padding-bottom: 0; }
+
+  /* ---- CATEGORIAS: 3 colunas (tablet) ---- */
+  .categorias{ min-height: 0; padding: 64px 0; }
+  #conteiner_categorias{
+    grid-template-columns: repeat(3, 1fr);
+    position: static; top: auto; width: auto; height: auto;
+    margin: 0 20px; padding: 0; gap: 12px;
+  }
+
+  /* ---- LANÇAMENTO ESPECIAL: sai do offset em vh ---- */
+  .lancamento_especial{ height: auto; min-height: 60vh; padding: 64px 0; }
+  #container_texto{ width: auto; left: 0; top: 0; padding: 0 20px; }
+
+  /* ---- TERRITÓRIO: 2 colunas (tablet) ---- */
+  .territorio{ min-height: 0; padding: 64px 0; }
+  #container_cards{ grid-template-columns: repeat(2, 1fr); width: auto; margin: 0 20px; gap: 20px; }
+  .imagem_territorio{ height: auto; aspect-ratio: 4/5; }
+
+  /* ---- DESTAQUES: 3 colunas em grade (tablet) ---- */
+  .destaques{ display: block; min-height: 0; padding: 64px 0; }
+  #conteudo_destaques{ width: auto; height: auto; margin: 0 20px; }
+  #escrito_destaques{ height: auto; margin-bottom: 28px; }
+  #produtos_destaques{ grid-template-columns: repeat(3, 1fr); height: auto; }
+
+  /* ---- HISTÓRIAS: 3 colunas (tablet) ---- */
+  .historias{ min-height: 0; padding: 64px 0; }
+  #container_historias{ grid-template-columns: repeat(3, 1fr); width: auto; margin: 0 20px; gap: 20px; }
+  .card_historia img{ width: 100%; height: auto; aspect-ratio: 4/5; }
+
+  /* ---- BANNER ---- */
+  .banner{ min-height: 0; padding: 64px 20px; }
+  #texto_banner{ height: auto; }
+
+  /* ---- FOOTER: 3 colunas fluidas ---- */
+  #conteudo_footer{ grid-template-columns: repeat(3, 1fr); gap: 4vw; width: auto; margin: 0 20px; height: auto; }
+  #fim_footer{ height: 0; }
+}
+
+
+/* ==================================================================== */
+/* ---- MOBILE (<= 768px) ---- */
+@media (max-width: 768px){
+  /* HEADER — hambúrguer assume */
+  header{ justify-content: space-between; padding: 0 20px; height: 64px; }
+  header > img{ position: static; top: auto; left: auto; width: 90px; height: auto; }
+  header > nav{ display: none; }
+  #botao_hamburguer{ display: flex; }
+  .overlay_menu{ display: block; }
+  #drawer_menu{ display: flex; }
+
+  /* HERO — botões empilham com respiro */
+  .hero{ min-height: 100vh; padding: 96px 20px 56px; }
+  #botoes{ display: flex; flex-direction: column; gap: 14px; margin-top: 28px; }
+  #botoes button{ margin: 0; width: 100%; height: 54px; }
+
+  /* FAVORITOS — 1 coluna */
+  #imagens{ flex-direction: column; gap: 40px; }
+  .card{ flex: none; width: 100%; }
+
+  /* CATEGORIAS — 2 colunas */
+  #conteiner_categorias{ grid-template-columns: repeat(2, 1fr); }
+
+  /* TERRITÓRIO — 1 coluna */
+  #container_cards{ grid-template-columns: 1fr; }
+  .imagem_territorio{ aspect-ratio: 16/11; }
+
+  /* DESTAQUES — vitrine horizontal com snap */
+  #produtos_destaques{
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 62vw;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 16px;
+  }
+  .card_produto{ scroll-snap-align: start; }
+
+  /* HISTÓRIAS — 1 coluna */
+  #container_historias{ grid-template-columns: 1fr; }
+  .card_historia img{ aspect-ratio: 16/10; }
+
+  /* FOOTER — 1 coluna, rodapé empilha e centraliza */
+  #conteudo_footer{ grid-template-columns: 1fr; gap: 32px; }
+  #rodape_footer{ flex-direction: column; height: auto; gap: 16px; text-align: center; padding: 24px 20px; }
+  #rodape_footer p{ margin: 0; }
+  #logo_footer{ width: 140px; height: auto; }
+  #logo_footer img{ max-width: 100%; height: auto; }
+  #fim_footer{ height: 0; }
+}
+
+
+/* ==================================================================== */
+/* ---- MOBILE PEQUENO (<= 480px) ---- */
+@media (max-width: 480px){
+  /* CATEGORIAS — respiro menor */
+  #conteiner_categorias{ gap: 10px; }
+  .card_categoria{ height: 120px; padding: 16px; }
+
+  /* DESTAQUES — card um pouco mais largo */
+  #produtos_destaques{ grid-auto-columns: 66vw; }
+}
+/* FIM RESPONSIVIDADE */
 /* ==================================================================== */

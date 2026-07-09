@@ -1,3 +1,4 @@
+import { MotionConfig } from "motion/react";
 import Header from "../components/Header";
 
 import Hero_Home from "../components/Hero_Home";
@@ -14,7 +15,10 @@ import Footer from "../components/Footer";
 
 export default function App(){
     return (
-        <>
+        // reducedMotion="user" respeita o prefers-reduced-motion do SO para
+        // todo componente motion da árvore (reveal, hover, header, parallax)
+        // sem precisar repetir a checagem em cada componente.
+        <MotionConfig reducedMotion="user">
             <Header />
             <main>
                 <Hero_Home />
@@ -28,6 +32,6 @@ export default function App(){
                 <Banner />
             </main>
             <Footer />
-        </>
+        </MotionConfig>
     )
 }

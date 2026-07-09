@@ -1,10 +1,11 @@
 import logo from "../src/assets/images/logo.png";
 import { colunasFooter } from "../src/data/footer";
+import { Revela } from "../src/lib/Revela";
 
 export default function Footer(){
     return(
         <footer className="footer">
-            <div id="conteudo_footer">
+            <Revela as="div" id="conteudo_footer" distancia={40}>
                 {colunasFooter.map((coluna, index) => (
                     <div className="coluna_footer" key={index}>
                         <p className="p_laranja">{coluna.titulo}</p>
@@ -13,13 +14,13 @@ export default function Footer(){
                         ))}
                     </div>
                 ))}
-            </div>
-            <div id="rodape_footer">
+            </Revela>
+            <Revela as="div" id="rodape_footer" distancia={24}>
                 <p>Copyright © 2026 X11. Todos os direitos reservados.</p>
                 <div id="logo_footer">
                     <img src={logo} alt="logo X11" />
                 </div>
-            </div>
+            </Revela>
             <div id="fim_footer"></div>
         </footer>
     )

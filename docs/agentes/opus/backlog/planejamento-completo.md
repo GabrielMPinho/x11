@@ -19,8 +19,8 @@ Responsividade (2) vem antes das animações (3): estabilizar antes de animar.
 | Fase | Descrição | Status |
 |---|---|---|
 | 1 | Fundação + Data-driven | ✅ Concluída (2026-07-09) |
-| 2 | Responsividade + Mobile (drawer lateral) | ⏳ Ativa |
-| 3 | Animações Framer Motion (reveal bidirecional, hover) | ⬜ Pendente |
+| 2 | Responsividade + Mobile (drawer lateral) | ⏳ Em finalização — fix de breakpoint (1024→1280px) + header, junto com o início da Fase 3 |
+| 3 | Animações Framer Motion (reveal bidirecional, hover) | ⏳ Ativa — **1ª rodada reprovada** (imagens invisíveis, desktop alterado). Refazendo: reveal ligado ao scroll + header 3 estados + banner estático |
 
 ---
 
@@ -33,8 +33,15 @@ Responsividade (2) vem antes das animações (3): estabilizar antes de animar.
 
 ---
 
-## Fase 2 — Responsividade + Mobile ⏳ ATIVA
-> Instrução detalhada (cópia ativa em `docs/agentes/sonnet/fazer/fase-2-responsividade.md`).
+## Fase 2 — Responsividade + Mobile ⏳ ATIVA (rodada de correção)
+> **Situação (2026-07-09):** o esqueleto responsivo foi implementado e o
+> **desktop está preservado**, mas o dono conferiu no navegador e reprovou o
+> **acabamento visual do mobile** (títulos cortados, botões com texto cortado,
+> imagens grandes demais, espaçamento ruim). Instrução de correção ativa em
+> `docs/agentes/sonnet/fazer/fase-2-correcao-mobile.md`. Causa-raiz:
+> micro-posicionamentos em `vh`/`vw` do desktop que ficaram valendo no mobile.
+> A fase só é dada como concluída após o dono aprovar o visual das telas
+> pequenas.
 
 ### Objetivo
 Página **totalmente responsiva** (do mobile ao desktop grande), **sem alterar em
