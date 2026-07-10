@@ -1,0 +1,23 @@
+/* ====================================================================
+   TOKENS DE PADRONIZAÇÃO — cores e tipografia comuns a todas as páginas.
+   Importado no topo de base.css (as regras abaixo dependem destas
+   variáveis). Ponto único para ajustar a identidade visual do projeto.
+   ==================================================================== */
+
+:root{
+  /* Cores da marca */
+  --laranja: #FF5000;
+  --branco: #ffffff;
+  --background_escuro: #181614;
+  --background_claro: #E5E5E5;
+  --background_cinza: #22211f;
+
+  /* Espaçamento: hoje os valores ainda são aplicados direto nas regras
+     (vw/rem/px). Tokens de espaçamento (ex.: --espaco-1, --espaco-2…)
+     podem ser adicionados aqui numa próxima passada, sem mudar o visual. */
+}
+
+/* Tipografia base */
+body {
+  font-family: "Roboto", sans-serif;
+}

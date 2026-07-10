@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { RevelaComProgresso } from "../src/lib/Revela";
-import { useEstiloRevela } from "../src/lib/useEstiloRevela";
-import { useProgressoSecao } from "../src/lib/useProgressoSecao";
-import BotaoCortado from "./BotaoCortado";
+import { RevelaComProgresso } from "@/padrao/lib/Revela";
+import { useEstiloRevela } from "@/padrao/lib/useEstiloRevela";
+import { useProgressoSecao } from "@/padrao/lib/useProgressoSecao";
+import BotaoCortado from "@/padrao/componentes/BotaoCortado";
 
 export default function Lancamento_especial(){
     const ref = useRef(null);

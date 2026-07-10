@@ -1,4 +1,4 @@
-import placeholder from "../assets/images/placeholder-acessorio.svg";
+import placeholder from "@/padrao/assets/images/placeholder-acessorio.svg";
 
 export const destaques = [
   { imagem: placeholder, titulo: "CAPACETE REVO JAGUAR", preco: 599.0 },

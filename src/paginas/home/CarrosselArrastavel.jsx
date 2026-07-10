@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { destaques } from "../src/data/destaques";
+import { destaques } from "@/paginas/home/dados/destaques";
 
 // Modo "arrastavel" do Destaques (2026-07-10) — touch/tablet/ponteiro
 // grosso, sem reduced-motion. Substitui o antigo fallback de swipe nativo

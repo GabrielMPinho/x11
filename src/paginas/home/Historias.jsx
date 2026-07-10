@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { historias } from "../src/data/historias";
-import { RevelaComProgresso } from "../src/lib/Revela";
-import { useProgressoSecao } from "../src/lib/useProgressoSecao";
-import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
+import { historias } from "@/paginas/home/dados/historias";
+import { RevelaComProgresso } from "@/padrao/lib/Revela";
+import { useProgressoSecao } from "@/padrao/lib/useProgressoSecao";
+import { atrasoCard, LARGURA_ENTRADA_CARD } from "@/padrao/lib/useEstiloRevela";
 
 export default function Historias(){
     const ref = useRef(null);

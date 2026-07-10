@@ -5,6 +5,41 @@
 
 ---
 
+## 2026-07-10 13:47 — Reestruturação multi-página: pasta por página + pasta de padronização (feito pelo Opus, a pedido do dono)
+
+**O que foi feito e por quê** (o dono pediu explicitamente que o **Opus** fizesse
+a reestruturação — exceção pontual ao fluxo Opus-só-planeja — para o projeto
+"receber novas páginas"):
+- **`src/padrao/`** (padronização — tudo comum a todas as páginas): `componentes/`
+  (Header, Footer, BotaoCortado), `lib/` (Revela, useProgressoSecao,
+  useEstiloRevela, motion), `dados/` (navegacao, footer), `estilos/`
+  (**tokens.css** = cores `:root` + fonte; **base.css** = @import tokens + reset +
+  Lenis + todas as regras), `assets/images/`.
+- **`src/paginas/`** (uma pasta por página): **`home/`** (a landing atual — `Home.jsx`
+  com o `<main>` das 9 seções + os componentes de seção + `dados/`); **scaffolds**
+  de `equipamento/` (detalhe do produto), `homem/`, `mulher/`,
+  `guia-de-equipamento/`, `onde-encontrar/`, `institucional/` (stub por enquanto,
+  sem conteúdo/rota).
+- **`App.jsx` virou o SHELL** compartilhado (Lenis + MotionConfig + Header +
+  `<Home/>` + Footer) — Header/Footer saíram pra fora da página; **DOM final
+  idêntico**.
+- **Alias `@` → `src/`** (`vite.config.ts` + `tsconfig.app.json` `paths`); todos os
+  imports migraram pra `@/padrao/...` / `@/paginas/...`. `components/` (raiz),
+  `src/lib/`, `src/data/`, `src/assets/`, `src/index.css` **deixaram de existir**
+  (movidos via `git mv`, histórico preservado).
+
+**Invariante respeitado — visual intocado:** o CSS foi apenas **relocado**
+(index.css → base.css; `:root`/fonte extraídos pra tokens.css; `url()` dos assets
+corrigidos) sem mudar valores. Conferido no build: **9 seções, 22 imagens 0
+quebradas, token --laranja resolvendo, hero_bg ok, 0 erros de console**, e
+screenshot do desktop **idêntico** ao anterior. `npx vite build` ✅ ·
+`npm run lint` ✅.
+
+**Ainda não há roteamento** — só a reestruturação de pastas (era o pedido). As
+páginas novas entram cada uma na sua pasta; o roteamento entra no shell depois.
+
+---
+
 ## 2026-07-10 12:20 — Leva de refinos fechada: dono confirmou o arraste no touch; aguardando commit
 
 - **Dono confirmou:** o **carrossel arrastável funciona no touch** (o `dragstart`

@@ -1,6 +1,6 @@
-import logo from "../src/assets/images/logo.png";
-import { colunasFooter } from "../src/data/footer";
-import { Revela } from "../src/lib/Revela";
+import logo from "@/padrao/assets/images/logo.png";
+import { colunasFooter } from "@/padrao/dados/footer";
+import { Revela } from "@/padrao/lib/Revela";
 
 export default function Footer(){
     return(

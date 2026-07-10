@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { favoritos } from "../src/data/favoritos";
-import { RevelaComProgresso } from "../src/lib/Revela";
-import { useProgressoSecao } from "../src/lib/useProgressoSecao";
-import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
+import { favoritos } from "@/paginas/home/dados/favoritos";
+import { RevelaComProgresso } from "@/padrao/lib/Revela";
+import { useProgressoSecao } from "@/padrao/lib/useProgressoSecao";
+import { atrasoCard, LARGURA_ENTRADA_CARD } from "@/padrao/lib/useEstiloRevela";
 
 export default function Favoritos(){
     const ref = useRef(null);

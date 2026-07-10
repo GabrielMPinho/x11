@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { transicaoHover } from "../src/lib/motion";
+import { transicaoHover } from "@/padrao/lib/motion";
 
 // Botão com corte diagonal (clip-path) da marca. Reaproveitado no Hero,
 // Lançamento desconto e Lançamento especial: no hover, uma camada de cor

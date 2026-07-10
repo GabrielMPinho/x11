@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useTransform } from "motion/react";
-import { destaques } from "../src/data/destaques";
+import { destaques } from "@/paginas/home/dados/destaques";
 
 // Razão scroll↔movimento (polimento 2026-07-10): a altura fixa de 300vh
 // dava ~4× o deslocamento real do trilho (medido ~446px em 1440px contra

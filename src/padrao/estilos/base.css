@@ -1,17 +1,11 @@
+/* Tokens (cores + tipografia) vêm primeiro — regras abaixo dependem das
+   variáveis de :root. Ver src/padrao/estilos/tokens.css. */
+@import "./tokens.css";
+
 *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-:root{
-  --laranja: #FF5000;
-  --branco: #ffffff;
-  --background_escuro: #181614;
-  --background_claro: #E5E5E5;
-  --background_cinza: #22211f;
-}
-body {
-  font-family: "Roboto", sans-serif;
 }
 
 /* ==================================================================== */
@@ -393,7 +387,7 @@ button{
 .lancamento_especial{
   min-height: 75vh;
   height: 80vh;
-  background-image: url("../src/assets/images/cat-aventura.jpg");
+  background-image: url("../assets/images/cat-aventura.jpg");
   background-size: cover;
   object-position: center; 
   display: flex;
@@ -966,7 +960,7 @@ button{
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-image: url('../src/assets/images/hero-home.jpg');
+  background-image: url('../assets/images/hero-home.jpg');
   background-size: cover;
   background-position: center;
   pointer-events: none;

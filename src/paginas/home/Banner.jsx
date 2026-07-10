@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "motion/react";
-import { EASE } from "../src/lib/motion";
+import { EASE } from "@/padrao/lib/motion";
 
 // Frase estática (sem marquee) — só a ENTRADA muda: cada palavra nasce
 // borrada (filter:blur) e sem opacidade, e "foca" em sequência (stagger),

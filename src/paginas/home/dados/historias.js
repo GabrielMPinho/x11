@@ -1,6 +1,6 @@
-import story1 from "../assets/images/story1.jpg";
-import story2 from "../assets/images/story2.jpg";
-import story3 from "../assets/images/story3.jpg";
+import story1 from "@/padrao/assets/images/story1.jpg";
+import story2 from "@/padrao/assets/images/story2.jpg";
+import story3 from "@/padrao/assets/images/story3.jpg";
 
 export const historias = [
   {

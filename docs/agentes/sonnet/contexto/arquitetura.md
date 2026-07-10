@@ -1,83 +1,77 @@
 # Arquitetura
 
-## Estrutura de pastas
+## Estrutura de pastas (multi-página, 2026-07-10)
+O projeto foi reorganizado para **receber novas páginas**: cada página tem sua
+pasta em `src/paginas/`, e **tudo que é comum a todas** (padronização) vive em
+`src/padrao/`.
+
 ```
 x11/
-├── index.html              # entry HTML; carrega /src/index.jsx e a fonte (Google Fonts)
-├── components/             # componentes de seção (um por bloco da página)
-│   ├── Header.jsx
-│   ├── Hero_Home.jsx
-│   ├── Favoritos.jsx
-│   ├── Lancamento_desconto.jsx
-│   ├── Categorias.jsx
-│   ├── Lancamento_especial.jsx
-│   ├── Territorio.jsx
-│   ├── Destaques.jsx
-│   ├── Historias.jsx
-│   ├── Banner.jsx
-│   └── Footer.jsx
+├── index.html                  # entry HTML; carrega /src/index.jsx, a fonte (Google Fonts)
+│                               # e o CSS base (src/padrao/estilos/base.css)
 ├── src/
-│   ├── index.jsx           # cria o root React e renderiza <App/>
-│   ├── App.jsx             # compõe todas as seções na ordem da página
-│   ├── index.css           # TODO o estilo (arquivo único)
-│   ├── data/               # conteúdo data-driven (1 arquivo por seção)
-│   │   ├── navegacao.js
-│   │   ├── favoritos.js
-│   │   ├── categorias.js
-│   │   ├── destaques.js
-│   │   ├── territorio.js
-│   │   ├── historias.js
-│   │   └── footer.js
-│   └── assets/images/      # todas as imagens (.jpg, .png, .svg)
-├── docs/
-│   └── agentes/            # documentação dos agentes (ver estrutura abaixo)
+│   ├── index.jsx               # cria o root React e renderiza <App/>
+│   ├── App.jsx                 # SHELL compartilhado: Lenis + MotionConfig + Header + <página> + Footer
+│   │
+│   ├── padrao/                 # PADRONIZAÇÃO — comum a TODAS as páginas
+│   │   ├── componentes/        # Header.jsx, Footer.jsx, BotaoCortado.jsx
+│   │   ├── lib/                # Revela.jsx, useProgressoSecao.js, useEstiloRevela.js, motion.js
+│   │   ├── dados/              # navegacao.js, footer.js (dados compartilhados)
+│   │   ├── estilos/
+│   │   │   ├── tokens.css      # CORES (:root) + tipografia base (fonte)
+│   │   │   └── base.css        # @import tokens + reset + Lenis + TODAS as regras
+│   │   └── assets/images/      # todas as imagens (.jpg, .png, .svg)
+│   │
+│   └── paginas/                # uma pasta por PÁGINA
+│       ├── home/               # a landing atual (única implementada)
+│       │   ├── Home.jsx        # <main> com as 9 seções
+│       │   ├── *.jsx           # seções: Hero_Home, Favoritos, Lancamento_desconto,
+│       │   │                   #   Categorias, Lancamento_especial, Territorio,
+│       │   │                   #   Destaques, CarrosselDestaques, CarrosselArrastavel,
+│       │   │                   #   Historias, Banner
+│       │   └── dados/          # favoritos, categorias, territorio, historias, destaques
+│       ├── equipamento/        # detalhe do produto (ao clicar num produto) — scaffold
+│       ├── homem/  mulher/  guia-de-equipamento/  onde-encontrar/  institucional/
+│       │                       # páginas da navegação — scaffolds (stub por enquanto)
+│
+├── docs/agentes/               # documentação dos agentes
 ├── package.json
-└── vite.config.ts
+├── tsconfig.app.json           # paths: { "@/*": ["./src/*"] }
+└── vite.config.ts              # alias "@" → src/
 ```
 
-### Estrutura de `docs/agentes/`
-```
-docs/agentes/
-├── opus/                   # agente PLANEJADOR (Opus)
-│   ├── README.md           # papel do Opus e fluxo de trabalho
-│   ├── instrucoes-do-dono.md
-│   ├── roadmap.md          # fases e status
-│   └── backlog/            # prompts de fases futuras (aguardando a vez)
-├── sonnet/                 # agente EXECUTOR de código (Sonnet)
-│   ├── README.md           # como o executor opera
-│   ├── contexto/           # tudo que o executor deve SABER
-│   └── fazer/              # UMA única instrução por vez (o que fazer agora)
-└── alterações/
-    └── CHANGELOG.md        # histórico (entradas novas no topo)
-```
-
-> Observação: `components/` está na RAIZ, não em `src/`. Por isso os imports
-> dentro dos componentes usam `../src/...` para alcançar assets e dados.
+### Alias de import `@` → `src/`
+Imports usam **`@/...`** (absoluto a partir de `src/`), configurado em
+`vite.config.ts` (`resolve.alias`) e `tsconfig.app.json` (`paths`). Ex.:
+`import Header from "@/padrao/componentes/Header"`,
+`import { favoritos } from "@/paginas/home/dados/favoritos"`,
+`import logo from "@/padrao/assets/images/logo.png"`. Vantagem: **independe de
+profundidade** — mover/criar páginas não quebra caminhos. Imports de irmãos na
+mesma pasta podem ser relativos (`./Favoritos`).
 
 ## Fluxo de renderização
-`index.html` → `src/index.jsx` (createRoot) → `src/App.jsx` → seções.
+`index.html` → `src/index.jsx` (createRoot) → `src/App.jsx` (shell) → `<Home/>`.
 
-### Smooth scroll global — Lenis (Fase 5, 2026-07-10)
-`App.jsx` envolve toda a árvore (`<Header/>`+`<main>`+`<Footer/>`) num
-`<ReactLenis root>` (pacote **`lenis`**, único novo em `package.json`) —
-suaviza o scroll da janela **sem** transformar/wrappear o DOM num container
-(`root:true` = instância global no `window`, nenhum `<div>` extra é
-inserido), por isso `position:sticky`/`fixed` (header minimalista, drawer
-mobile, carrossel pinado do Destaques) continuam funcionando sem nenhuma
-adaptação. Um componente pequeno dentro do provider
-(`SincroniaLenisFramer`, no próprio `App.jsx`) sincroniza o rAF do Lenis com
-o frameloop do **Framer Motion** (via `useAnimationFrame` de `motion/react`)
-— crítico pro reveal (`Revela.jsx`) e o carrossel (`CarrosselDestaques.jsx`)
-não ficarem 1 frame atrasados em relação ao smooth scroll, já que ambos leem
-a posição de scroll a cada frame via `useScroll`. Com
-`prefers-reduced-motion`, o Lenis **nem inicializa** — a árvore renderiza
-direto, sem o provider, scroll 100% nativo. Detalhes completos (config,
-por quê `autoRaf:false`, CSS mínimo em `src/index.css`) em
-`contexto/estilos.md` e no CHANGELOG (entrada "Fase 5").
+O **shell** (`App.jsx`) é comum a todas as páginas: envolve tudo no
+`<ReactLenis root>` (smooth scroll) + `<MotionConfig>` e renderiza
+`<Header/>` + a página + `<Footer/>`. Hoje a página é fixa (`<Home/>`); ao
+implementar as demais, o **roteamento** entra aqui, trocando só o componente da
+página e mantendo Header/Footer/Lenis em volta. **Não há router ainda**
+(decisão: só a reestruturação de pastas nesta passada).
 
-## Composição da página (ordem em App.jsx)
+### Smooth scroll global — Lenis (Fase 5)
+`App.jsx` envolve a árvore num `<ReactLenis root>` (pacote **`lenis`**) —
+suaviza o scroll da janela **sem** wrappear o DOM (`root:true` = instância no
+`window`), então `position:sticky`/`fixed` (header minimalista, drawer, carrossel
+pinado) seguem funcionando. `SincroniaLenisFramer` (no `App.jsx`) sincroniza o
+rAF do Lenis com o frameloop do Framer Motion (via `useAnimationFrame`) — crítico
+pro reveal (`padrao/lib/Revela.jsx`) e o carrossel
+(`paginas/home/CarrosselDestaques.jsx`) não atrasarem 1 frame. Com
+`prefers-reduced-motion`, o Lenis **nem inicializa** (scroll nativo). CSS mínimo
+do Lenis em `padrao/estilos/base.css`.
+
+## Composição da Home (ordem em paginas/home/Home.jsx)
 ```
-<Header/>                 → topo fixo com logo + navegação
 <main>
   <Hero_Home/>           → capa com imagem de fundo + CTA masculino/feminino
   <Favoritos/>           → 3 cards "favoritos da coleção" (fundo escuro)
@@ -85,28 +79,27 @@ por quê `autoRaf:false`, CSS mínimo em `src/index.css`) em
   <Categorias/>          → grid de 12 categorias (fundo escuro)
   <Lancamento_especial/> → banner com imagem de fundo + gradiente + texto
   <Territorio/>          → 4 cards "onde você pilota" (fundo escuro)
-  <Destaques/>           → cards de produtos "mais vendidos" (9, data-driven — fundo cinza)
+  <Destaques/>           → "mais vendidos": carrossel scroll-hijack (desktop),
+  │                          arrastável (touch, CarrosselArrastavel) ou grade (reduced-motion)
   <Historias/>           → 3 cards de histórias (fundo escuro)
-  <Banner/>              → faixa com frase grande centralizada
+  <Banner/>              → faixa com frase grande (entrada blur por palavra)
 </main>
-<Footer/>                → 3 colunas de links + rodapé com logo
 ```
+Header e Footer ficam no **shell** (`App.jsx`), fora da Home — o DOM final é o
+mesmo de antes da reestruturação.
 
 ## Fluxo de dados (padrão data-driven)
-Cada seção com conteúdo repetido importa seu array de `src/data/` e o percorre
-com `.map()`. As imagens são **importadas** no arquivo de dados (para o Vite
-resolver o asset) e passadas como campo do objeto.
+Cada seção importa seu array de dados e o percorre com `.map()`. Imagens são
+**importadas** no arquivo de dados (pro Vite resolver o asset) e passadas como
+campo do objeto.
 
-Exemplo (`src/data/favoritos.js`):
+Exemplo (`src/paginas/home/dados/favoritos.js`):
 ```js
-import jaqueta from "../assets/images/jaqueta_fav.jpg";
-export const favoritos = [
-  { imagem: jaqueta, alt: "...", nome: "...", desc: "..." },
-  // ...
-];
+import jaqueta from "@/padrao/assets/images/jaqueta_fav.jpg";
+export const favoritos = [ { imagem: jaqueta, nome: "...", desc: "..." } /* ... */ ];
 ```
-E no componente:
+No componente (`src/paginas/home/Favoritos.jsx`):
 ```jsx
-import { favoritos } from "../src/data/favoritos";
+import { favoritos } from "@/paginas/home/dados/favoritos";
 {favoritos.map((item, i) => (<div className="card" key={i}>...</div>))}
 ```

@@ -7,8 +7,8 @@ import {
     useMotionValueEvent,
 } from "motion/react";
 import { useLenis } from "lenis/react";
-import logo from "../src/assets/images/logo.png";
-import { navegacao } from "../src/data/navegacao";
+import logo from "@/padrao/assets/images/logo.png";
+import { navegacao } from "@/padrao/dados/navegacao";
 
 const EASE = [0.22, 1, 0.36, 1];
 

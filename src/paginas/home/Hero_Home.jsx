@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "motion/react";
-import { heroStagger, heroItem } from "../src/lib/motion";
-import BotaoCortado from "./BotaoCortado";
+import { heroStagger, heroItem } from "@/padrao/lib/motion";
+import BotaoCortado from "@/padrao/componentes/BotaoCortado";
 
 export default function Hero_Home(){
     const heroRef = useRef(null);

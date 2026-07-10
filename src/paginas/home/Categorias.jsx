@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { categorias } from "../src/data/categorias";
-import { RevelaComProgresso } from "../src/lib/Revela";
-import { useProgressoSecao } from "../src/lib/useProgressoSecao";
-import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
+import { categorias } from "@/paginas/home/dados/categorias";
+import { RevelaComProgresso } from "@/padrao/lib/Revela";
+import { useProgressoSecao } from "@/padrao/lib/useProgressoSecao";
+import { atrasoCard, LARGURA_ENTRADA_CARD } from "@/padrao/lib/useEstiloRevela";
 
 export default function Categorias(){
     const ref = useRef(null);

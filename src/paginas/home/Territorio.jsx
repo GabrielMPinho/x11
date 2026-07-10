@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { territorio } from "../src/data/territorio";
-import { RevelaComProgresso } from "../src/lib/Revela";
-import { useProgressoSecao } from "../src/lib/useProgressoSecao";
-import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
+import { territorio } from "@/paginas/home/dados/territorio";
+import { RevelaComProgresso } from "@/padrao/lib/Revela";
+import { useProgressoSecao } from "@/padrao/lib/useProgressoSecao";
+import { atrasoCard, LARGURA_ENTRADA_CARD } from "@/padrao/lib/useEstiloRevela";
 
 export default function Territorio(){
     const ref = useRef(null);

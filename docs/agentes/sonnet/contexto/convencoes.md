@@ -27,11 +27,19 @@ Regras que **o agente executor** deve seguir ao atuar neste projeto.
 - **Idioma:** português para nomes de variáveis, arquivos de dados, classes CSS
   e comentários.
 - **Componentes:** `.jsx`, `export default function NomeDoComponente(){ ... }`.
+- **Estrutura de pastas (multi-página, 2026-07-10):** comum a todas as páginas em
+  **`src/padrao/`** (componentes, lib, dados, estilos, assets); cada página em
+  **`src/paginas/<pagina>/`** (com seus componentes e `dados/`). Ao criar uma
+  página nova, siga esse padrão. Ver `arquitetura.md`.
+- **Imports com alias `@` → `src/`:** use `@/padrao/...`, `@/paginas/...`
+  (absolutos, independem de profundidade). Irmãos na mesma pasta podem ser `./X`.
 - **Chaves em listas:** usar `key={index}` segue o padrão existente (listas
   estáticas, sem reordenação — aceitável aqui).
-- **CSS:** um arquivo só (`src/index.css`), organizado por blocos comentados.
-  Não criar CSS Modules nem styled-components. Reaproveitar as variáveis de
-  `:root`.
+- **CSS:** em `src/padrao/estilos/` — **`tokens.css`** (cores `:root` + fonte
+  base) importado no topo de **`base.css`** (reset + Lenis + TODAS as regras,
+  organizado por blocos comentados). Um arquivo de regras só (`base.css`); **não**
+  criar CSS Modules nem styled-components. Reaproveitar as variáveis de `:root`
+  (tokens). `base.css` é linkado no `index.html`.
 - **Nomes de classe:** manter o padrão existente (mistura de `.classe` e `#id`
   em português). Não renomear classes existentes (quebraria o CSS).
 

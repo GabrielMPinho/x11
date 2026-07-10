@@ -1,18 +1,14 @@
 import { MotionConfig, useAnimationFrame, useReducedMotion } from "motion/react";
 import { ReactLenis, useLenis } from "lenis/react";
-import Header from "../components/Header";
+import Header from "@/padrao/componentes/Header";
+import Footer from "@/padrao/componentes/Footer";
+import Home from "@/paginas/home/Home";
 
-import Hero_Home from "../components/Hero_Home";
-import Favoritos from "../components/Favoritos";
-import Lancamento_desconto from "../components/Lancamento_desconto";
-import Categorias from "../components/Categorias";
-import Lancamento_especial from "../components/Lancamento_especial";
-import Territorio from "../components/Territorio";
-import Destaques from "../components/Destaques";
-import Historias from "../components/Historias";
-import Banner from "../components/Banner";
-
-import Footer from "../components/Footer";
+// App = SHELL compartilhado por todas as páginas (padronização): provider do
+// Lenis, MotionConfig, Header e Footer. O conteúdo da página vive em
+// src/paginas/<pagina>/ — por enquanto só a Home. Ao adicionar novas páginas
+// (as da header + a de equipamento), o roteamento entra aqui, trocando só o
+// <Home /> pelo componente da página, mantendo Header/Footer/Lenis em volta.
 
 // Fase 5: sincroniza o rAF do Lenis com o frameloop do Framer Motion em vez
 // de 2 loops de rAF independentes. O reveal (`useScroll` em Revela/
@@ -44,20 +40,10 @@ export default function App(){
     // suavização rode de verdade quando o usuário pediu menos movimento.
     const prefereMenosMovimento = useReducedMotion();
 
-    const pagina = (
+    const layout = (
         <>
             <Header />
-            <main>
-                <Hero_Home />
-                <Favoritos />
-                <Lancamento_desconto />
-                <Categorias />
-                <Lancamento_especial />
-                <Territorio />
-                <Destaques />
-                <Historias />
-                <Banner />
-            </main>
+            <Home />
             <Footer />
         </>
     );
@@ -68,7 +54,7 @@ export default function App(){
         // sem precisar repetir a checagem em cada componente.
         <MotionConfig reducedMotion="user">
             {prefereMenosMovimento ? (
-                pagina
+                layout
             ) : (
                 // root: instância global operando no scroll nativo da janela
                 // (sem wrapper/content div extra — diferente de root:false/
@@ -80,7 +66,7 @@ export default function App(){
                 // suaviza wheel/scrollbar.
                 <ReactLenis root options={{ lerp: 0.1, autoRaf: false, syncTouch: false }}>
                     <SincroniaLenisFramer />
-                    {pagina}
+                    {layout}
                 </ReactLenis>
             )}
         </MotionConfig>

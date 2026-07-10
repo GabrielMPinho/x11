@@ -1,6 +1,6 @@
-import jaqueta from "../assets/images/jaqueta_fav.jpg";
-import conj1 from "../assets/images/conjunto1_fav.jpg";
-import conj2 from "../assets/images/conjunto2_fav.jpg";
+import jaqueta from "@/padrao/assets/images/jaqueta_fav.jpg";
+import conj1 from "@/padrao/assets/images/conjunto1_fav.jpg";
+import conj2 from "@/padrao/assets/images/conjunto2_fav.jpg";
 
 export const favoritos = [
   {

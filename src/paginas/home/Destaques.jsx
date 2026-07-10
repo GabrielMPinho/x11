@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
-import { destaques } from "../src/data/destaques";
-import { RevelaComProgresso } from "../src/lib/Revela";
-import { useProgressoSecao } from "../src/lib/useProgressoSecao";
-import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
+import { destaques } from "@/paginas/home/dados/destaques";
+import { RevelaComProgresso } from "@/padrao/lib/Revela";
+import { useProgressoSecao } from "@/padrao/lib/useProgressoSecao";
+import { atrasoCard, LARGURA_ENTRADA_CARD } from "@/padrao/lib/useEstiloRevela";
 import CarrosselDestaques from "./CarrosselDestaques";
 import CarrosselArrastavel from "./CarrosselArrastavel";
 
