@@ -1,7 +1,11 @@
 # Componentes / Seções
 
-Cada componente representa uma seção visual da página. Todos estão em
-`components/` (raiz). Classes CSS relevantes ficam em `src/index.css`.
+Cada componente representa uma seção visual da página **Home**. Os
+**compartilhados** (`Header`, `Footer`, `BotaoCortado`) ficam em
+`src/padrao/componentes/`; as **seções da Home** em `src/paginas/home/`. Dados
+compartilhados (`navegacao`, `footer`) em `src/padrao/dados/`; dados da Home em
+`src/paginas/home/dados/` (a coluna "Dados" abaixo cita o nome do arquivo).
+Classes CSS relevantes ficam em `src/padrao/estilos/base.css`.
 
 | Componente | Classe raiz | Dados | Fundo | Descrição |
 |---|---|---|---|---|
@@ -22,7 +26,8 @@ Cada componente representa uma seção visual da página. Todos estão em
 ## Componentes ainda estáticos (sem dados externos)
 `Hero_Home`, `Lancamento_desconto`, `Lancamento_especial` e `Banner` têm conteúdo
 único (não repetido), então o texto vive no próprio JSX. Isso é aceitável, mas se
-o conteúdo precisar variar, extrair para `src/data/` seguindo o padrão.
+o conteúdo precisar variar, extrair para `src/paginas/home/dados/` (ou
+`src/padrao/dados/` se for compartilhado) seguindo o padrão.
 
 ## Elementos decorativos (NÃO funcionais — por decisão do dono)
 - Setas ← → em `Destaques`: apenas visuais (hover), nunca viram controle

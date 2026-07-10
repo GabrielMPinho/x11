@@ -111,6 +111,21 @@ Numeração pela **ordem real de execução**:
 - O Opus deixa um **prompt estruturado** em `sonnet/fazer/`, autossuficiente, com
   a mesma qualidade que o Opus entregaria.
 
+## Estrutura multi-página (2026-07-10)
+- **O dono pediu para versionar o projeto para receber novas páginas.** Estrutura:
+  **cada página na sua pasta** (`src/paginas/<pagina>/`) e **uma pasta só de
+  padronização** (`src/padrao/`) com tudo comum a todas as páginas (fontes, cores,
+  espaçamento, componentes padrão, Header, Footer, lib, assets).
+- **As páginas serão:** as da **navegação** (Homem, Mulher, Guia de Equipamento,
+  Onde Encontrar, Institucional) + uma de **equipamento específico** (detalhe do
+  produto, ao clicar num produto). A **Home** já existe; as outras são scaffolds.
+- **Exceção pontual ao fluxo:** o dono pediu que o **Opus fizesse a reestruturação
+  ele mesmo** ("faça você mesmo, faça apenas isso") — feito e commitado
+  (`598a7ad`), visual conferido idêntico. (Fora isso, a regra "Opus não edita
+  código" segue valendo.)
+- **Backlog das páginas:** ver `opus/backlog/paginas.md` (roteamento primeiro,
+  depois equipamento, depois as demais). Decisões abertas do dono ali.
+
 ## Observações
 - O dono apagou o PDF de layout que havia adicionado — não há PDF versionado. A
   fonte da verdade do visual é o **site rodando em desktop**.

@@ -1,7 +1,9 @@
 # Estilos (CSS)
 
-Todo o CSS vive em **`src/index.css`** (arquivo único, ~680 linhas), organizado
-por seção com comentários `/* HEADER */`, `/* HERO */`, etc.
+O CSS vive em **`src/padrao/estilos/`** (padronização): **`tokens.css`** (cores
+`:root` + fonte base) é importado no topo de **`base.css`**, que tem o reset, o
+CSS do Lenis e **todas as regras** — organizado por seção com comentários
+`/* HEADER */`, `/* HERO */`, etc. `base.css` é o arquivo linkado no `index.html`.
 
 ## Reset e fontes
 - Reset global: `* { margin:0; padding:0; box-sizing:border-box; }`
@@ -47,7 +49,7 @@ praticamente tudo — inclusive **posicionamento** (`position: relative` +
 **desktop (> 1280px)**, intocada (exceto a troca pontual de `font-size` fixo
 por `clamp()`, já existente e mantida como está).
 
-A responsividade vive **agrupada no final de `src/index.css`**, no bloco
+A responsividade vive **agrupada no final de `src/padrao/estilos/base.css`**, no bloco
 `/* RESPONSIVIDADE (FASE 2) — NOVO SISTEMA DE DESIGN MOBILE */`, logo após
 `/* FIM FOOTER */`, dentro de 3 breakpoints em cascata (nessa ordem no
 arquivo — importa para a especificidade/ordem de sobrescrita):
@@ -132,9 +134,9 @@ próprio do jeito esperado, e a imagem ficava presa em `opacity:0` pra sempre.
 Não existe mais NENHUM `motion.img`/`motion.a` no projeto (conferido por
 `grep`) — hover de imagem agora é **CSS puro** (ver abaixo), não Framer.
 
-### `src/lib/Revela.jsx` + `src/lib/useEstiloRevela.js` — reveal ligado ao scroll (não mais duração fixa)
+### `src/padrao/lib/Revela.jsx` + `src/padrao/lib/useEstiloRevela.js` — reveal ligado ao scroll (não mais duração fixa)
 O cálculo de opacity/y a partir de um progresso 0→1 (janela de movimento +
-amplitude) vive em **`src/lib/useEstiloRevela.js`** (arquivo à parte desde
+amplitude) vive em **`src/padrao/lib/useEstiloRevela.js`** (arquivo à parte desde
 2026-07-10, só pra não misturar hook com componente no mesmo módulo e evitar
 o aviso de Fast Refresh do oxlint). `Revela.jsx` importa de lá.
 - **Janela de movimento** (constantes em `useEstiloRevela.js`): entrada nos
@@ -153,7 +155,7 @@ o aviso de Fast Refresh do oxlint). `Revela.jsx` importa de lá.
   explicitamente com esse valor por Banner e as duas colunas do Footer).
 - **`RevelaComProgresso`** — elementos que reaproveitam um `progresso`
   (MotionValue já calculada pelo container via `useProgressoSecao`, em
-  `src/lib/useProgressoSecao.js`): cards de um grid OU elementos de texto
+  `src/padrao/lib/useProgressoSecao.js`): cards de um grid OU elementos de texto
   individuais (eyebrow/título/parágrafo em Lançamento). Mapeia uma fatia
   deslocada do progresso (`atraso`) nos mesmos `opacity`/`y` — cada unidade
   assenta em leve sequência, mas o atraso é uma fatia do MESMO progresso de
@@ -222,7 +224,7 @@ o aviso de Fast Refresh do oxlint). `Revela.jsx` importa de lá.
 
 ### Hero — entrada por sequência de load + parallax (não scroll-reveal)
 Eyebrow → título → parágrafo → botões entram em sequência **no carregamento**
-(`heroStagger`/`heroItem` em `src/lib/motion.js`, `initial`/`animate` — não
+(`heroStagger`/`heroItem` em `src/padrao/lib/motion.js`, `initial`/`animate` — não
 `whileInView`/scroll — é a 1ª coisa vista, não há o que "revelar ao rolar").
 Amplitude reforçada em 2026-07-10 (`y:20→32`, `duration:0.7→0.8s`,
 `staggerChildren:0.12→0.14`) pra casar com o ritmo mais perceptível do
@@ -245,7 +247,7 @@ também fecham o espaço fantasma que `<img>` (inline por padrão) deixa embaixo
 dentro de um `<div>` comum — era a causa do desktop ter ficado uns +4px mais
 alto que o original na v1 (achado na conferência de pixel-diff do Opus).
 
-### Botão cortado com preenchimento (`components/BotaoCortado.jsx`)
+### Botão cortado com preenchimento (`src/padrao/componentes/BotaoCortado.jsx`)
 Sem mudança desde a v1 — não fazia parte do bug (não é imagem, não depende de
 propagação de `whileInView`). Reutilizado no Hero (masculino/feminino),
 Lançamento desconto e Lançamento especial: `<button>` real com uma camada
@@ -370,7 +372,7 @@ tipografia). O que mudou (2026-07-10, pedido do dono: reproduzir o preset
 a frase quebra em palavras (`LINHA_1`/`LINHA_2`, array de strings no próprio
 componente — texto não mudou, só a forma de renderizar), cada palavra um
 `motion.span.palavra_banner` (`display:inline-block`, nova regra em
-`src/index.css`) com espaço normal (quebrável) entre elas — preserva o wrap
+`src/padrao/estilos/base.css`) com espaço normal (quebrável) entre elas — preserva o wrap
 natural em telas estreitas. Variants `escondido` (`opacity:0,
 filter:blur(10px), y:10`) → `visivel` (`opacity:1, filter:blur(0px), y:0`)
 com `staggerChildren:0.06` no `motion.h1` pai. Disparo por
@@ -382,7 +384,7 @@ sair/voltar da viewport). `prefers-reduced-motion`: `initial` já nasce
 
 ### Destaques — Horizontal Scroll Carousel (Fase 4) + carrossel arrastável (mobile) — EXCEÇÃO à regra de ouro
 **Única seção do projeto que muda no desktop >1280px** (exceção pontual
-aprovada pelo dono — ver `convencoes.md`). `components/Destaques.jsx` tem
+aprovada pelo dono — ver `convencoes.md`). `src/paginas/home/Destaques.jsx` tem
 **3 modos** (`hijack`/`arrastavel`/`estatico`, ver abaixo — eram 2 antes de
 2026-07-10), escolhidos em runtime (não só CSS) por um hook local,
 `useModoCarrossel()`: `window.matchMedia("(pointer: fine) and (min-width:
@@ -390,7 +392,7 @@ aprovada pelo dono — ver `convencoes.md`). `components/Destaques.jsx` tem
 resolver) já nasce correto pro caso reduced-motion (síncrono) e cai em
 `"arrastavel"` nos demais — nunca invisível antes do JS medir.
 
-**Carrossel isolado em `components/CarrosselDestaques.jsx` (fix 2026-07-10)
+**Carrossel isolado em `src/paginas/home/CarrosselDestaques.jsx` (fix 2026-07-10)
 — por quê:** na 1ª versão, o `useScroll({target: refCarrossel})` rodava
 dentro do próprio `Destaques` — mas o **1º render de `Destaques` é sempre o
 fallback** (`refCarrossel.current=null`); quando o modo virava carrossel
@@ -484,7 +486,7 @@ suavizado em vez de mover os cards. Agora:
 
 **Modo `arrastavel`** (touch/tablet/ponteiro grosso, `≤1280px` OU pointer
 grosso em qualquer largura, **sem** reduced-motion) —
-**`components/CarrosselArrastavel.jsx`** (novo), sem 300vh/pin, **não**
+**`src/paginas/home/CarrosselArrastavel.jsx`** (novo), sem 300vh/pin, **não**
 ligado a scroll nenhum:
 - Trilho `motion.div` com **`drag="x"`** (Framer Motion) —
   `dragConstraints={{left:-maxArrasto, right:0}}`, `maxArrasto` **medido**

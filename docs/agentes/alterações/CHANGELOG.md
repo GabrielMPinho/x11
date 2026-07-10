@@ -5,6 +5,29 @@
 
 ---
 
+## 2026-07-10 13:57 — Docs sincronizados com a nova estrutura + criado o backlog de páginas
+
+**O que foi feito** (a pedido do dono: "atualize todos os documentos; ainda não
+temos um backlog"):
+- **Novo backlog** `opus/backlog/paginas.md` — o próximo frente (as páginas):
+  Fase 0 **roteamento** (infra; decisão de lib pendente — React Router?), depois
+  **equipamento** (detalhe do produto, prioridade), depois as páginas da navegação
+  (homem/mulher/guia-de-equipamento/onde-encontrar/institucional). Inclui as
+  **decisões abertas do dono** e o débito técnico anotado (`npm run build`/`tsc -b`,
+  tokens de espaçamento).
+- **Contexto sincronizado** com a estrutura nova (`padrao/` + `paginas/`, alias
+  `@`, CSS em `estilos/base.css`+`tokens.css`): `arquitetura.md` (já reescrito),
+  `README.md`, `componentes.md`, `estilos.md`, `convencoes.md`.
+- **`planejamento-completo.md`**: fases 1–6 marcadas concluídas/commitadas + Fase 7
+  (reestruturação) registrada; aponta pro backlog de páginas.
+- **`instrucoes-do-dono.md`**: registrada a decisão da estrutura multi-página, as
+  páginas previstas e a exceção pontual ("Opus fez a reestruturação ele mesmo").
+
+Sem mudança de código nesta entrada — só documentação. `git commit` + `push` na
+master (autorizado pelo dono).
+
+---
+
 ## 2026-07-10 13:47 — Reestruturação multi-página: pasta por página + pasta de padronização (feito pelo Opus, a pedido do dono)
 
 **O que foi feito e por quê** (o dono pediu explicitamente que o **Opus** fizesse

@@ -13,7 +13,10 @@
 ## Referência de design (fonte da verdade do visual)
 A referência do visual é **o próprio site rodando em desktop** — ele deve ser
 preservado 100%. Não há PDF de layout versionado no projeto. Atualmente só a
-página HOME está implementada em código.
+página **HOME** está implementada; o projeto foi reestruturado (2026-07-10) em
+`src/padrao/` (comum) + `src/paginas/` (uma pasta por página) para **receber as
+novas páginas** — as da navegação + a de equipamento (detalhe do produto), hoje
+scaffolds. Ver `arquitetura.md` e o backlog em `docs/agentes/opus/backlog/`.
 
 ## O que é o projeto
 Landing page (single-page) de e-commerce da marca **X11**, de equipamentos de
@@ -25,8 +28,11 @@ Estética: agressiva, angular, tom escuro com destaque em laranja.
 - **React 19** (`react` / `react-dom` ^19.2)
 - **Vite 8** (bundler + dev server)
 - **Framer Motion** (pacote `motion`) — animações
-- **CSS puro** em um único arquivo `src/index.css` (NÃO usa Tailwind, apesar de
-  um commit antigo mencionar migração que foi revertida)
+- **CSS puro** em `src/padrao/estilos/` (`tokens.css` cores+fonte + `base.css`
+  reset+regras) — NÃO usa Tailwind, apesar de um commit antigo mencionar migração
+  que foi revertida
+- **Lenis** (`lenis`) — smooth scroll global (ver `arquitetura.md`)
+- **Imports com alias `@` → `src/`** (`@/padrao/...`, `@/paginas/...`)
 - **Oxlint** — linter
 - Componentes em **`.jsx`** (JavaScript + JSX). Apesar do nome "React + TS" no
   README padrão, o projeto **não usa TypeScript** de fato.
@@ -52,6 +58,7 @@ variáveis, classes CSS e arquivos de dados usam português.
 ## Regras de ouro (do dono do projeto)
 1. **NUNCA alterar o visual atual em desktop.** Refatorações e responsividade
    devem preservar 100% da aparência em telas grandes. Ver `convencoes.md`.
-2. Manter tudo **data-driven** — conteúdo em `src/data/`, nunca hardcoded no JSX.
+2. Manter tudo **data-driven** — conteúdo em `dados/` da página ou
+   `src/padrao/dados/` (compartilhado), nunca hardcoded no JSX.
 3. A cada alteração, atualizar `docs/agentes/alterações/CHANGELOG.md` (entrada
    nova no topo).

@@ -5,12 +5,18 @@
 > tem sua instrução copiada para `docs/agentes/sonnet/fazer/` (1 por vez); quando
 > concluída e conferida, a próxima fase pendente é ativada.
 
+> **NOTA (2026-07-10):** as fases 1–6 (UX/animação/carrossel/Lenis) estão
+> **concluídas e commitadas**, e o projeto foi **reestruturado** para multi-página
+> (ver Fase 7 abaixo). O próximo frente de trabalho — **as páginas novas** — tem
+> backlog próprio em [`paginas.md`](./paginas.md).
+
 ## Princípios (valem para todas as fases)
 1. **Desktop = intocável.** As regras CSS atuais são a base; nada muda em telas
-   grandes (> 1024px).
+   grandes (**> 1280px**).
 2. **Animação nunca altera o layout final.** Sem movimento (ou com
    `prefers-reduced-motion`), a página é idêntica à atual.
-3. **Data-driven de verdade.** Conteúdo repetido vive em `src/data/`.
+3. **Data-driven de verdade.** Conteúdo repetido vive em `dados/` da página
+   (`src/paginas/<pagina>/dados/`) ou `src/padrao/dados/` (compartilhado).
 
 ## Ordem de execução: 1 → 2 → 3 → 4
 Responsividade (2) vem antes das animações (3): estabilizar antes de animar. A
@@ -23,9 +29,10 @@ Fase 4 (carrossel do Destaques) vem **depois** da rodada de correção da Fase 3
 | 1 | Fundação + Data-driven | ✅ Concluída (2026-07-09) |
 | 2 | Responsividade + Mobile (drawer lateral) | ✅ **Concluída e conferida** — desktop preservado; overflow do logo do footer (769–1280px) **corrigido e verificado** pelo Opus (`docScrollW==clientW` em 900/1024/1100/1280/1440) |
 | 3 | Animações Framer Motion (reveal ligado ao scroll; header agora 2 estados) | ✅ **Concluída e conferida** — Banner blur ✅ (09:20); pulo do header + stagger dos grids ✅ (09:39); conferência final do Opus junto com a Fase 4 ✅ |
-| 4 | **Destaques como Horizontal Scroll Carousel** (exceção aprovada à regra de ouro) | ✅ **CONCLUÍDA e CONFERIDA (2026-07-10)** — carrossel fluido (`useSpring` + altura proporcional), **folga de meio card no fim = 170px** ✓, header minimalista 2 estados + logo aprovado ✓, overflow zero nos 5 breakpoints ✓, imagens ok (só footer 0.98, benigno). **Aguardando sinal verde do dono pro commit.** |
+| 4 | **Destaques como Horizontal Scroll Carousel** (exceção aprovada à regra de ouro) | ✅ **CONCLUÍDA e CONFERIDA (2026-07-10)** — carrossel fluido (`useSpring` + altura proporcional), **folga de meio card no fim = 170px** ✓, header minimalista 2 estados + logo aprovado ✓, overflow zero nos 5 breakpoints ✓, imagens ok (só footer 0.98, benigno). **Commitada** (`8db519b`). |
 | 5 | **Smooth scroll (Lenis)** — feel de scroll suave | ✅ Implementada (11:33) — falta conferência final do Opus (junto com a rodada mobile) |
-| 6 | **Refinos: carrossel arrastável no mobile + logo→Home** | ✅ **Concluída** — carrossel arrastável no mobile (**dono confirmou que arrasta no touch**), logo→Home (`display:contents`, logo inteiro), Lenis ✅, overflow ✅. Nota opcional adiada: `draggable={false}` nas imagens p/ robustez no mouse (não move o gesto no touch, dispensado pelo dono). **Aguardando sinal verde pro commit** |
+| 6 | **Refinos: carrossel arrastável no mobile + logo→Home** | ✅ **Concluída** — carrossel arrastável no mobile (**dono confirmou que arrasta no touch**), logo→Home (`display:contents`, logo inteiro), Lenis ✅, overflow ✅. Nota opcional adiada: `draggable={false}` nas imagens p/ robustez no mouse (não move o gesto no touch, dispensado pelo dono). **Commitada** (`302ee60`). |
+| 7 | **Reestruturação multi-página** (`padrao/` + `paginas/`, alias `@`, shell) | ✅ **Concluída e commitada** (`598a7ad`, feita pelo Opus a pedido do dono) — visual idêntico conferido. Destrava o backlog de páginas ([`paginas.md`](./paginas.md)) |
 
 ---
 

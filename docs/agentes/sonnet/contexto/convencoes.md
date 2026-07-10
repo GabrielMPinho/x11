@@ -11,11 +11,12 @@ Regras que **o agente executor** deve seguir ao atuar neste projeto.
      ("OS MAIS VENDIDOS")** PODE mudar no desktop, pois vira um **horizontal
      scroll carousel** (ver Fase 4 no planejamento). Todas as **demais** seções
      seguem pixel-idênticas > 1280px.
-2. **Data-driven sempre.** Conteúdo repetido vive em `src/data/`, nunca
-   hardcoded no JSX. Componente só percorre os dados com `.map()`.
+2. **Data-driven sempre.** Conteúdo repetido vive em `dados/` da página
+   (`src/paginas/<pagina>/dados/`) ou em `src/padrao/dados/` se for compartilhado,
+   nunca hardcoded no JSX. Componente só percorre os dados com `.map()`.
 3. **Imagens sempre via `import`.** Nunca referenciar imagem como string de
-   caminho (`"../src/assets/..."`) — quebra no build de produção. Importe o
-   asset (no arquivo de dados ou no componente) e use a variável.
+   caminho — quebra no build de produção. Importe o asset via alias
+   (`import x from "@/padrao/assets/images/..."`) e use a variável.
 4. **Documentar a cada alteração.** Ao final de qualquer mudança, atualizar:
    - `docs/agentes/alterações/CHANGELOG.md` (nova entrada NO TOPO)
    - `docs/agentes/sonnet/contexto/*` (se a mudança afetou
@@ -46,8 +47,8 @@ Regras que **o agente executor** deve seguir ao atuar neste projeto.
 ## Animações (padrão a seguir)
 - Usar o pacote `motion` (import de `"motion/react"`).
 - **Modelo atual (Fase 3, 2ª rodada): reveal LIGADO AO SCROLL** (`useScroll` +
-  `useTransform`), NÃO `whileInView`. Ver `src/lib/Revela.jsx`
-  (`Revela`/`RevelaComProgresso`) e `src/lib/useProgressoSecao.js`. É
+  `useTransform`), NÃO `whileInView`. Ver `src/padrao/lib/Revela.jsx`
+  (`Revela`/`RevelaComProgresso`) e `src/padrao/lib/useProgressoSecao.js`. É
   bidirecional por natureza (subir reverte a mesma curva).
 - **Fail-safe:** cada unidade de reveal tem UM único elemento `motion`; imagens
   e textos são filhos DOM comuns. Nunca pôr opacity inicial numa `<img>` nem
