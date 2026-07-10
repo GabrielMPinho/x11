@@ -15,6 +15,40 @@ body {
 }
 
 /* ==================================================================== */
+/* LENIS (Fase 5) — CSS mínimo exigido pela lib (copiado de
+   node_modules/lenis/dist/lenis.css — projeto usa um arquivo CSS só, sem
+   imports externos, daí colado aqui em vez de importado do pacote). Não
+   altera nada em repouso: só entra em jogo enquanto o scroll está de fato
+   rolando/parado via Lenis (classes que o próprio Lenis adiciona/remove no
+   <html>). Só existe quando <ReactLenis> monta (App.jsx) — se
+   prefers-reduced-motion estiver ativo, o Lenis nem inicializa e nenhuma
+   dessas classes é aplicada (scroll 100% nativo). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+.lenis.lenis-autoToggle {
+  transition-property: overflow;
+  transition-duration: 1ms;
+  transition-behavior: allow-discrete;
+}
+/* FIM LENIS */
+/* ==================================================================== */
+
+/* ==================================================================== */
 /* HEADER */
 header{
   background-color: black;
@@ -35,13 +69,41 @@ header > nav > a{
   text-decoration: none;
   font-size: medium;
 }
-header > img{
+/* Descendente (não mais filho direto) desde 2026-07-10: o logo virou
+   clicável ("voltar ao topo"), envolvido num <button class="logo_home_
+   botao"> — o <img> deixou de ser filho DIRETO de <header>. Tamanho/
+   posição/z-index do logo continuam aplicados direto na <img> (idênticos),
+   só o seletor precisou alcançar mais um nível. */
+header img{
   position: relative;
   height: auto;
   width: auto;
   top: 2.9vh;
   left: 4vw;
   z-index: 1;
+}
+/* Botão-wrapper do logo (2026-07-10, "voltar ao topo"), usado nos DOIS
+   headers (completo e minimalista). FIX (mesmo dia, rodada seguinte): a
+   1ª versão usava `display:block;line-height:0` (pensando no padrão de
+   `.zoom_imagem`) — mas ali o `img` da regra também ganha `display:block`
+   explícito; aqui `header img`/`.header_minimalista img` NÃO definem
+   `display` (a `<img>` continua inline), então o `line-height:0` do
+   wrapper colapsava a caixa do botão (medido: 66px de altura pra uma
+   imagem de 130px) e cortava o logo. Fix: `display:contents` — o botão
+   **não gera caixa própria**, a `<img>` volta a se comportar como se fosse
+   filha DIRETA do header (o que `header img`/`.header_minimalista img`
+   já esperam), sem nenhum `line-height`/`overflow` pra colapsar/recortar
+   nada. Continua clicável/focável (âncora com `display:contents` também
+   mantém isso, mas `<button>` já funciona nos navegadores-alvo do
+   projeto). Reset de fundo/borda/padding mantido por precaução (não tem
+   efeito visual com `display:contents`, mas documenta a intenção). */
+.logo_home_botao{
+  display: contents;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
 }
 /* FIM HEADER */
 /* ==================================================================== */
@@ -566,6 +628,42 @@ button{
   width: 340px;
 }
 
+/* Modo "arrastavel" (2026-07-10) — touch/tablet/ponteiro grosso, sem
+   reduced-motion. Substitui o antigo fallback de swipe nativo (que na
+   prática não funcionava no mobile — o Lenis intercepta o gesto horizontal
+   de containers aninhados sem `data-lenis-prevent`, ver Fase 5). Layout
+   simples (sem 300vh/pin/sticky), unconditional — vale em qualquer largura,
+   já que este componente só monta em contextos não-hijack (mesmo um
+   ponteiro grosso numa janela larga cai aqui). Reutiliza .card_produto/
+   .zoom_imagem/.imagem_produto_destaque/.titulo_produto_destaque/
+   .preco_produto_destaque (mesmo hover-zoom de sempre). */
+.destaques.destaques_arrastavel{
+  display: block;
+  min-height: 0;
+  padding: 64px 0;
+}
+.trilho_arrastavel_container{
+  overflow: hidden;
+  padding: 0 4vw;
+}
+.trilho_arrastavel{
+  display: flex;
+  gap: 16px;
+  cursor: grab;
+  /* Deixa o navegador mandar o gesto vertical pro scroll da página e só o
+     horizontal pro drag — sem isso, arrastar na diagonal ou tentar rolar a
+     página por cima do trilho fica ambíguo/travado. */
+  touch-action: pan-y;
+  will-change: transform;
+}
+.trilho_arrastavel:active{
+  cursor: grabbing;
+}
+.card_arrastavel{
+  flex: 0 0 38vw;
+  width: 38vw;
+}
+
 /* FIM DESTAQUES */
 /* ==================================================================== */
 
@@ -777,7 +875,7 @@ button{
    header pequeno"): `170px` de largura (~72px de altura) — pouco acima dos
    60px da barra, sobreposição sutil, não o logo inteiro (tamanho aprovado
    pelo dono). Mesmo mecanismo de sobreposição do completo
-   (`header > img{position:relative;top:2.9vh;z-index:1}`): `position:
+   (`header img{position:relative;top:2.9vh;z-index:1}`): `position:
    relative` + `top` empurra o logo pra baixo do fluxo normal, sem
    `overflow:hidden` no `.header_minimalista` (não definido) pra ela vazar
    por cima do conteúdo abaixo da barra. `top` reduzido de `12px` pra
@@ -926,7 +1024,7 @@ button{
      de medição) e sem os offsets de desktop (top/left). */
   header > nav{ margin-left: 2vw; gap: 1.25rem; }
   header > nav > a{ font-size: 0.85rem; }
-  header > img{ position: static; top: auto; left: auto; width: 110px; height: auto; }
+  header img{ position: static; top: auto; left: auto; width: 110px; height: auto; }
 
   /* Logo do header MINIMALISTA acompanha a mesma largura do completo neste
      breakpoint (110px) — o completo vira `position:static` aqui (contido,
@@ -1048,7 +1146,7 @@ button{
 @media (max-width: 768px){
   /* HEADER — hambúrguer assume */
   header{ justify-content: space-between; padding: 0 20px; height: 64px; }
-  header > img{ position: static; top: auto; left: auto; width: 90px; height: auto; }
+  header img{ position: static; top: auto; left: auto; width: 90px; height: auto; }
   header > nav{ display: none; }
   .botao_hamburguer{ display: flex; }
   .overlay_menu{ display: block; }
@@ -1078,7 +1176,11 @@ button{
   #container_cards{ grid-template-columns: 1fr; }
   .imagem_territorio{ aspect-ratio: 16/11; }
 
-  /* DESTAQUES — vitrine horizontal com snap */
+  /* DESTAQUES — modo arrastável: card mais largo no mobile ("espia" o
+     próximo, convida o arraste) — alvo do dono, ~78vw. */
+  .card_arrastavel{ flex: 0 0 78vw; width: 78vw; }
+
+  /* DESTAQUES (reduced-motion) — vitrine horizontal com snap */
   #produtos_destaques{
     grid-template-columns: none;
     grid-auto-flow: column;

@@ -24,7 +24,8 @@ Fase 4 (carrossel do Destaques) vem **depois** da rodada de correção da Fase 3
 | 2 | Responsividade + Mobile (drawer lateral) | ✅ **Concluída e conferida** — desktop preservado; overflow do logo do footer (769–1280px) **corrigido e verificado** pelo Opus (`docScrollW==clientW` em 900/1024/1100/1280/1440) |
 | 3 | Animações Framer Motion (reveal ligado ao scroll; header agora 2 estados) | ✅ **Concluída e conferida** — Banner blur ✅ (09:20); pulo do header + stagger dos grids ✅ (09:39); conferência final do Opus junto com a Fase 4 ✅ |
 | 4 | **Destaques como Horizontal Scroll Carousel** (exceção aprovada à regra de ouro) | ✅ **CONCLUÍDA e CONFERIDA (2026-07-10)** — carrossel fluido (`useSpring` + altura proporcional), **folga de meio card no fim = 170px** ✓, header minimalista 2 estados + logo aprovado ✓, overflow zero nos 5 breakpoints ✓, imagens ok (só footer 0.98, benigno). **Aguardando sinal verde do dono pro commit.** |
-| 5 | **Smooth scroll (Lenis)** — feel de scroll suave | 🕓 Candidata (pós-commit da Fase 4) — Lenis + sync `useScroll`, fallback reduced-motion/touch. **Requer aval do dono** (dependência nova). Opus especifica quando liberado |
+| 5 | **Smooth scroll (Lenis)** — feel de scroll suave | ✅ Implementada (11:33) — falta conferência final do Opus (junto com a rodada mobile) |
+| 6 | **Refinos: carrossel arrastável no mobile + logo→Home** | ✅ **Concluída** — carrossel arrastável no mobile (**dono confirmou que arrasta no touch**), logo→Home (`display:contents`, logo inteiro), Lenis ✅, overflow ✅. Nota opcional adiada: `draggable={false}` nas imagens p/ robustez no mouse (não move o gesto no touch, dispensado pelo dono). **Aguardando sinal verde pro commit** |
 
 ---
 

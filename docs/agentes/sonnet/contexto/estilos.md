@@ -7,6 +7,17 @@ por seção com comentários `/* HEADER */`, `/* HERO */`, etc.
 - Reset global: `* { margin:0; padding:0; box-sizing:border-box; }`
 - Fonte: `Roboto` (via Google Fonts no `index.html`). `Inter` também é carregada.
 
+## Lenis — CSS mínimo (Fase 5, 2026-07-10)
+Logo depois do reset/fontes, um bloco `/* LENIS */` colado do
+`node_modules/lenis/dist/lenis.css` (o projeto usa **um arquivo CSS só**,
+sem imports de pacote — por isso colado em vez de importado). Classes que o
+próprio Lenis adiciona/remove no `<html>` (`.lenis`, `.lenis-stopped`,
+`.lenis-smooth`, `.lenis-autoToggle`) e seletores de suporte
+(`[data-lenis-prevent]`). **Inerte em repouso** — só reflete o estado real
+de scroll/parado do Lenis, não altera nada visualmente por si só. Ver
+`arquitetura.md` pro provider (`<ReactLenis root>` em `App.jsx`) e o porquê
+da sincronia com o Framer Motion.
+
 ## Variáveis CSS (`:root`)
 ```css
 --laranja:            #FF5000;   /* cor de destaque da marca */
@@ -296,6 +307,31 @@ compartilhado (`AnimatePresence`, inalterado desde a Fase 2, controlado por
 um único `menuAberto` no componente pai). `.header_minimalista` usa
 `z-index:40`, abaixo do overlay/drawer (`90`/`100`).
 
+**Logo clicável → volta ao topo (2026-07-10):** o `<img>` do logo, **nos 2
+estados**, ficou dentro de um `<button class="logo_home_botao" aria-label=
+"Início — voltar ao topo">`. Clique → `lenis.scrollTo(0)` (`useLenis()` de
+`lenis/react`, Fase 5) com fallback `window.scrollTo({top:0})` quando o
+Lenis não está ativo (`useLenis()` retorna `undefined` — reduced-motion,
+`App.jsx` nem monta `<ReactLenis>` nesse caso). **Efeito colateral no CSS:**
+o `<img>` deixou de ser filho **direto** de `<header>` — o seletor
+`header > img` virou **`header img`** (descendente) nas 3 declarações
+(base, `≤1280px`, `≤768px`); `.header_minimalista img` já era descendente,
+sem mudança.
+
+**Fix do logo cortado (mesmo dia, rodada seguinte):** a 1ª versão do
+`.logo_home_botao` usava `display:block;line-height:0` (pensando no padrão
+de `.zoom_imagem`) — mas ali o `img` filho **também** ganha `display:block`
+explícito; em `header img`/`.header_minimalista img` isso nunca foi
+definido (a `<img>` continua `inline`), então o `line-height:0` do wrapper
+**colapsava a caixa do botão** (medido: 66px de altura pra uma imagem de
+130px) e cortava o logo — visível no completo, mais sutil no minimalista.
+**Fix:** `.logo_home_botao{display:contents}` (sem `line-height`) — o botão
+**não gera caixa própria**, a `<img>` volta a se comportar como filha
+**direta** do header (exatamente o que `header img`/`.header_minimalista
+img` já esperavam antes do wrapper existir), sem nada colapsando/recortando.
+`cursor:pointer` (propriedade herdada) continua chegando na `<img>` — que é
+quem de fato pinta a caixa e recebe o cursor visualmente.
+
 **Logo maior que a barra, sem ser o tamanho natural (2026-07-10 — 3 rodadas
 de ajuste fino):** trajetória do feedback do dono — `80px` (pequena) →
 `108px` (ainda pequena) → tamanho **natural** do completo, `width:auto`,
@@ -344,13 +380,15 @@ sair/voltar da viewport). `prefers-reduced-motion`: `initial` já nasce
 `"visivel"` (nítido desde o primeiro paint). `#texto_banner` virou uma
 `<div>` simples (só o `motion.h1` dentro, sem wrapper motion extra).
 
-### Destaques — Horizontal Scroll Carousel (Fase 4, 2026-07-10) — EXCEÇÃO à regra de ouro
+### Destaques — Horizontal Scroll Carousel (Fase 4) + carrossel arrastável (mobile) — EXCEÇÃO à regra de ouro
 **Única seção do projeto que muda no desktop >1280px** (exceção pontual
 aprovada pelo dono — ver `convencoes.md`). `components/Destaques.jsx` tem
-**2 modos**, escolhidos em runtime (não só CSS) por um hook local,
+**3 modos** (`hijack`/`arrastavel`/`estatico`, ver abaixo — eram 2 antes de
+2026-07-10), escolhidos em runtime (não só CSS) por um hook local,
 `useModoCarrossel()`: `window.matchMedia("(pointer: fine) and (min-width:
-1281px)")` + `useReducedMotion()`. Estado inicial é sempre o **fallback**
-(nunca invisível antes do JS medir).
+1281px)")` + `useReducedMotion()`. Estado inicial (antes do `matchMedia`
+resolver) já nasce correto pro caso reduced-motion (síncrono) e cai em
+`"arrastavel"` nos demais — nunca invisível antes do JS medir.
 
 **Carrossel isolado em `components/CarrosselDestaques.jsx` (fix 2026-07-10)
 — por quê:** na 1ª versão, o `useScroll({target: refCarrossel})` rodava
@@ -436,24 +474,59 @@ do projeto (sem Tailwind):
 - `will-change:transform` no trilho (`.trilho_carrossel`) — só `transform`
   é animado, igual ao resto do projeto.
 
-**Modo fallback** (≤1280px, ponteiro grosso/touch, ou reduced-motion) —
-estrutura de sempre (`#produtos_destaques`, `RevelaComProgresso` por card),
-**sem 300vh nem pin**:
-- **Tablet (`≤1280px`) deixou de ser grade estática de 3 colunas** — agora é
-  o mesmo swipe/snap do mobile (`grid-auto-flow:column;overflow-x:auto;
-  scroll-snap-type:x mandatory`), card `38vw` (ponte até `62vw`/`66vw` do
-  mobile) — o dono pediu a escolha binária "carrossel OU swipe nativo", sem
-  grade estática no meio. `≤768px`/`≤480px` inalterados.
-  - Em reduced-motion **>1280px**, isso cai na **grade estática de 5
-    colunas original** (regra base, sem media query) — sem scroll nem
-    hijack, todos os cards visíveis de uma vez, atende a exigência de
-    acessibilidade com folga.
-- **Amplitude do reveal por card reforçada só aqui** (`distancia` 84→**120**,
+**3 modos, não mais 2 (2026-07-10):** `useModoCarrossel` (`Destaques.jsx`)
+passou a devolver `"hijack" | "arrastavel" | "estatico"` em vez de um
+boolean. Causa: o antigo fallback único de swipe nativo (`overflow-x:auto`+
+snap) **parou de funcionar no mobile** depois da Fase 5 — o **Lenis**
+intercepta o gesto horizontal de containers roláveis aninhados que não
+tenham `data-lenis-prevent`, então arrastar virava scroll vertical
+suavizado em vez de mover os cards. Agora:
+
+**Modo `arrastavel`** (touch/tablet/ponteiro grosso, `≤1280px` OU pointer
+grosso em qualquer largura, **sem** reduced-motion) —
+**`components/CarrosselArrastavel.jsx`** (novo), sem 300vh/pin, **não**
+ligado a scroll nenhum:
+- Trilho `motion.div` com **`drag="x"`** (Framer Motion) —
+  `dragConstraints={{left:-maxArrasto, right:0}}`, `maxArrasto` **medido**
+  (`trilho.scrollWidth − container.clientWidth`, recalcula no `resize` —
+  mesmo espírito da medição do hijack, não chutado). `dragElastic:0.12`
+  (borracha leve nas pontas) + `dragMomentum` (inércia de verdade).
+  `.trilho_arrastavel{cursor:grab}` / `:active{cursor:grabbing}`.
+- **Coexistência com o Lenis (crítico):** `.trilho_arrastavel_container`
+  tem `data-lenis-prevent` (o Lenis não rouba o gesto) e
+  `.trilho_arrastavel` tem **`touch-action:pan-y`** — o navegador manda o
+  gesto horizontal pro drag e o vertical pro scroll normal da página.
+- Reaproveita `.card_produto`/`.zoom_imagem`/`.imagem_produto_destaque`/
+  `.titulo_produto_destaque`/`.preco_produto_destaque` (mesmo hover-zoom).
+  `.card_arrastavel{width:38vw}` (base, cobre tablet/ponteiro grosso largo)
+  → **`78vw`** em `≤768px` (mobile — "espia" o próximo card, convida o
+  arraste). Setas `←→` mantidas (decorativas, ajudam a sinalizar "isso é
+  arrastável" — diferente do hijack, que as oculta porque ali o trilho já
+  se move sozinho).
+- `.destaques.destaques_arrastavel{display:block;...}` é regra
+  **incondicional** (fora de media query) — o modo pode ativar em qualquer
+  largura (ponteiro grosso numa janela larga também cai aqui), então não dá
+  pra depender só do `≤1280px` pra sair do layout flex/vh do desktop.
+
+**Modo `estatico`** (reduced-motion, em qualquer largura) — o fallback
+acessível original: `#produtos_destaques` + `RevelaComProgresso` por card
+(mesmo JSX de antes da Fase 6, só o branch renomeado), **sem drag,
+sem inércia**:
+- **`≤1280px`:** grid vira swipe/snap CSS puro (`grid-auto-flow:column;
+  overflow-x:auto;scroll-snap-type:x mandatory`), card `38vw` → `62vw`
+  (`≤768px`) → `66vw` (`≤480px`) — 100% CSS, sem JS de gesto, sempre
+  navegável por teclado/touch nativo mesmo com `data-lenis-prevent`
+  nenhum (não precisa, é scroll vertical de página vs. scroll horizontal
+  de grid, sem conflito de gesto).
+- **`>1280px`** (reduced-motion no desktop, caso raro): grade estática de 5
+  colunas original (regra base, sem media query) — sem scroll nem hijack,
+  todos os cards visíveis de uma vez.
+- **Amplitude do reveal por card reforçada** (`distancia` 84→**120**,
   `saida` 80→**96**, no `RevelaComProgresso`) — review do dono: "os mais
-  vendidos com pouca animação" era efeito colateral do ajuste de stagger da
-  rodada anterior (sutil demais nesta seção). O *timing* (`atrasoCard`/
-  `LARGURA_ENTRADA_CARD`, último card assentando bem antes do centro da
-  seção) **não mudou** — só a distância percorrida.
+  vendidos com pouca animação" (rodada anterior à Fase 6). `RevelaComProgresso`
+  já força `opacity:1;y:0` fixo sozinho quando reduced-motion está ligado,
+  então este branch é estático de fato independente da amplitude
+  configurada.
 
 ## Regras gerais de animação (valem pra tudo acima)
 - Biblioteca: `motion` (Framer Motion, import de `"motion/react"`).

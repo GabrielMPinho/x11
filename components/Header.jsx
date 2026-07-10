@@ -6,6 +6,7 @@ import {
     useScroll,
     useMotionValueEvent,
 } from "motion/react";
+import { useLenis } from "lenis/react";
 import logo from "../src/assets/images/logo.png";
 import { navegacao } from "../src/data/navegacao";
 
@@ -31,6 +32,7 @@ export default function Header(){
     const [estado, setEstado] = useState("completo");
     const prefereMenosMovimento = useReducedMotion();
     const { scrollY } = useScroll();
+    const lenis = useLenis();
 
     useMotionValueEvent(scrollY, "change", (y) => {
         const alturaJanela = typeof window !== "undefined" ? window.innerHeight : 800;
@@ -44,6 +46,21 @@ export default function Header(){
 
     const minimalista = estado === "minimalista";
 
+    // Logo clicável → "Home" (landing de página única = topo da página, sem
+    // recarregar). Usa o Lenis já montado pela Fase 5 pra rolar suave;
+    // `useLenis()` retorna `undefined` quando o Lenis não está ativo
+    // (reduced-motion, App.jsx nem monta o <ReactLenis> nesse caso) — cai
+    // pro `scrollTo` nativo, instantâneo (sem "smooth" que o dono de
+    // reduced-motion não pediu).
+    function irParaHome(evento){
+        evento.preventDefault();
+        if (lenis) {
+            lenis.scrollTo(0);
+        } else {
+            window.scrollTo({ top: 0 });
+        }
+    }
+
     return (
         <>
             {/* Completo — sempre em fluxo normal, sem exceção: nenhuma
@@ -52,7 +69,14 @@ export default function Header(){
                 qualquer header não-fixo (nunca é removido do fluxo depois
                 de montado, então nunca desloca <main>). */}
             <header>
-                <img src={logo} alt="logo laranja"/>
+                <button
+                    type="button"
+                    className="logo_home_botao"
+                    aria-label="Início — voltar ao topo"
+                    onClick={irParaHome}
+                >
+                    <img src={logo} alt="logo laranja"/>
+                </button>
                 <nav>
                     {navegacao.map((item, index) => (
                         <a href={item.link} key={index}>{item.nome}</a>
@@ -85,7 +109,14 @@ export default function Header(){
                         exit={{ opacity: 0, y: -12 }}
                         transition={{ duration: prefereMenosMovimento ? 0 : 0.3, ease: EASE }}
                     >
-                        <img src={logo} alt="logo laranja"/>
+                        <button
+                            type="button"
+                            className="logo_home_botao"
+                            aria-label="Início — voltar ao topo"
+                            onClick={irParaHome}
+                        >
+                            <img src={logo} alt="logo laranja"/>
+                        </button>
                         <nav>
                             {navegacao.map((item, index) => (
                                 <a href={item.link} key={index}>{item.nome}</a>

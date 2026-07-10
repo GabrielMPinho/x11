@@ -5,54 +5,72 @@ import { RevelaComProgresso } from "../src/lib/Revela";
 import { useProgressoSecao } from "../src/lib/useProgressoSecao";
 import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
 import CarrosselDestaques from "./CarrosselDestaques";
+import CarrosselArrastavel from "./CarrosselArrastavel";
 
 // Fase 4 (pedido do dono): "OS MAIS VENDIDOS" vira um Horizontal Scroll
-// Carousel (mecanismo de referência: hover.dev/Framer Motion, código
-// completo em docs/agentes/sonnet/fazer/fase-4-carrossel-destaques.md) —
-// EXCEÇÃO PONTUAL E APROVADA à regra de ouro: só esta seção muda no
-// desktop >1280px. Só ativa com ponteiro fino (mouse/trackpad) em telas
-// >1280px — em qualquer outro caso (tablet, touch, reduced-motion) cai no
-// fallback de swipe nativo (Parte 2/3), nunca faz scroll-hijack no toque.
+// Carousel (mecanismo de referência: hover.dev/Framer Motion) — EXCEÇÃO
+// PONTUAL E APROVADA à regra de ouro: só esta seção muda no desktop
+// >1280px.
+//
+// 3 modos (2026-07-10 — antes eram 2: hijack + um fallback único de swipe
+// nativo; o swipe não funcionava no mobile porque o Lenis, Fase 5,
+// intercepta o gesto horizontal de containers aninhados sem
+// `data-lenis-prevent`. O dono pediu um carrossel de verdade ARRASTÁVEL no
+// lugar do swipe):
+// - "hijack" — (pointer:fine) e (min-width:1281px), sem reduced-motion →
+//   CarrosselDestaques (scroll-hijack, 300vh+pin). INALTERADO.
+// - "arrastavel" — qualquer outro caso não-reduced-motion (touch, tablet,
+//   ≤1280px, ponteiro grosso) → CarrosselArrastavel (drag de verdade,
+//   Framer Motion, sem 300vh/pin, sem depender do scroll).
+// - "estatico" — reduced-motion → fallback acessível de sempre (grade com
+//   overflow-x:auto + scroll-snap, sem drag/inércia).
 function useModoCarrossel() {
-    const [carrossel, setCarrossel] = useState(false);
     const prefereMenosMovimento = useReducedMotion();
+    const [modo, setModo] = useState(prefereMenosMovimento ? "estatico" : "arrastavel");
 
     useEffect(() => {
         if (prefereMenosMovimento || typeof window === "undefined") {
-            setCarrossel(false);
+            setModo("estatico");
             return;
         }
         const consulta = window.matchMedia("(pointer: fine) and (min-width: 1281px)");
-        const atualizar = () => setCarrossel(consulta.matches);
+        const atualizar = () => setModo(consulta.matches ? "hijack" : "arrastavel");
         atualizar();
         consulta.addEventListener("change", atualizar);
         return () => consulta.removeEventListener("change", atualizar);
     }, [prefereMenosMovimento]);
 
-    return carrossel;
+    return modo;
 }
 
 export default function Destaques(){
-    const carrossel = useModoCarrossel();
+    const modo = useModoCarrossel();
     const refFallback = useRef(null);
     const progressoFallback = useProgressoSecao(refFallback);
 
-    // Carrossel isolado num componente-filho próprio (fix 2026-07-10): só
-    // monta quando `carrossel` já é `true`, então o `useScroll({target})`
-    // dele inicializa com o ref JÁ anexado no 1º render — ver
-    // CarrosselDestaques.jsx pro porquê (era a causa do trilho ficar
-    // travado em x:0 mesmo com o pin e a medição corretos).
-    if (carrossel) {
+    // Carrossel de hijack isolado num componente-filho próprio (fix
+    // 2026-07-10): só monta quando `modo` já é "hijack", então o
+    // `useScroll({target})` dele inicializa com o ref JÁ anexado no 1º
+    // render — ver CarrosselDestaques.jsx pro porquê. INALTERADO.
+    if (modo === "hijack") {
         return <CarrosselDestaques />;
     }
 
-    // Fallback (≤1280px, ponteiro grosso/touch, ou reduced-motion): grade/
-    // swipe nativo com snap (ver CSS), sem 300vh nem pin. Amplitude do
-    // reveal por card reforçada (distancia/saida maiores que o padrão) —
-    // review do dono: "os mais vendidos estão com pouca animação" nesta
-    // seção especificamente; o atraso/largura de entrada dos cards
-    // continuam vindo de atrasoCard/LARGURA_ENTRADA_CARD (não regride o
-    // fix de "último card só assenta depois do centro").
+    // Arrastável (touch/tablet/ponteiro grosso, sem reduced-motion): drag
+    // de verdade, não ligado ao scroll — ver CarrosselArrastavel.jsx.
+    if (modo === "arrastavel") {
+        return <CarrosselArrastavel />;
+    }
+
+    // Estático (reduced-motion): grade/swipe nativo com snap (ver CSS),
+    // sem 300vh nem pin, sem drag/inércia. Amplitude do reveal por card
+    // reforçada (distancia/saida maiores que o padrão) — review do dono:
+    // "os mais vendidos estão com pouca animação" nesta seção
+    // especificamente; o atraso/largura de entrada dos cards continuam
+    // vindo de atrasoCard/LARGURA_ENTRADA_CARD (não regride o fix de
+    // "último card só assenta depois do centro"). `RevelaComProgresso` já
+    // força `opacity:1;y:0` sozinho quando reduced-motion está ligado —
+    // este branch já é 100% estático de fato.
     return(
         <section className="destaques" ref={refFallback}>
             <div id="conteudo_destaques">

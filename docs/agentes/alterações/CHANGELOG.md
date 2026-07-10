@@ -5,6 +5,264 @@
 
 ---
 
+## 2026-07-10 12:20 — Leva de refinos fechada: dono confirmou o arraste no touch; aguardando commit
+
+- **Dono confirmou:** o **carrossel arrastável funciona no touch** (o `dragstart`
+  que o Opus pegou era do mouse do teste automatizado, que não reflete o toque
+  real). O fix `draggable={false}`/`-webkit-user-drag:none` foi **dispensado pelo
+  dono** — fica anotado como melhoria opcional (robustez no mouse/desktop estreito),
+  **não** aplicado. Instrução `fix-drag-mobile-imagem.md` removida de `fazer/`.
+- **Estado conferido:** logo inteiro (completo 308×130 / minimalista 170×72,
+  `display:contents`) ✅, Lenis ativo ✅, overflow zero (900–1440) ✅, mobile
+  arrastável ✅ (confirmado pelo dono).
+- **Pendente:** **commit** da leva (Fase 5 Lenis + carrossel arrastável mobile +
+  logo→Home + fix do logo) — 12 arquivos não commitados desde `8db519b`.
+  Aguardando sinal verde do dono. `fazer/` vazio (sem tarefa ativa).
+
+---
+
+## 2026-07-10 12:15 — Conferência do Opus: logo/Lenis/overflow OK; carrossel arrastável tem bug (drag nativo da imagem) — fix
+
+**Conferência (Opus, script Playwright no build atual):**
+- **Logo CORRIGIDO ✓** — completo 308×130 (inteiro), minimalista 170×72; nada
+  cortado (o `display:contents` resolveu).
+- **Lenis ATIVO ✓** (`html.lenis`).
+- **Overflow ZERO ✓** em 900/1024/1100/1280/1440.
+- **Carrossel arrastável (mobile): BUG** — arrastar **não move os cards**.
+  Instrumentando os eventos, dispara **`dragstart`**: o toque cai sobre a `<img>`
+  e o navegador inicia o **arraste nativo da imagem**, roubando o gesto do Framer
+  (`transform` fica vazio). `maxArrasto` medido = 2516 (limites OK); o problema é
+  só o ghost-drag da imagem. Quebra sempre no mouse; frágil no touch.
+- **Fix (instrução):** `draggable={false}` + `-webkit-user-drag:none` nas imagens
+  dos cards → o gesto volta pro Framer. Instrução `sonnet/fazer/fix-drag-mobile-
+  imagem.md`.
+
+**Pendências de conferência:** feel do Lenis no scroll real (suavidade) e o
+arraste pós-fix — confiro após o fix. **Nada commitado.**
+
+---
+
+## 2026-07-10 12:07 — Fix: logo cortado pelo wrapper "voltar ao topo"
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/fix-logo-cortada.md`,
+correção cirúrgica — só o CSS do `.logo_home_botao`; carrossel, Lenis, nav,
+drawer e demais seções não tocados):
+
+- **Causa raiz (medida pelo Opus por screenshot):** o wrapper
+  `.logo_home_botao` (introduzido na rodada anterior, "logo volta pra Home")
+  usava `display:block;line-height:0`, pensando no mesmo padrão de
+  `.zoom_imagem`. Só que ali o `img` filho **também** ganha `display:block`
+  explícito — em `header img`/`.header_minimalista img` isso nunca foi
+  definido (a `<img>` continua `inline`), então o `line-height:0` do
+  wrapper colapsava a **caixa do botão** (medido: 66px de altura pra uma
+  imagem de 130px), cortando o logo — bem visível no header completo, mais
+  sutil no minimalista.
+- **Fix:** `.logo_home_botao` passou a usar **`display:contents`** (removido
+  o `line-height:0`) — o botão **não gera caixa própria**, então a `<img>`
+  volta a se comportar como se fosse filha **direta** do header (exatamente
+  o que `header img`/`.header_minimalista img` já esperavam antes do
+  wrapper existir). Nada mais no CSS dessas duas regras foi tocado — logo
+  volta ao tamanho/posição/sobreposição aprovados, nos dois estados.
+  `cursor:pointer` continua funcionando (propriedade herdada, passa pelo
+  `display:contents` até a `<img>`, que é o elemento que de fato pinta a
+  caixa).
+- **Nada mudou em `components/Header.jsx`** — a estrutura `<button
+  className="logo_home_botao"><img/></button>` (nos 2 estados) já estava
+  certa; o bug era **só** CSS. Clique → `lenis.scrollTo(0)`/fallback
+  continua inalterado.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` (oxlint) ✅.
+
+**Pendente:** conferência do Opus (logo inteiro e correto nos 2 estados,
+clique volta ao topo, nada mais mudou). Não commitado.
+
+---
+
+## 2026-07-10 12:05 — Bug: logo CORTADO nos dois headers (wrapper do "voltar ao topo") — correção
+
+**Contexto (Opus, medido + screenshot no build atual):** ao tornar o logo clicável
+(11:55), a `<img>` foi envolvida num `<button class="logo_home_botao">` com
+**`line-height: 0`**. Como a `<img>` é **inline**, isso **colapsou a caixa do
+botão** — medido **botão 66px vs img 130px** — e o **logo aparece cortado** (só a
+parte de baixo). Confirmado no header **completo** (bem cortado) e, menor, no
+**minimalista**. O clique funciona; o defeito é só o **box do wrapper**.
+
+**Correção (instrução):** tornar o `.logo_home_botao` **neutro no layout** —
+preferência **`display: contents`** (sem gerar caixa; a img volta a se posicionar
+como filha direta do header, idêntica ao aprovado) e **remover o `line-height:0`**;
+se `display:contents` no `<button>` der problema de foco, trocar por `<a
+href="#topo">` com `display:contents`. Alternativa: manter caixa mas com
+`overflow:visible`, `height:auto` e **img `display:block`**, se ficar
+pixel-idêntico.
+
+**Encaminhamento:** instrução ativa `sonnet/fazer/fix-logo-cortada.md`. Obs.: o
+**carrossel arrastável no mobile** e o **Lenis** ainda têm conferência do Opus
+pendente (faço junto na próxima). **Nada commitado.**
+
+---
+
+## 2026-07-10 11:55 — Carrossel arrastável no mobile (3º modo) + logo do header volta pra Home
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/mobile-carrossel-arrastavel-e-logo-home.md`; o
+scroll-hijack do desktop `>1280px+ponteiro fino` **não foi tocado**):
+
+**PARTE 1 — Destaques ganhou um 3º modo: "arrastavel"**
+- Causa raiz do swipe nativo não funcionar no mobile: a **Fase 5 (Lenis)**
+  intercepta o gesto horizontal de containers roláveis aninhados que não
+  tenham `data-lenis-prevent` — o `overflow-x:auto`+snap do fallback antigo
+  virava scroll vertical suavizado em vez de mover os cards.
+- **`useModoCarrossel` (em `Destaques.jsx`) agora decide entre 3 modos** (era
+  um boolean `carrossel`):
+  - **`hijack`** — `(pointer:fine)+(min-width:1281px)`, sem reduced-motion →
+    `CarrosselDestaques` (scroll-hijack, 300vh+pin). **Inalterado.**
+  - **`arrastavel`** — qualquer outro caso não-reduced-motion (touch,
+    tablet, `≤1280px`, ponteiro grosso) → **novo** `CarrosselArrastavel`.
+  - **`estatico`** — reduced-motion → o fallback acessível de sempre (grade
+    `overflow-x:auto`+snap, sem drag/inércia) — mesmo JSX de antes,
+    renomeado só o branch.
+- **`components/CarrosselArrastavel.jsx` (novo):** trilho `motion.div` com
+  **`drag="x"`** de verdade (Framer Motion) — **não** ligado a
+  `useScroll`/scroll nenhum, só à posição do dedo/mouse.
+  `dragConstraints={{left:-maxArrasto, right:0}}` com `maxArrasto`
+  **medido** (`trilho.scrollWidth − container.clientWidth`, recalculado no
+  `resize` — mesmo espírito da medição do hijack, não um valor chutado).
+  `dragElastic:0.12` (borracha leve nas pontas) + `dragMomentum` (inércia).
+  `cursor:grab`/`grabbing`. Reaproveita `.card_produto` (imagem/título/
+  preço, mesmo hover-zoom) — card `38vw` (tablet/ponteiro grosso largo) →
+  **`78vw`** em `≤768px` (mobile, "espia" o próximo, convida o arraste).
+- **Coexistência com o Lenis (crítico):** o container do trilho ganhou
+  **`data-lenis-prevent`** (o Lenis não rouba o gesto) e o trilho
+  **`touch-action:pan-y`** (o navegador manda o horizontal pro drag e o
+  vertical pro scroll da página — testado mentalmente via spec: arrastar na
+  horizontal move os cards, rolar na vertical continua rolando a página).
+
+**PARTE 2 — Logo clica e volta pro topo (Home), nos 2 headers**
+- `components/Header.jsx`: o `<img>` do logo (header completo **e**
+  minimalista) passou a ficar dentro de um `<button type="button"
+  className="logo_home_botao" aria-label="Início — voltar ao topo">`. No
+  clique, `lenis.scrollTo(0)` (via `useLenis()` de `lenis/react`, já
+  montado pela Fase 5) — **fallback** `window.scrollTo({top:0})` quando o
+  Lenis não está ativo (`useLenis()` retorna `undefined` em reduced-motion,
+  já que `App.jsx` nem monta o `<ReactLenis>` nesse caso — scroll instantâneo,
+  sem "smooth" que reduced-motion não pediu).
+- **Aparência do logo 100% preservada:** `.logo_home_botao` é um reset total
+  (sem fundo/borda/padding, `line-height:0` fecha o espaço fantasma do
+  `<img>` — mesmo padrão já usado em `.zoom_imagem`). O `<img>` deixou de
+  ser **filho direto** de `<header>` (agora é neto, via o botão) — o
+  seletor `header > img` virou **`header img`** (descendente) nas 3
+  ocorrências (base, `≤1280px`, `≤768px`); `.header_minimalista img` já era
+  descendente, não precisou mudar. Tamanho/posição/`z-index`/sobreposição
+  do logo (valores já aprovados pelo dono em rodadas anteriores)
+  **inalterados**.
+- Não conflita com o hambúrguer/drawer (botões irmãos, handlers
+  independentes).
+
+**Verificação:** `npx vite build` ✅ (459 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência do Opus (mobile: arrasta com inércia, scroll
+vertical da página continua funcionando; desktop `>1280px`: hijack intacto;
+logo clica e volta ao topo suave nos 2 estados; reduced-motion: carrossel
+acessível + logo volta ao topo sem smooth; sem overflow horizontal; desktop
+em repouso idêntico). Não commitado.
+
+---
+
+## 2026-07-10 11:40 — Review do dono: carrossel arrastável no mobile + clicar no logo volta pra Home — instrução
+
+**Contexto (Opus):** com o Lenis (Fase 5) no ar, o dono apontou que **o carrossel
+não funciona no mobile** e pediu que o mobile seja um **carrossel arrastável**
+(drag, não ligado ao scroll). Também: **clicar no logo deve voltar pra Home**.
+- **Diagnóstico do mobile:** hoje o mobile usa **swipe nativo** (`#produtos_destaques`
+  `overflow-x:auto` + snap). Com o Lenis interceptando o touch da página, o scroll
+  horizontal de container aninhado **é engolido** (Lenis exige `data-lenis-prevent`
+  em áreas roláveis internas). Por isso não funciona.
+- **Solução (instrução):** 3 modos no Destaques — `hijack` (>1280 + ponteiro fino,
+  intacto), **`arrastavel`** (touch/≤1280: `motion.div drag="x"` com constraints
+  medidos, inércia, `data-lenis-prevent` + `touch-action:pan-y` pra não brigar com
+  o Lenis e preservar o scroll vertical), `estatico` (reduced-motion, acessível).
+- **Logo→Home:** envolver o `<img>` dos **dois** headers num botão acessível que
+  rola ao topo via `lenis.scrollTo(0)` (fallback `window.scrollTo`), sem mudar a
+  aparência do logo.
+
+**Encaminhamento:** instrução ativa `sonnet/fazer/mobile-carrossel-arrastavel-e-
+logo-home.md`. **Fase 5 (Lenis)** marcada como implementada (11:33), conferência
+final do Opus pendente (junto com esta rodada). **Nada commitado.**
+
+---
+
+## 2026-07-10 11:33 — Fase 5: smooth scroll global com Lenis
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/fase-5-lenis-smooth-scroll.md` — dono aprovou a
+dependência nova pro "feel premium" de scroll pedido):
+
+- **Dependência instalada:** `lenis` (`^1.3.25`, único pacote novo em
+  `package.json`) — mantém o **scroll nativo** (anima a posição da janela
+  via rAF, não transforma um container), por isso `position:sticky`/`fixed`
+  (header minimalista, drawer mobile, carrossel pinado) continuam
+  funcionando sem alteração.
+- **`src/App.jsx`:** a árvore inteira passou a ser envolvida por
+  `<ReactLenis root options={{lerp:0.1, autoRaf:false, syncTouch:false}}>`
+  (`root` = instância global no `window`, **sem** wrapper/content div extra
+  — não muda a estrutura do DOM). `lerp:0.1` é o próprio default
+  recomendado do Lenis (ponto de partida "suave mas responsivo", nem
+  "duro" nem "mole" — mesmo meio-termo que o dono já pediu pro carrossel).
+  `syncTouch:false` (já é o default) garante **toque 100% nativo**, sem
+  smooth — só suaviza wheel/scrollbar.
+- **Sincronizado com o frameloop do Framer Motion (crítico):** novo
+  componente `SincroniaLenisFramer` (dentro do `<ReactLenis>`, usa
+  `useLenis()` pra pegar a instância) chama `lenis.raf(tempo)` de dentro de
+  **`useAnimationFrame`** (hook de `motion/react`) em vez de deixar o Lenis
+  rodar seu próprio `requestAnimationFrame` independente (por isso
+  `autoRaf:false`) — evita ~1 frame de atraso/tranco entre o smooth scroll e
+  o `useScroll`/`useTransform` que o reveal (`Revela`/`useProgressoSecao`) e
+  o carrossel (`CarrosselDestaques`) já usam pra ler a posição de scroll a
+  cada frame. `useAnimationFrame` cuida da inscrição/cancelamento no
+  frameloop sozinho — não precisou de `cancelFrame` manual (que, por sinal,
+  **não é exportado** por `motion/react`, só pelo pacote interno
+  `motion-dom`, que o projeto não depende diretamente).
+- **`prefers-reduced-motion`:** o Lenis **nem inicializa** — `App.jsx`
+  decide com `useReducedMotion()` (mesmo hook já usado em todo o projeto,
+  não reage a mudança ao vivo da preferência do SO, só na carga da página —
+  comportamento já existente, replicado aqui) e renderiza a página **sem**
+  `<ReactLenis>` nesse caso: scroll 100% nativo, sem suavização nenhuma.
+- **CSS mínimo do Lenis** copiado pra `src/index.css` (arquivo único do
+  projeto — sem importar CSS de pacote externo): classes `html.lenis`,
+  `.lenis-stopped`, `[data-lenis-prevent]`, `.lenis-smooth iframe`,
+  `.lenis-autoToggle` — inertes em repouso, só entram em jogo enquanto o
+  Lenis está de fato rolando/parado.
+- **Nav decorativa mantida decorativa:** links de `data/navegacao.js` têm
+  `href=""` (não são âncoras reais) — **não** foram tornados funcionais;
+  Lenis também não recebeu `anchors:true`, então não intercepta cliques de
+  âncora automaticamente (comportamento inalterado).
+
+**Verificação:** `npx vite build` ✅ (458 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência do Opus (scroll suave perceptível no wheel;
+carrossel e reveal suaves e sincronizados, sem tranco; header troca nos
+limiares certos; reduced-motion = nativo; touch = nativo; sem overflow
+horizontal; desktop >1280px em repouso idêntico). Não commitado.
+
+---
+
+## 2026-07-10 11:15 — COMMIT das Fases 2–4 na master + Fase 5 (Lenis) ativada
+
+- **Commit `8db519b` na master** (sinal verde do dono, commit direto na master):
+  Fases 2, 3 e 4 (responsividade + drawer, animações scroll-linked + Banner blur +
+  header sem pulo, carrossel do Destaques + header minimalista 2 estados). 25
+  arquivos, gate lint ✅ / build ✅ antes de commitar.
+- **Fase 5 ATIVADA (Lenis / smooth scroll):** dono aprovou a dependência nova e
+  pediu pra seguir. Instrução `sonnet/fazer/fase-5-lenis-smooth-scroll.md`:
+  Lenis global (mantém scroll nativo → sticky/fixed e `useScroll` seguem
+  funcionando), **sync com o frameloop do Framer** (carrossel/reveal/header sem
+  tranco), **reduced-motion e touch = scroll nativo** (sem suavizar), **nada muda
+  em repouso** (desktop >1280px pixel-idêntico). **Nada commitado** nesta ativação.
+
+---
+
 ## 2026-07-10 11:12 — Conferência final do Opus: FASE 4 CONCLUÍDA (carrossel + header) — aguardando sinal verde pro commit
 
 **Conferência (Opus, script Playwright no build atual):**

@@ -57,6 +57,24 @@ docs/agentes/
 ## Fluxo de renderização
 `index.html` → `src/index.jsx` (createRoot) → `src/App.jsx` → seções.
 
+### Smooth scroll global — Lenis (Fase 5, 2026-07-10)
+`App.jsx` envolve toda a árvore (`<Header/>`+`<main>`+`<Footer/>`) num
+`<ReactLenis root>` (pacote **`lenis`**, único novo em `package.json`) —
+suaviza o scroll da janela **sem** transformar/wrappear o DOM num container
+(`root:true` = instância global no `window`, nenhum `<div>` extra é
+inserido), por isso `position:sticky`/`fixed` (header minimalista, drawer
+mobile, carrossel pinado do Destaques) continuam funcionando sem nenhuma
+adaptação. Um componente pequeno dentro do provider
+(`SincroniaLenisFramer`, no próprio `App.jsx`) sincroniza o rAF do Lenis com
+o frameloop do **Framer Motion** (via `useAnimationFrame` de `motion/react`)
+— crítico pro reveal (`Revela.jsx`) e o carrossel (`CarrosselDestaques.jsx`)
+não ficarem 1 frame atrasados em relação ao smooth scroll, já que ambos leem
+a posição de scroll a cada frame via `useScroll`. Com
+`prefers-reduced-motion`, o Lenis **nem inicializa** — a árvore renderiza
+direto, sem o provider, scroll 100% nativo. Detalhes completos (config,
+por quê `autoRaf:false`, CSS mínimo em `src/index.css`) em
+`contexto/estilos.md` e no CHANGELOG (entrada "Fase 5").
+
 ## Composição da página (ordem em App.jsx)
 ```
 <Header/>                 → topo fixo com logo + navegação
