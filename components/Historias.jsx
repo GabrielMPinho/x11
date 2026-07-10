@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { historias } from "../src/data/historias";
 import { RevelaComProgresso } from "../src/lib/Revela";
 import { useProgressoSecao } from "../src/lib/useProgressoSecao";
+import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
 
 export default function Historias(){
     const ref = useRef(null);
@@ -9,7 +10,7 @@ export default function Historias(){
 
     return(
         <section className="historias" ref={ref}>
-            <RevelaComProgresso as="div" className="titulo" progresso={progresso}>
+            <RevelaComProgresso as="div" className="titulo" progresso={progresso} distancia={108}>
                 <div className="escrito_cat">
                     <p className="p_laranja">DIÁRIO DE BORDO</p>
                     <h2>HISTÓRIAS</h2>
@@ -23,7 +24,8 @@ export default function Historias(){
                             className="card_historia"
                             key={index}
                             progresso={progresso}
-                            atraso={0.06 + index * 0.06}
+                            atraso={atrasoCard(index, historias.length)}
+                            larguraEntrada={LARGURA_ENTRADA_CARD}
                         >
                             <div className="zoom_imagem">
                                 <img src={card.imagem} alt="imagem card" />

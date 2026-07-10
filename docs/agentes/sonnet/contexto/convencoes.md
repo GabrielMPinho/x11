@@ -3,10 +3,14 @@
 Regras que **o agente executor** deve seguir ao atuar neste projeto.
 
 ## Regras de ouro (inegociáveis)
-1. **NÃO alterar o visual atual em desktop.** Qualquer refatoração,
+1. **NÃO alterar o visual atual em desktop (> 1280px).** Qualquer refatoração,
    responsividade ou animação deve manter a aparência pixel-idêntica em telas
-   grandes (> 1024px). Se estiver em dúvida se algo muda o visual, não faça —
-   pergunte.
+   grandes (**> 1280px** — fronteira atualizada de 1024→1280 pelo dono). Se
+   estiver em dúvida se algo muda o visual, não faça — pergunte.
+   - **Única exceção documentada (dono, 2026-07-10):** a seção **Destaques
+     ("OS MAIS VENDIDOS")** PODE mudar no desktop, pois vira um **horizontal
+     scroll carousel** (ver Fase 4 no planejamento). Todas as **demais** seções
+     seguem pixel-idênticas > 1280px.
 2. **Data-driven sempre.** Conteúdo repetido vive em `src/data/`, nunca
    hardcoded no JSX. Componente só percorre os dados com `.map()`.
 3. **Imagens sempre via `import`.** Nunca referenciar imagem como string de
@@ -32,13 +36,21 @@ Regras que **o agente executor** deve seguir ao atuar neste projeto.
   em português). Não renomear classes existentes (quebraria o CSS).
 
 ## Animações (padrão a seguir)
-- Usar o pacote `motion` (import `motion` de `"motion/react"`).
-- Reveal bidirecional: `whileInView` **sem** `once`.
-- Centralizar `variants` reutilizáveis em `src/lib/motion.js` (a criar na Fase 3)
-  para manter a estética consistente.
+- Usar o pacote `motion` (import de `"motion/react"`).
+- **Modelo atual (Fase 3, 2ª rodada): reveal LIGADO AO SCROLL** (`useScroll` +
+  `useTransform`), NÃO `whileInView`. Ver `src/lib/Revela.jsx`
+  (`Revela`/`RevelaComProgresso`) e `src/lib/useProgressoSecao.js`. É
+  bidirecional por natureza (subir reverte a mesma curva).
+- **Fail-safe:** cada unidade de reveal tem UM único elemento `motion`; imagens
+  e textos são filhos DOM comuns. Nunca pôr opacity inicial numa `<img>` nem
+  depender de propagação de variant. O único opacity<1 é o wrapper de reveal,
+  que sempre chega a 1 quando em cena.
 - Só animar `transform`/`opacity`. Nunca animar propriedades que causam reflow
   (width, height, top, margin) de forma que altere o layout final.
-- Sempre incluir fallback `prefers-reduced-motion`.
+- Sempre incluir fallback `prefers-reduced-motion` (tudo estático e visível).
+- **Exceção estrutural aprovada (Fase 4):** a seção Destaques usa `sticky` +
+  altura alta (~300vh) + `x` ligado ao scroll — o único lugar onde a altura
+  muda, e só no desktop; ver Fase 4.
 
 ## O que NÃO fazer sem autorização explícita
 - Corrigir typos de conteúdo (`MOTOCILISMO`, `COMBRO`, título cortado em

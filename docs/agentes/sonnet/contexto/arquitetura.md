@@ -67,7 +67,7 @@ docs/agentes/
   <Categorias/>          → grid de 12 categorias (fundo escuro)
   <Lancamento_especial/> → banner com imagem de fundo + gradiente + texto
   <Territorio/>          → 4 cards "onde você pilota" (fundo escuro)
-  <Destaques/>           → 5 cards de produtos "mais vendidos" (fundo cinza)
+  <Destaques/>           → cards de produtos "mais vendidos" (9, data-driven — fundo cinza)
   <Historias/>           → 3 cards de histórias (fundo escuro)
   <Banner/>              → faixa com frase grande centralizada
 </main>

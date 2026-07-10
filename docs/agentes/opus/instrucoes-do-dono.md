@@ -51,8 +51,38 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   recebem **apenas micro-interação/hover**, sem virar funcionais nesta passada.
 - **Menu mobile:** **drawer lateral** (hambúrguer abre painel deslizante; fecha
   ao tocar fora).
+- **Header — 2 estados, SEMPRE presente (2026-07-10):** o dono redefiniu o header.
+  Nada de 3 estados nem de "sumir ao rolar". Só dois: **Hero/topo → header
+  COMPLETO** (design cheio atual); **resto da página → header MINIMALISTA**
+  (barra fixa enxuta, ~60px, logo pequeno + nav condensada, fundo sólido),
+  **sempre visível** (nunca some). Design minimalista **definido pelo Opus** na
+  instrução.
+- **Smooth scroll (Lenis) — candidato pra DEPOIS (2026-07-10):** o dono gostou da
+  ideia de scroll suave (perguntou sobre Locomotive Scroll). Decisão: **primeiro
+  terminar o carrossel**, depois avaliar. Recomendação do Opus: usar **Lenis**
+  (núcleo que a Locomotive v5 usa; o Framer já cobre os efeitos), como **Fase 5**.
+  Requer aval do dono por ser dependência nova. Ver `backlog` (Fase 5 candidata).
 - **Reveal de scroll:** **bidirecional** — ao descer, os elementos aparecem; ao
   subir, somem fazendo o caminho inverso.
+- **Mais animação de entrada/saída (2026-07-10):** após a 2ª rodada da Fase 3, o
+  dono conferiu no navegador e achou que ficou com **poucas animações de entrada
+  e saída** — quer o movimento **mais perceptível** (maior amplitude, entrada/saída
+  que se leem ao longo do scroll, seções se montando/desmontando), **mantendo** a
+  base scroll-linked e sem regredir os invariantes (nada invisível, desktop
+  >1280px intacto, sem scroll horizontal).
+- **Horizontal scroll carousel no Destaques (2026-07-10):** o dono gostou do
+  padrão de `hover.dev` (horizontal scroll carousel — rolar pra baixo faz os
+  cards andarem pra o lado) e **aprovou aplicá-lo na seção "OS MAIS VENDIDOS"
+  (Destaques)**, **inclusive no desktop >1280px**, abrindo uma **exceção pontual
+  à regra de ouro** — SÓ nessa seção. As demais seções continuam pixel-idênticas
+  no desktop. Vira a **Fase 4** do planejamento.
+- **Banner com "blur por palavra" (2026-07-10):** o dono quer na frase antes do
+  footer o efeito do `TextEffect` de motion-primitives (`per="word"`,
+  `preset="blur"`) — cada palavra entra num blur-in em sequência. **Continua sem
+  marquee e estática em repouso** (só a entrada muda). **Sem instalar
+  motion-primitives nem Tailwind:** reproduzir com o `motion` já existente. É a
+  **instrução ativa** em `sonnet/fazer/banner-blur-por-palavra.md` (a rodada de
+  correção anterior foi concluída e aprovada pelo Opus).
 
 ## Ordem das fases (definida pelo dono)
 Numeração pela **ordem real de execução**:

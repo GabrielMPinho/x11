@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
     AnimatePresence,
     motion,
@@ -11,64 +11,104 @@ import { navegacao } from "../src/data/navegacao";
 
 const EASE = [0.22, 1, 0.36, 1];
 
-// 3 estados (diretiva do dono):
-// - "completo": no Hero/topo — header cheio, como o design original.
-// - "escondido": saiu do Hero rolando pra BAIXO — some (desliza pra cima).
-// - "compacto": abaixo do Hero, rolando pra CIMA — versão reduzida, fixa.
+// Histerese do limiar Hero (zona morta pra não "piscar" perto do ponto de
+// troca): entra em minimalista ao PASSAR de 0.7×altura da janela, mas só
+// volta a "completo" ao subir abaixo de 0.5×altura.
+const ENTRA_MINIMALISTA = 0.7;
+const VOLTA_COMPLETO = 0.5;
+
+// Novo design (2026-07-10) — 2 estados, header SEMPRE presente (substitui o
+// modelo de 3 estados/"escondido" da rodada anterior, que o dono achou
+// bugado):
+// - "completo": no Hero/topo — o <header> original, cheio, SEMPRE em fluxo
+//   normal (nunca vira fixed — nunca causa pulo em <main>).
+// - "minimalista": resto da página — uma barra FIXA independente
+//   (`.header_minimalista`, elemento separado, nunca ocupa fluxo), que
+//   aparece via fade/slide curto e permanece SEMPRE visível (não some ao
+//   rolar pra baixo).
 export default function Header(){
     const [menuAberto, setMenuAberto] = useState(false);
     const [estado, setEstado] = useState("completo");
     const prefereMenosMovimento = useReducedMotion();
     const { scrollY } = useScroll();
-    const ultimoY = useRef(0);
 
     useMotionValueEvent(scrollY, "change", (y) => {
-        const limiteHero = typeof window !== "undefined" ? window.innerHeight * 0.7 : 600;
-        const indoParaBaixo = y > ultimoY.current;
-        ultimoY.current = y;
-
-        if (y < limiteHero) {
-            setEstado("completo");
-        } else if (indoParaBaixo) {
-            setEstado("escondido");
-        } else {
-            setEstado("compacto");
-        }
+        const alturaJanela = typeof window !== "undefined" ? window.innerHeight : 800;
+        setEstado((atual) => {
+            if (atual === "completo") {
+                return y > alturaJanela * ENTRA_MINIMALISTA ? "minimalista" : "completo";
+            }
+            return y < alturaJanela * VOLTA_COMPLETO ? "completo" : "minimalista";
+        });
     });
 
-    // reduced-motion: nada pode sumir — header sempre completo e estático.
-    const estadoEfetivo = prefereMenosMovimento ? "completo" : estado;
-    const flutuante = estadoEfetivo !== "completo";
+    const minimalista = estado === "minimalista";
 
-    return(
-        <motion.header
-            className={[
-                flutuante ? "header_flutuante" : null,
-                estadoEfetivo === "compacto" ? "header_compacto" : null,
-            ].filter(Boolean).join(" ") || undefined}
-            animate={{
-                y: estadoEfetivo === "escondido" ? "-100%" : "0%",
-                opacity: estadoEfetivo === "escondido" ? 0 : 1,
-            }}
-            transition={{ duration: prefereMenosMovimento ? 0 : 0.4, ease: EASE }}
-        >
-            <img src={logo} alt="logo laranja"/>
-            <nav>
-                {navegacao.map((item, index) => (
-                    <a href={item.link} key={index}>{item.nome}</a>
-                ))}
-            </nav>
-            <button
-                id="botao_hamburguer"
-                aria-label="Abrir menu"
-                aria-expanded={menuAberto}
-                aria-controls="drawer_menu"
-                onClick={() => setMenuAberto(true)}
-            >
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+    return (
+        <>
+            {/* Completo — sempre em fluxo normal, sem exceção: nenhuma
+                classe/estilo condicional é aplicada aqui. No Hero/topo é
+                pixel-idêntico ao original; ao rolar, só sai de vista como
+                qualquer header não-fixo (nunca é removido do fluxo depois
+                de montado, então nunca desloca <main>). */}
+            <header>
+                <img src={logo} alt="logo laranja"/>
+                <nav>
+                    {navegacao.map((item, index) => (
+                        <a href={item.link} key={index}>{item.nome}</a>
+                    ))}
+                </nav>
+                <button
+                    className="botao_hamburguer"
+                    aria-label="Abrir menu"
+                    aria-expanded={menuAberto}
+                    aria-controls="drawer_menu"
+                    onClick={() => setMenuAberto(true)}
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </header>
+
+            {/* Minimalista — elemento fixo INDEPENDENTE do <header> acima
+                (não é o mesmo nó DOM trocando de classe): monta/desmonta via
+                AnimatePresence só quando fora do Hero. Como nunca ocupa
+                fluxo, esse mount/unmount não desloca nada — dispensa o
+                espaçador que o modelo anterior precisava. */}
+            <AnimatePresence>
+                {minimalista && (
+                    <motion.div
+                        className="header_minimalista"
+                        initial={{ opacity: 0, y: -12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: prefereMenosMovimento ? 0 : 0.3, ease: EASE }}
+                    >
+                        <img src={logo} alt="logo laranja"/>
+                        <nav>
+                            {navegacao.map((item, index) => (
+                                <a href={item.link} key={index}>{item.nome}</a>
+                            ))}
+                        </nav>
+                        <button
+                            className="botao_hamburguer"
+                            aria-label="Abrir menu"
+                            aria-expanded={menuAberto}
+                            aria-controls="drawer_menu"
+                            onClick={() => setMenuAberto(true)}
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Drawer/overlay do menu mobile — compartilhado pelos 2
+                gatilhos acima (completo e minimalista), inalterado desde a
+                Fase 2. */}
             <AnimatePresence>
                 {menuAberto && (
                     <>
@@ -100,6 +140,6 @@ export default function Header(){
                     </>
                 )}
             </AnimatePresence>
-        </motion.header>
+        </>
     )
 }

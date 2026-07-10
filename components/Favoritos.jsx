@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { favoritos } from "../src/data/favoritos";
 import { RevelaComProgresso } from "../src/lib/Revela";
 import { useProgressoSecao } from "../src/lib/useProgressoSecao";
+import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
 
 export default function Favoritos(){
     const ref = useRef(null);
@@ -9,7 +10,7 @@ export default function Favoritos(){
 
     return (
         <section className="favoritos" ref={ref}>
-            <RevelaComProgresso as="div" className="titulo" progresso={progresso}>
+            <RevelaComProgresso as="div" className="titulo" progresso={progresso} distancia={108}>
                 <div className="escrito_fav">
                     <p className="p_laranja">SELEÇÃO</p>
                     <h2>FAVORITOS DA COLEÇÃO</h2>
@@ -22,7 +23,8 @@ export default function Favoritos(){
                         className="card"
                         key={index}
                         progresso={progresso}
-                        atraso={0.06 + index * 0.05}
+                        atraso={atrasoCard(index, favoritos.length)}
+                        larguraEntrada={LARGURA_ENTRADA_CARD}
                     >
                         <div className="zoom_imagem">
                             <img src={item.imagem} alt={item.alt} />

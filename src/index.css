@@ -510,6 +510,62 @@ button{
   margin: 0;
 }
 
+/* Fase 4 — Destaques vira Horizontal Scroll Carousel, SÓ ativo (via JS,
+   Destaques.jsx) com ponteiro fino em telas >1280px. EXCEÇÃO PONTUAL E
+   APROVADA à regra de ouro (só esta seção muda no desktop >1280px) — ver
+   docs/agentes/sonnet/contexto/convencoes.md. Reutiliza .card_produto/
+   .zoom_imagem/.imagem_produto_destaque/.titulo_produto_destaque/
+   .preco_produto_destaque (mesmo visual/hover de sempre); classes novas só
+   pro layout do trilho/pin, sem tocar nas regras acima. */
+.destaques.destaques_carrossel{
+  position: relative;
+  /* Altura real vem de `style` inline (CarrosselDestaques.jsx), proporcional
+     ao deslocamento medido do trilho (~1.2–1.5×) — ajuste 2026-07-10, a
+     razão fixa de 300vh (~4× o deslocamento) fazia o scroll "travado/duro"
+     (rolava muito, o trilho andava pouco). `min-height` aqui é só o piso
+     antes da medição rodar (1º render, deslocamento=0). */
+  min-height: 100vh;
+  display: block;
+}
+.destaques_pin{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+.cabecalho_carrossel_destaques{
+  padding: 0 4vw;
+  margin-bottom: 4vh;
+}
+.cabecalho_carrossel_destaques h3{
+  color: var(--branco);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin: 0;
+}
+.trilho_carrossel{
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  /* padding-left = respiro do 1º card (o scrollWidth CONTA esse lado).
+     A folga de "meio card" no FIM não vive aqui — uma 1ª tentativa com
+     `padding-right:170px` não funcionou: em container flex, `scrollWidth`
+     não inclui o end-padding quando o conteúdo transborda (quirk do
+     navegador), então o padding não entrava na conta do deslocamento. A
+     folga final agora é somada direto em JS — ver FOLGA_FIM em
+     CarrosselDestaques.jsx. */
+  padding-left: 4vw;
+  will-change: transform;
+}
+.card_carrossel{
+  flex: 0 0 340px;
+  width: 340px;
+}
+
 /* FIM DESTAQUES */
 /* ==================================================================== */
 
@@ -598,6 +654,9 @@ button{
   letter-spacing: 0.5px;
 
   font-size: clamp(2.2rem, 6vw + 1.16rem, 5rem);
+}
+.palavra_banner{
+  display: inline-block;
 }
 /* FIM BANNER */
 /* ==================================================================== */
@@ -688,37 +747,61 @@ button{
    (position/overflow/display) e usam seletores NOVOS — não mudam o valor
    de nenhuma regra existente, exceto onde comentado. */
 
-/* Header flutuante (fixo) — só existe fora do estado "completo" (JS
-   controla via classe). Em "completo" (Hero/topo) o header segue em fluxo
-   normal, exatamente como o desktop original; o position:fixed só entra
-   quando o usuário já rolou passado o Hero, então não desloca nada da
-   renderização de repouso. */
-.header_flutuante{
+/* Header minimalista (novo design, 2026-07-10 — substitui os antigos
+   header_flutuante/header_compacto de 3 estados). O <header> "completo"
+   (regras acima) fica SEMPRE em fluxo normal, sem exceção — nunca vira
+   fixed, então nunca causa pulo em <main> (não precisa mais de espaçador:
+   o completo simplesmente rola pra fora como qualquer elemento normal). A
+   barra minimalista é um elemento FIXED **independente** (não é o mesmo
+   <header>, ver components/Header.jsx), montado/desmontado via
+   AnimatePresence só quando fora do Hero — como nunca ocupou fluxo, seu
+   fade de entrada/saída não desloca nada. Ela é SEMPRE visível enquanto
+   montada (não some ao rolar pra baixo, diferente do antigo "escondido"). */
+.header_minimalista{
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 40;
-}
-/* Versão compacta do header (aparece ao rolar pra cima, abaixo do Hero) —
-   menor, logo pequeno, nav enxuta. Especificidade de classe vence a regra
-   base `header{height:12vh}` independente de breakpoint. */
-.header_compacto{
-  height: 64px;
-  padding: 0 20px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2vw;
   background-color: black;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
-.header_compacto > img{
-  width: 80px;
+/* Logo maior que a barra de 60px, mas SEM chegar ao tamanho natural
+   (2026-07-10, 3ª rodada — o tamanho natural/308px do header completo
+   ficou grande demais pro dono; alvo agora é só "um pouco maior que o
+   header pequeno"): `170px` de largura (~72px de altura) — pouco acima dos
+   60px da barra, sobreposição sutil, não o logo inteiro (tamanho aprovado
+   pelo dono). Mesmo mecanismo de sobreposição do completo
+   (`header > img{position:relative;top:2.9vh;z-index:1}`): `position:
+   relative` + `top` empurra o logo pra baixo do fluxo normal, sem
+   `overflow:hidden` no `.header_minimalista` (não definido) pra ela vazar
+   por cima do conteúdo abaixo da barra. `top` reduzido de `12px` pra
+   `4px` (4ª rodada — o dono pediu pra "arredar ela um pouco pra cima",
+   tamanho mantido). */
+.header_minimalista img{
+  position: relative;
+  width: 170px;
   height: auto;
+  top: 4px;
+  z-index: 1;
 }
-.header_compacto > nav{
-  margin-left: 0;
-  gap: 1.25rem;
+.header_minimalista nav{
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
-.header_compacto > nav > a{
+.header_minimalista nav a{
+  color: #afb3ae;
+  text-decoration: none;
   font-size: 0.8rem;
+}
+.header_minimalista nav a:hover{
+  color: var(--laranja);
 }
 
 /* Botão cortado com preenchimento animado no hover (Hero, Lançamento
@@ -807,7 +890,10 @@ button{
    foi estendida até 1280px para cobrir esse intervalo sem overflow. */
 
 /* ---------- Elementos novos do menu mobile (ocultos por padrão) ---------- */
-#botao_hamburguer{
+/* Classe (não mais id) — o header minimalista (2026-07-10) tem seu PRÓPRIO
+   botão hambúrguer (mobile ≤768px), independente do botão do header
+   completo; os dois abrem o MESMO drawer/overlay compartilhado abaixo. */
+.botao_hamburguer{
   display: none;
   flex-direction: column;
   justify-content: space-between;
@@ -816,7 +902,7 @@ button{
   background: transparent; border: none; outline: none;
   clip-path: none; cursor: pointer; z-index: 20;
 }
-#botao_hamburguer span{ display: block; width: 100%; height: 2px; background-color: var(--branco); }
+.botao_hamburguer span{ display: block; width: 100%; height: 2px; background-color: var(--branco); }
 .overlay_menu{ display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.6); z-index: 90; }
 #drawer_menu{
   display: none; position: fixed; top: 0; right: 0;
@@ -841,6 +927,14 @@ button{
   header > nav{ margin-left: 2vw; gap: 1.25rem; }
   header > nav > a{ font-size: 0.85rem; }
   header > img{ position: static; top: auto; left: auto; width: 110px; height: auto; }
+
+  /* Logo do header MINIMALISTA acompanha a mesma largura do completo neste
+     breakpoint (110px) — o completo vira `position:static` aqui (contido,
+     sem overlap, ajuste da Fase 2 pra não estourar no tablet), mas a barra
+     minimalista é um elemento à parte e mantém seu próprio mecanismo de
+     sobreposição (`position:relative`+`top`+`z-index`) em qualquer largura,
+     só reduzindo o `top` proporcionalmente ao logo menor. */
+  .header_minimalista img{ width: 110px; top: 18px; }
 
   /* ---- CABEÇALHO DE SEÇÃO: padrão único (esquerda + barra laranja) ---- */
   .titulo{
@@ -907,11 +1001,26 @@ button{
   #container_cards{ grid-template-columns: repeat(2, 1fr); width: auto; margin: 0 20px; gap: 20px; }
   .imagem_territorio{ height: auto; aspect-ratio: 4/5; }
 
-  /* ---- DESTAQUES: 3 colunas em grade (tablet) ---- */
+  /* ---- DESTAQUES: vitrine horizontal com snap (tablet) ---- */
+  /* Fase 4: era grade estática de 3 colunas; o dono pediu o mecanismo
+     binário "carrossel (>1280px + ponteiro fino) OU swipe nativo" — sem
+     grade estática no meio. ≤1280px cai no swipe/snap (já usado no
+     mobile), só com card mais largo pro tablet; o próprio Destaques.jsx
+     nunca ativa o carrossel/300vh/pin fora de >1280px+ponteiro fino. */
   .destaques{ display: block; min-height: 0; padding: 64px 0; }
   #conteudo_destaques{ width: auto; height: auto; margin: 0 20px; }
   #escrito_destaques{ height: auto; margin-bottom: 28px; }
-  #produtos_destaques{ grid-template-columns: repeat(3, 1fr); height: auto; }
+  #produtos_destaques{
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 38vw;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 20px;
+    height: auto;
+    padding-bottom: 16px;
+  }
+  .card_produto{ scroll-snap-align: start; }
 
   /* ---- HISTÓRIAS: 3 colunas (tablet) ---- */
   .historias{ min-height: 0; padding: 64px 0; }
@@ -925,6 +1034,12 @@ button{
   /* ---- FOOTER: 3 colunas fluidas ---- */
   #conteudo_footer{ grid-template-columns: repeat(3, 1fr); gap: 4vw; width: auto; margin: 0 20px; height: auto; }
   #fim_footer{ height: 0; }
+
+  /* Logo do rodapé (308×130px natural) estourava a lateral em 769–1280px:
+     só era restringido dentro do bloco ≤768px. Estende a mesma restrição
+     de largura pra toda a faixa ≤1280px (correção Fase 3). */
+  #logo_footer{ width: 140px; height: auto; }
+  #logo_footer img{ max-width: 100%; height: auto; }
 }
 
 
@@ -935,9 +1050,17 @@ button{
   header{ justify-content: space-between; padding: 0 20px; height: 64px; }
   header > img{ position: static; top: auto; left: auto; width: 90px; height: auto; }
   header > nav{ display: none; }
-  #botao_hamburguer{ display: flex; }
+  .botao_hamburguer{ display: flex; }
   .overlay_menu{ display: block; }
   #drawer_menu{ display: flex; }
+
+  /* HEADER MINIMALISTA — mesma resolução: nav condensada vira hambúrguer
+     (o botão já mostra via `.botao_hamburguer{display:flex}` acima, que
+     vale pros dois gatilhos, completo e minimalista). Logo um pouco menor
+     que no tablet/desktop pra sobrar folga ao lado do hambúrguer. */
+  .header_minimalista{ padding: 0 20px; }
+  .header_minimalista nav{ display: none; }
+  .header_minimalista img{ width: 90px; top: 14px; }
 
   /* HERO — botões empilham com respiro */
   .hero{ min-height: 100vh; padding: 96px 20px 56px; }

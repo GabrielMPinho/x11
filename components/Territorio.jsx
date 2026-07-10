@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { territorio } from "../src/data/territorio";
 import { RevelaComProgresso } from "../src/lib/Revela";
 import { useProgressoSecao } from "../src/lib/useProgressoSecao";
+import { atrasoCard, LARGURA_ENTRADA_CARD } from "../src/lib/useEstiloRevela";
 
 export default function Territorio(){
     const ref = useRef(null);
@@ -9,7 +10,7 @@ export default function Territorio(){
 
     return(
         <section className="territorio" ref={ref}>
-            <RevelaComProgresso as="div" className="titulo" progresso={progresso}>
+            <RevelaComProgresso as="div" className="titulo" progresso={progresso} distancia={108}>
                 <div className="escrito_cat">
                     <p className="p_laranja">SEU TERRITÓRIO</p>
                     <h2>ONDE VOCÊ PILOTA?</h2>
@@ -23,7 +24,8 @@ export default function Territorio(){
                             className="card_territorio"
                             key={index}
                             progresso={progresso}
-                            atraso={0.06 + index * 0.06}
+                            atraso={atrasoCard(index, territorio.length)}
+                            larguraEntrada={LARGURA_ENTRADA_CARD}
                         >
                             <div className="zoom_imagem">
                                 <img src={card.imagem} alt="imagem territorio" className="imagem_territorio" />

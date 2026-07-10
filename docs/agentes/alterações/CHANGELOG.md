@@ -5,6 +5,808 @@
 
 ---
 
+## 2026-07-10 11:12 — Conferência final do Opus: FASE 4 CONCLUÍDA (carrossel + header) — aguardando sinal verde pro commit
+
+**Conferência (Opus, script Playwright no build atual):**
+- **Carrossel:** folga do fim = **170px** (meio card) ✓; movimento fluido
+  (`useSpring`) e altura proporcional ✓.
+- **Overflow:** `document.scrollWidth == clientWidth` em **900/1024/1100/1280/1440**
+  ✓ (header minimalista + carrossel não introduziram overflow).
+- **Imagens:** todas atingem opacity 1, **exceto o logo do footer (0.98)** — caso
+  benigno conhecido (última seção sem pista de scroll; 98% imperceptível), **não
+  é regressão** do carrossel.
+- **reduced-motion:** menor opacity de imagem = **1.00** ✓.
+- **Logo do header:** aprovado pelo dono (11:04).
+
+**Estado do projeto:** Fases **1, 2, 3 e 4 concluídas e conferidas**. Todo o
+trabalho das Fases 2/3/4 está no **working tree, não commitado** (desde `b014deb`).
+`fazer/` esvaziado (sem tarefa ativa).
+
+**Próximo passo:** (A) **commit** de tudo (aguardando sinal verde do dono; o Opus
+cria branch + mensagem quando liberado); depois (B) **Fase 5 — Lenis (smooth
+scroll)**, que o Opus especifica após aval do dono (dependência nova). Retoque
+opcional trivial: nudge do `offset` do footer pra assentar em 1.0 (hoje 0.98).
+
+---
+
+## 2026-07-10 11:09 — Carrossel: folga de "meio card" no fim, agora de verdade (fix da tentativa anterior)
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/carrossel-folga-fim.md`,
+correção cirúrgica — só o cálculo do deslocamento; header/logo, `useSpring`,
+altura proporcional, cards, medição e fallback mantidos):
+
+- **Diagnóstico do Opus:** a tentativa anterior (`padding-right:170px` no
+  `.trilho_carrossel`) **não tinha efeito** — em container flex, o
+  `scrollWidth` **não inclui o end-padding** quando o conteúdo transborda
+  (quirk conhecido do navegador). Como `deslocamento = scrollWidth −
+  clientWidth`, o padding nunca entrava na conta — o carrossel continuava
+  terminando com o último card colado na borda (`folgaDireita=0`).
+- **Fix robusto:** a folga agora é somada **direto no JS**
+  (`components/CarrosselDestaques.jsx`), sem depender do `scrollWidth`
+  refletir nada — `setDeslocamento(Math.max(scrollWidth − clientWidth, 0) +
+  FOLGA_FIM)`, `FOLGA_FIM=170` (metade do card de 340px). `x` passa a ir de
+  `0` a `-(deslocamento medido + 170)`.
+- **`padding-right:170px` removido** de `.trilho_carrossel` (não fazia
+  efeito, só confundia). `padding-left:4vw` (respiro do 1º card) mantido —
+  esse lado o `scrollWidth` conta normalmente.
+- Efeito colateral esperado e aceitável: como a altura da seção
+  (`alturaSecao`) é proporcional ao `deslocamento` medido, e `FOLGA_FIM`
+  agora faz parte desse valor, o pin fica ~195px mais alto (`170×
+  FATOR_ALTURA_PIN`) pra acomodar a distância de rolagem extra da folga.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` (oxlint) ✅.
+
+**Pendente:** conferência do Opus (`folgaDireita≈150–180px` no fim do pin,
+não mais 0). Não commitado.
+
+---
+
+## 2026-07-10 11:08 — Carrossel: folga do fim não pegou (quirk do scrollWidth com padding-right) — correção via JS
+
+**Contexto (Opus, medido no build atual):** o logo do header ficou **perfeito**
+(aprovado pelo dono, ver 11:04). Mas o carrossel **ainda acaba colado no último
+card**. Medição: `.trilho_carrossel` está com `padding-right: 170px`, porém
+`scrollWidth` continua **3374px** (idêntico a antes do padding) → `deslocamento =
+1934`, `translateX` final −1934, `folgaDireita = 0`.
+- **Causa:** **quirk de container flex** — `scrollWidth` **não inclui o
+  `padding-right`/end-padding** quando o conteúdo transborda. A folga pedida via
+  padding nunca entrou no cálculo do deslocamento.
+- **Correção (instrução):** somar a folga **direto no deslocamento em JS**
+  (`deslocamento = max(scrollWidth − clientWidth,0) + ~170px`) e **remover** o
+  `padding-right` inútil. (Alternativa: espaçador real como último filho, que o
+  `scrollWidth` conta.)
+
+**Encaminhamento:** instrução ativa `sonnet/fazer/carrossel-folga-fim.md` (só o
+fim do carrossel; header não se toca). **Nada commitado.**
+
+---
+
+## 2026-07-10 11:04 — Logo do header minimalista: recuada do tamanho natural (grande demais) pra "um pouco maior que a barra" + nudge pra cima
+
+**O que foi feito e por quê:** 2 pedidos diretos do dono em sequência, fora
+do fluxo Opus → Sonnet:
+1. A rodada anterior levou o logo minimalista ao tamanho **natural** do
+   header completo (~308×130px, `width:auto;height:auto`) pra resolver o
+   feedback de "pequena demais"; o dono achou o resultado **grande demais**
+   e pediu algo só **"um pouco maior que o header pequeno"** (a barra de
+   60px). `.header_minimalista img` (regra base, `>1280px`): de `width:
+   auto;height:auto` (natural) para **`width:170px`** (`height:auto`, ~72px
+   de altura — pouco acima dos 60px da barra).
+2. Confirmado o tamanho ("o tamanho está ótimo"), pedido só pra **"arredar
+   ela um pouco pra cima"** — `top` reduzido de `20px` (valor da rodada
+   anterior) para **`4px`** (nudge pra cima, tamanho mantido).
+- **Tiers `≤1280px` (`110px`/`18px`) e `≤768px` (`90px`/`14px`) não foram
+  tocados** em nenhuma das duas rodadas — só o desktop (`>1280px`), que era
+  o único usando `auto`/natural e o único mencionado pelo dono; a ordem
+  descendente desktop > tablet > mobile continua (`170 > 110 > 90`).
+- Mecanismo de sobreposição (`position:relative`+`top`+`z-index:1`, sem
+  `overflow:hidden` na barra) inalterado.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` (oxlint) ✅.
+
+**Pendente:** conferência visual final do dono. Não commitado.
+
+---
+
+## 2026-07-10 11:01 — Carrossel: folga de "meio card" no fim + logo do header minimalista do tamanho do completo
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/carrossel-folga-e-logo-cheio.md`,
+2 ajustes cirúrgicos; `useSpring`, altura proporcional, header 2 estados e o
+resto mantidos como estavam):
+
+**PARTE 1 — Carrossel: folga à direita no fim do pin**
+- Antes o último card parava exatamente encostado na borda direita da
+  viewport (`folgaDireita=0`) — o dono pediu que passasse um pouco, "como um
+  meio card invisível". Fix: `.trilho_carrossel` ganhou `padding-right:
+  170px` (metade dos 340px do `.card_carrossel`). Como o deslocamento
+  continua **medido do `scrollWidth`** (que já inclui esse padding), o
+  trilho passa a rolar ~170px a mais automaticamente — nenhum ajuste no
+  mapeamento `useTransform`/`FIM_MOVIMENTO`/`useSpring` de
+  `CarrosselDestaques.jsx` foi necessário. `.destaques_pin` mantém
+  `overflow:hidden`.
+
+**PARTE 2 — Header minimalista: logo do tamanho do header completo**
+- Medido pelo Opus: logo minimalista estava em 108×46px (achado pequeno
+  pelo dono) contra 308×130px do logo do header completo (tamanho natural).
+  Pedido: "ocupando tudo, no jeito que é no header cheio".
+- **`.header_minimalista img` passou a espelhar `header > img` breakpoint a
+  breakpoint:**
+  - **>1280px:** `width:auto;height:auto` — tamanho **natural (~308×130)**,
+    igual ao completo (antes fixo em 108px).
+  - **≤1280px:** `width:110px` — mesmo valor que o completo usa nesse range
+    (tablet, pra não estourar).
+  - **≤768px:** `width:90px` — mesmo valor do completo no mobile (era
+    88px).
+- **Sobreposição mantida em todas as larguras** (diferente do completo, que
+  vira `position:static` sem overlap em ≤1280px — a minimalista é um
+  elemento à parte e manteve seu próprio mecanismo): `position:relative` +
+  `top` positivo (`20px` no desktop, `18px` em ≤1280px, `14px` em ≤768px —
+  reduzido proporcionalmente ao logo menor) + `z-index:1`, sem
+  `overflow:hidden` na barra. Qualquer transbordo por CIMA da barra de 60px
+  (a imagem natural é mais alta que a barra) fica invisível de graça — a
+  barra é `position:fixed;top:0`, já é o próprio topo da viewport.
+- Resto do header minimalista (barra 60px, fundo, sombra, nav condensada,
+  hover laranja, sempre presente) **não foi tocado**.
+
+**Verificação:** `npx vite build` ✅ (456 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência do Opus (folga ≈150–180px no fim do carrossel;
+logo minimalista grande e sobreposta sem recorte/overflow em nenhuma
+largura; desktop >1280px fora Destaques/header pixel-idêntico;
+mobile/reduced-motion ok). Não commitado.
+
+---
+
+## 2026-07-10 10:52 — Review do dono: folga de meio card no fim do carrossel + logo minimalista do tamanho do completo — instrução
+
+**Contexto (Opus, medido por script no build atual):**
+- **Carrossel:** no fim do pin o último card para **colado na borda direita**
+  (`folgaDireita=0`; `translateX` final −1934 em 1440; trilho com `padding-right:0`,
+  9 cards de 340, gap 32, padL 4vw). O dono quer que **passe um meio card** ("como
+  se tivesse um meio card invisível ali"). **Fix (instrução):** `padding-right ≈
+  meio card (~170px)` no trilho — como o deslocamento é medido do `scrollWidth`,
+  a folga entra sozinha (último card para ~170px antes da borda).
+- **Logo minimalista:** medido **108×46px** (dono achou pequeno); o **completo é
+  308×130px** (natural). **Fix:** o logo minimalista passa a ter o **mesmo tamanho
+  do completo em cada breakpoint** (~308px desktop, ~110px ≤1280, ~90px ≤768),
+  **sobreposto/transbordando** a barra de 60px (z-index, sem `overflow:hidden`),
+  como o header cheio. Sem overflow horizontal. Resto do header mantido.
+
+**Encaminhamento:** instrução ativa `sonnet/fazer/carrossel-folga-e-logo-cheio.md`.
+Docs atualizados. **Nada commitado.**
+
+---
+
+## 2026-07-10 10:46 — Carrossel: folga no fim do pin + rolagem mais rápida/precisa
+
+**O que foi feito e por quê** (pedido direto do dono, fora do fluxo Opus →
+Sonnet — testando com os 9 produtos adicionados na entrada anterior):
+
+- **"Acaba bem quando o último produto é lançado" → agora sobra folga.**
+  Antes o `x` do trilho ia de `[0,1] → [0,-deslocamento]` no MESMO intervalo
+  do progresso do pin inteiro, então o trilho terminava de andar exatamente
+  no fim do pin (sem "respiro" antes de soltar a seção). Fix: novo
+  `FIM_MOVIMENTO=0.82` — o `useTransform` agora mapeia `[0, 0.82] →
+  [0,-deslocamento]`; do `0.82` ao `1` do progresso o `x` fica **parado**
+  em `-deslocamento` (comportamento padrão de clamp do `useTransform`) —
+  sobra ~18% do pin como folga com o último card já assentado antes de a
+  seção soltar o scroll.
+- **Rolagem mais rápida:** `FATOR_ALTURA_PIN` (altura extra do pin,
+  proporcional ao deslocamento medido) reduzido de `1.35` para **`1.15`** —
+  menos distância de rolagem por pixel de movimento do trilho.
+- **Mola mais "limpa"/precisa:** `useSpring` do progresso ajustado de
+  `{stiffness:140, damping:28, mass:0.4}` para **`{stiffness:200,
+  damping:26, mass:0.3}`** — segue a rolagem com menos atraso perceptível
+  (menos "arrastado"), continuando sem ultrapassar o alvo e voltar
+  (`damping` alto o bastante pra não oscilar).
+- Nada mais mudou: medição real do deslocamento, cards da loja, título
+  sempre visível, fallback swipe/reduced-motion.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` (oxlint) ✅.
+
+**Pendente:** conferência visual do dono do novo timing/velocidade. Não
+commitado.
+
+---
+
+## 2026-07-10 10:43 — Destaques: +4 produtos (5 → 9) pra testar o carrossel com mais cards
+
+**O que foi feito e por quê:** pedido direto do dono, fora do fluxo Opus →
+Sonnet (sem instrução em `fazer/`) — adicionar mais produtos ao "OS MAIS
+VENDIDOS" pra analisar melhor o comportamento do carrossel (Fase 4) com uma
+fila mais longa de cards.
+- `src/data/destaques.js`: 4 novos itens (mesma imagem placeholder e padrão
+  de preço dos 5 existentes) — CAPACETE URBAN X, MOCHILA TRAILBAG, JOELHEIRA
+  PROTECT, ÓCULOS RACE VISION. Total agora **9**.
+- **Zero mudança de código** em `Destaques.jsx`/`CarrosselDestaques.jsx`/CSS:
+  tudo já era data-driven (`destaques.map`, `atrasoCard(index,
+  destaques.length)`, medição real do trilho) — o carrossel, a
+  medição/deslocamento e o fallback (grid 5 colunas em reduced-motion, que
+  agora quebra em 2 linhas automaticamente; swipe/snap no tablet/mobile)
+  absorvem a contagem nova sem ajuste manual.
+- `arquitetura.md` atualizado (não citava mais "5 cards" fixos).
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` (oxlint) ✅.
+
+**Pendente:** conferência visual do dono/Opus do carrossel com 9 cards. Não
+commitado.
+
+---
+
+## 2026-07-10 10:39 — Polimento: carrossel fluido (razão de scroll + mola) + logo do header minimalista maior e sobreposta
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/polir-carrossel-e-logo-header.md`,
+2 polimentos pequenos apontados pelo dono; resto do header/carrossel mantido
+como estava):
+
+**PARTE 1 — Carrossel: de "travado e duro" pra fluido (`components/CarrosselDestaques.jsx`)**
+- **Razão scroll↔movimento corrigida:** a seção tinha `height:300vh` fixo
+  (~2700px, pin de ~1800px) contra um deslocamento real do trilho de só
+  ~446px (medido em 1440px) — razão ~4:1, por isso rolar bastante para o
+  card andar pouco (sensação de pesado). Fix: a altura da seção agora é
+  **calculada em runtime** a partir do próprio `deslocamento` medido —
+  `calc(100vh + deslocamento×FATOR_ALTURA_PIN px)`, `FATOR_ALTURA_PIN=1.35`
+  (alvo do dono: pin ≈ 1.2–1.5× o deslocamento) — aplicada via `style`
+  inline no `<section>` (a classe `.destaques.destaques_carrossel` no CSS
+  virou só `min-height:100vh`, o piso antes da 1ª medição). O mapeamento
+  `[0,1] → [0,-deslocamento]` do `x` não mudou — "sem buraco" continua
+  igual.
+- **Movimento suavizado:** `x` era derivado direto de `scrollYProgress`
+  (1:1 com o scroll, rígido). Agora passa por **`useSpring(scrollYProgress,
+  {stiffness:140, damping:28, mass:0.4})`** antes do `useTransform` — o
+  trilho desliza (fluido) mas continua responsivo, sem ficar "flutuante";
+  assenta em `-deslocamento` (último card sem buraco) ao fim do pin.
+  `.destaques_pin` mantém `overflow:hidden` — qualquer leve overshoot da
+  mola no assentamento não vaza como scroll horizontal.
+- Nada mais mudou: medição real do deslocamento (`scrollWidth −
+  clientWidth` + `resize`), cards da loja (`.card_carrossel` 340px), título
+  sempre visível no pin, fallback swipe/reduced-motion, e a regra de só
+  ativar em >1280px + ponteiro fino.
+
+**PARTE 2 — Header minimalista: logo maior e sobreposta (`src/index.css`)**
+- Pedido do dono: "quero a logo... um pouco maior e sobreposta, no mesmo
+  jeito que ela é inteira (completa)". Antes: `.header_minimalista img
+  {width:80px}`, contida dentro da barra de 60px, sem sobreposição.
+- **Aumentada** para `width:108px` (`height:auto`, ~44px de altura —
+  dentro do alvo 100–110px) e **`88px`** no mobile (`≤768px`), pra sobrar
+  folga ao lado do hambúrguer.
+- **Sobreposta com o mesmo mecanismo do header completo**
+  (`header > img{position:relative;top:2.9vh;z-index:1}`, que já transborda
+  a barra de 12vh): `.header_minimalista img` ganhou `position:relative;
+  top:18px` (`14px` no mobile) `z-index:1` — empurra o logo pra baixo do
+  fluxo normal, ultrapassando a borda inferior da barra de 60px e ficando
+  **por cima** do conteúdo abaixo. `.header_minimalista` não tem (e
+  continua sem) `overflow:hidden`, então nada recorta o logo.
+
+**Verificação:** `npx vite build` ✅ (456 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência do Opus (carrossel desliza fluido com razão de
+rolagem ~1.2–1.5×, sem buraco no fim; logo minimalista maior e sobreposta,
+sem recorte, sem overflow horizontal; desktop >1280px fora
+Destaques/header pixel-idêntico; mobile/reduced-motion ok). Não commitado.
+
+---
+
+## 2026-07-10 10:34 — Review do dono: polir feel do carrossel (fluidez) + logo do header maior/sobreposta — instrução
+
+**Contexto (Opus, review do dono após o fix):** os cards do carrossel **passaram a
+andar** (fix do componente-filho OK). Dois polimentos pedidos:
+1. **Carrossel "travado e duro".** Diagnóstico do Opus (valores atuais no código):
+   (a) razão **scroll↔movimento ~4:1** — seção `height:300vh` (~2700px), pin
+   ~1800px, mas o trilho anda só **446px** → sensação de travado; (b) `x` **cru**
+   (`useTransform` 1:1, sem `useSpring`) → rígido. **Fix (instrução):** altura da
+   seção **proporcional ao deslocamento real** (pin ≈ 1.2–1.5× o deslocamento, não
+   ~4×) + **`useSpring`** no progresso/`x` pra deslizar. Manter overflow:hidden no
+   pin (mola não vaza scroll horizontal).
+2. **Logo do header minimalista** — o dono quer **maior e sobreposta**, "como no
+   completo". Hoje `.header_minimalista img` é `80px`, contido. **Fix:** ~100–110px
+   + **protrair/transbordar** a barra (deslocamento pra baixo + `z-index`, sem
+   `overflow:hidden`), análogo ao `header > img` completo (`top:2.9vh; z-index`).
+   Resto do header minimalista mantido ("de resto está muito bom").
+
+**Encaminhamento:** instrução ativa `sonnet/fazer/polir-carrossel-e-logo-header.md`.
+Docs atualizados. **Nada commitado.**
+
+---
+
+## 2026-07-10 10:29 — Fix: cards do carrossel andando (componente-filho) + Header novo (2 estados, sempre presente)
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/carrossel-fix-e-header-minimalista.md`,
+2 ajustes independentes, ambos apontados ao vivo pelo dono):
+
+**PARTE 1 — Carrossel: cards agora andam**
+- Causa raiz confirmada pelo diagnóstico do Opus (medido por script): o pin
+  (`sticky`) e a medição do deslocamento (446px em 1440px) estavam certos,
+  mas o `translateX` do trilho ficava travado em `0`. Motivo: `useScroll({
+  target: refCarrossel })` rodava dentro do componente `Destaques`, cujo
+  **1º render sempre é o fallback** (`carrossel=false`, `refCarrossel.current
+  =null`) — quando o modo carrossel vira `true` depois do mount e a `<section>`
+  finalmente monta, o Framer **não re-vincula** um `useScroll` que já tinha
+  inicializado (uma vez) sem alvo. `scrollYProgress` ficava preso em `0` pra
+  sempre → `x = useTransform(0, [0,1], [0,-446])` nunca saía de `0`.
+- **Fix:** novo componente **`components/CarrosselDestaques.jsx`**, que
+  recebe TODO o mecanismo do carrossel (`<section ref>`, `useScroll`,
+  `useTransform`, medição do deslocamento, o trilho). `Destaques.jsx` só
+  decide o modo (`useModoCarrossel`, inalterado) e renderiza **ou**
+  `<CarrosselDestaques/>` **ou** o fallback. Como `CarrosselDestaques` só é
+  montado **depois** que o modo carrossel já está decidido, seu `<section
+  ref>` já existe no **1º render dele** — `useScroll` inicializa vinculado
+  ao alvo certo desde o início, e o progresso passa a andar 0→1 ao longo do
+  pin.
+- **Nada do que já funcionava mudou:** os 300vh + `sticky top:0 h:100vh`, a
+  medição real do deslocamento (`scrollWidth − clientWidth` + `resize`), os
+  cards da loja (`.card_carrossel` 340px), o título sempre visível no pin, e
+  o fallback swipe/reduced-motion — só a localização do `useScroll` mudou
+  (movida pro componente-filho).
+
+**PARTE 2 — Header: novo design minimalista, sempre presente (substitui o modelo de 3 estados)**
+- O dono achou o header de 3 estados (completo/escondido/compacto) bugado —
+  pediu **2 estados**, e o header **nunca some**: **completo** no Hero/topo,
+  **minimalista** (sempre visível, não some ao rolar pra baixo) no resto da
+  página.
+- **`components/Header.jsx` reescrito com 2 elementos físicos independentes**
+  em vez de 1 elemento trocando de classe:
+  1. **`<header>`** — o header completo original, **sempre renderizado, sem
+     NENHUMA classe/estilo condicional** (nunca vira `fixed`). No Hero/topo é
+     pixel-idêntico ao original; ao rolar, só sai de vista como qualquer
+     elemento normal em fluxo — nunca é removido do fluxo depois de montado,
+     então **nunca causa pulo** em `<main>` (elimina de vez a necessidade do
+     espaçador/`.header_espacador` da correção anterior — removido, não é
+     mais usado).
+  2. **`.header_minimalista`** — barra nova, **`position:fixed`** desde
+     sempre, `height:60px`, fundo preto sólido + `box-shadow` inferior sutil,
+     logo pequeno (`80px`) à esquerda, nav condensada à direita (mesmos links
+     de `data/navegacao`, `0.8rem`, `gap:1.5rem`, cinza claro com hover
+     laranja). Monta/desmonta via `AnimatePresence` só quando fora do Hero —
+     como **nunca ocupa fluxo**, esse fade (`opacity` + `y:-12→0`, `~0.3s`)
+     não desloca nada. **Nunca some** enquanto montada (troca só de acordo
+     com a posição de scroll, não mais com a direção).
+  - **Mobile `≤768px`:** a minimalista também ganhou **seu próprio botão
+    hambúrguer** (`.botao_hamburguer`, id virou classe pra suportar 2
+    instâncias — completo e minimalista — abrindo o **mesmo** drawer/overlay
+    compartilhado, inalterado desde a Fase 2).
+  - **Histerese mantida** (`0.7×altura` pra entrar em minimalista, `0.5×altura`
+    pra voltar a completo) — evita piscar perto do limiar.
+  - **`prefers-reduced-motion`:** a troca de estado continua acontecendo
+    (completo no Hero, minimalista no resto — **diferente** do modelo
+    anterior, que forçava sempre completo); só a transição de entrada/saída
+    da minimalista vira instantânea (`duration:0`).
+
+**Verificação:** `npx vite build` ✅ (456 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência do Opus (carrossel: `translateX` andando de 0 a
+−446px, 1º card à esquerda, último sem buraco; header: completo no Hero,
+minimalista fixo sempre visível no resto, sem pulo, sem piscar, sem
+overflow; mobile hambúrguer/drawer ok nos 2 gatilhos; reduced-motion e
+desktop >1280px assentado ok). Não commitado.
+
+---
+
+## 2026-07-10 10:25 — Conferência do Opus: carrossel pina mas cards não andam (diagnóstico) + header redesenhado (2 estados) — instrução
+
+**Conferência do carrossel (Opus, medido por script Playwright, 1440px):**
+- Modo carrossel ativa e **o pin funciona** (`pinTop=0` na faixa de 2700px); o
+  **deslocamento é medido corretamente em 446px** (trilho 1886 − viewport 1440).
+- **Mas o `translateX` do trilho fica travado em 0** do início ao fim do pin →
+  os cards não andam. **Causa raiz:** o `useScroll({target: refCarrossel})` roda
+  no `Destaques`, mas no 1º render `carrossel=false` (ref `null`); quando
+  `useModoCarrossel` vira `true` depois do mount, o Framer **não re-vincula** o
+  `useScroll` ao ref preenchido tarde → `scrollYProgress` preso em 0 → `x=0`.
+- **Fix (instrução):** isolar o carrossel (a `<section ref>` + `useScroll`/
+  `useTransform`/`x`) num **componente-filho** montado só no modo carrossel, pro
+  hook inicializar com o ref já anexado. Manter pin/medição/fallback (já corretos).
+
+**Redesign do header (decisão do dono):** de 3 estados (completo/escondido/
+compacto) para **2 estados, header SEMPRE presente**: Hero → completo;
+resto da página → **minimalista fixo** (~60px, logo pequeno + nav condensada,
+fundo sólido, hover laranja), **nunca some**. Design minimalista **definido pelo
+Opus** na instrução. Remove o estado "escondido".
+
+**Encaminhamento:** instrução ativa `sonnet/fazer/carrossel-fix-e-header-
+minimalista.md` (Parte 1 carrossel + Parte 2 header). **Fase 5 (Lenis/smooth
+scroll)** registrada como candidata pós-carrossel (o dono adiou: "terminar o
+carrossel e depois entramos nisso"). Docs atualizados. **Nada commitado.**
+
+---
+
+## 2026-07-10 10:11 — Fase 4: Destaques vira Horizontal Scroll Carousel (desktop >1280px + ponteiro fino)
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/fase-4-carrossel-destaques.md`,
+mecanismo de referência do dono — hover.dev/Framer Motion — traduzido pro CSS
+do projeto, sem Tailwind. **Exceção pontual e já aprovada à regra de ouro:**
+só `.destaques` muda no desktop >1280px; todas as outras seções continuam
+pixel-idênticas):
+
+**`components/Destaques.jsx` reescrito com 2 modos (escolhidos em runtime, não CSS-only):**
+- **`useModoCarrossel()`** (hook local ao componente) decide via
+  `window.matchMedia("(pointer: fine) and (min-width: 1281px)")` +
+  `useReducedMotion()`. **Só** ponteiro fino + >1280px + sem reduced-motion
+  ativa o carrossel; qualquer outro caso (tablet, touch, reduced-motion, ou
+  antes do JS medir no 1º paint) cai no **fallback** — nunca invisível, nunca
+  scroll-hijack em toque.
+- **Modo carrossel** (`<section className="destaques destaques_carrossel">`):
+  - Seção com **`height:300vh`** (exceção estrutural aprovada) + `.destaques_pin`
+    **`position:sticky;top:0;height:100vh`** (fica "pinada" enquanto o usuário
+    rola os 300vh). Dentro, `.trilho_carrossel` é um `motion.div` com `x`
+    ligado a `useScroll({target: refDaSeção})` (sem offset — progresso 0→1
+    cobre a passagem inteira da seção, igual à referência) via `useTransform`.
+  - **`x` calculado por medição real, não `%` chutado:** a referência do dono
+    usa `["1%","-95%"]` calibrado pra 7 cards de 450px; com 5 cards e larguras
+    do projeto isso deixaria buraco ou cortaria. Em vez disso: `useEffect`
+    mede `trilho.scrollWidth - viewport.clientWidth` (recalculado no
+    `resize`) e usa esse valor em px como deslocamento máximo — 1º card
+    começa à esquerda (respiro `padding-left:4vw` no trilho), último card
+    termina **exatamente** encostado na borda direita, sem buraco, qualquer
+    largura de tela >1280px.
+  - **Cards da loja mantidos** (não o card-placeholder da referência):
+    `.card_produto` + `.card_carrossel` (largura fixa `340px`, novo) reaproveita
+    `.zoom_imagem`/`.imagem_produto_destaque`/`.titulo_produto_destaque`/
+    `.preco_produto_destaque` — mesmo hover-zoom de sempre, mesma
+    imagem+título+preço da vitrine, só o layout de trilho é novo.
+  - Título ("OS MAIS PROCURADOS/OS MAIS VENDIDOS") fica **fora** do trilho,
+    numa linha própria dentro do `.destaques_pin` (`flex-direction:column`,
+    não a linha única da referência) — **sempre visível durante o pin**, sem
+    precisar de scroll-reveal próprio (é estático nesse modo; o movimento da
+    seção agora É o carrossel). As setas `←→` foram **ocultadas** neste modo
+    (decorativas demais ao lado de um trilho que já se move sozinho).
+- **Modo fallback** (≤1280px, ponteiro grosso/touch, ou reduced-motion):
+  estrutura de sempre (`#produtos_destaques`, `RevelaComProgresso` por card),
+  **sem 300vh nem pin**. Dois ajustes:
+  1. **Tablet (`@media max-width:1280px`) deixou de ser grade estática de 3
+     colunas** — agora é o mesmo mecanismo de swipe/snap do mobile
+     (`grid-auto-flow:column;overflow-x:auto;scroll-snap-type:x mandatory`),
+     só com card mais largo (`38vw`, ponte até o `62vw`/`66vw` do mobile) —
+     o dono pediu a escolha binária "carrossel OU swipe nativo", sem grade
+     estática no meio. `≤768px`/`≤480px` inalterados (cascata já cobria).
+  2. **Amplitude do reveal por card reforçada só no Destaques** (`distancia`
+     de 84→**120**, `saida` de 80→**96**, no `RevelaComProgresso` do
+     fallback) — review do dono: "os mais vendidos com pouca animação" era
+     efeito colateral do ajuste de stagger da rodada anterior (entrada ficou
+     sutil demais aqui). O *timing* (`atrasoCard`/`LARGURA_ENTRADA_CARD`,
+     último card assentando bem antes do centro) **não mudou** — só a
+     distância percorrida, pra ficar mais perceptível sem reintroduzir o bug
+     do último card atrasado.
+- **`prefers-reduced-motion`:** força fallback sempre (hook nunca ativa o
+  carrossel) — em >1280px isso cai na grade estática de 5 colunas original
+  (sem scroll nem hijack, todos os cards visíveis/acessíveis de uma vez, o
+  que atende a exigência com folga); em ≤1280px cai no swipe/snap normal.
+
+**Verificação:** `npx vite build` ✅ (455 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência do Opus (rolar o carrossel: começa no 1º card,
+termina no último sem buraco, título visível durante o pin, header sem pulo,
+scroll solta antes/depois; tablet/touch com swipe+snap e entrada perceptível;
+reduced-motion sem hijack; sem overflow horizontal 320–1280px; demais seções
+desktop pixel-idênticas). Não commitado.
+
+---
+
+## 2026-07-10 09:45 — Fase 4 ATIVADA: carrossel horizontal no Destaques (instrução) + diagnóstico do "Destaques com pouca animação"
+
+**Contexto (Opus, review do dono após os ajustes P1/P2):** o dono apontou (1) o
+Destaques ficou **com pouca/nenhuma animação** e (2) **falta o carrossel** — e
+mandou o **código de referência** (hover.dev / Framer Motion).
+- **Diagnóstico do ponto (1):** efeito colateral do ajuste de stagger (09:39) — a
+  compressão + a `LARGURA_ENTRADA_CARD` mais curta deixaram os cards do Destaques
+  revelando sutil demais. **Resolvido pela Fase 4**: no desktop o carrossel passa
+  a ser a animação da seção; no fallback (≤1280/touch) a instrução pede restaurar
+  uma entrada perceptível.
+- **Encaminhamento:** movida a Fase 4 para `sonnet/fazer/fase-4-carrossel-
+  destaques.md` (instrução ativa). Mecanismo do carrossel segue o código de
+  referência do dono (`useScroll`+`useTransform` no `x`, seção ~300vh, filho
+  `sticky top:0 h:100vh overflow:hidden`), **mas adaptado às regras do projeto**:
+  **sem Tailwind**, reaproveitando `src/data/destaques.js` e o `.card_produto`
+  (imagem/título/preço — não o card-demo genérico), **medindo** o deslocamento
+  real do trilho (5 cards, não o `-95%` fixo da referência), com **fallback swipe
+  nativo** no touch e **reduced-motion** sem hijack. Exceção à regra de ouro (só
+  Destaques muda no desktop) já aprovada/documentada.
+
+**Sequência:** P1 (pulo do header) e P2 (stagger) concluídos na entrada 09:39; a
+conferência visual final do Opus será feita junto com a Fase 4. **Nada commitado.**
+
+---
+
+## 2026-07-10 09:39 — Correção: pulo do header no scroll + stagger dos grids terminando antes do centro
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/ajustes-scroll-e-stagger.md`,
+2 ajustes independentes, pós-review ao vivo do dono; **Destaques carrossel não
+foi tocado** — é a próxima instrução/Fase 4):
+
+**PONTO 1 — Fim do "pulo" do header ao cruzar o Hero**
+- Causa raiz confirmada: o header de 12vh (64px no mobile) alternava entre
+  fluxo normal (completo) e `position:fixed` (qualquer estado flutuante) —
+  removê-lo do fluxo tirava sua altura inteira de uma vez, empurrando
+  `<main>` pra cima (e de volta ao voltar ao topo).
+- **Fix (`components/Header.jsx` + `src/index.css`):** o header completo
+  continua **sempre em fluxo normal** (nada mudou aí); quando ele vira
+  flutuante (escondido/compacto), um **espaçador** (`<div
+  className="header_espacador">`, novo, renderizado condicionalmente só
+  quando `flutuante`) aparece **no mesmo render** reservando exatamente a
+  mesma altura que `header{height}` já definia por breakpoint (`12vh` base,
+  `64px` em `≤768px` — mesma regra espelhada em `.header_espacador`). Sair
+  do fluxo e a reserva aparecerem atomicamente (mesmo state update do React)
+  faz o deslocamento líquido em `<main>` ser **zero**.
+- **Histerese no limiar** (`ENTRA_FLUTUANTE=0.7`, `VOLTA_COMPLETO=0.5`, em
+  `Header.jsx`): antes um único limiar (`0.7×altura da janela`) controlava
+  entrada E saída do estado "completo", então uma micro-rolagem bem no
+  limiar podia alternar/piscar. Agora só entra em flutuante ao passar de
+  `0.7×altura`, mas só volta a "completo" abaixo de `0.5×altura` — zona
+  morta entre os dois evita a oscilação.
+- Nada mudou no comportamento visual dos 3 estados em si (completo/escondido/
+  compacto), no drawer mobile, nem no desktop `>1280px` em repouso (o header
+  completo em fluxo é pixel-idêntico ao original).
+
+**PONTO 2 — Stagger das grades: todos os cards assentados antes do centro da seção**
+- Causa raiz confirmada: em grades grandes (Categorias, 12 cards), o atraso
+  crescia linearmente por índice (`base + index*passo`) sem normalizar pela
+  contagem — o último card só assentava perto de `0.685` do progresso da
+  seção, mas a seção fica centralizada em `~0.5`: no centro da tela, o
+  último card (canto inferior direito) ainda aparecia esmaecido.
+- **Fix combinado (`src/lib/useEstiloRevela.js`, novo helper `atrasoCard` +
+  novo parâmetro `larguraEntrada`):**
+  1. **Atraso normalizado pela contagem:** `atrasoCard(index, qtd) = 0.03 +
+     (index/(qtd-1)) * 0.06` — o **último** card fica no máximo ~0.09 à
+     frente do primeiro, **independente de a grade ter 3 ou 12 itens**
+     (antes a Categorias somava 0.275 até o último). Só os 5 componentes de
+     grade (Favoritos/Categorias/Território/Destaques/Histórias) usam esse
+     helper; os títulos de seção e os blocos de texto de Lançamento
+     continuam com o `atraso` fixo de antes.
+  2. **Janela de entrada mais curta só pros cards:** novo parâmetro opcional
+     `larguraEntrada` em `useEstiloRevela`/`RevelaComProgresso` (default
+     continua `0.33`, o ritmo das seções/títulos — **não mudou**); os 5
+     componentes de grade passam `LARGURA_ENTRADA_CARD = 0.20` nos cards.
+  - Resultado no pior caso (Categorias, 12 cards): último card assenta em
+    `atraso(0.09) + larguraEntrada(0.20) = 0.29` do progresso da seção — bem
+    antes do centro (`~0.5`), com folga.
+  - Amplitude (`distancia`/`saida`) dos cards **não mudou** — só o *timing*;
+    o movimento continua visível, só termina mais cedo e mais "junto" entre
+    os cards (efeito ripple rápido, não fila arrastada).
+- Fail-safe mantido: um `motion` por card, imagem/texto como filhos comuns;
+  `reduced-motion` estático e visível (não mexido).
+
+**Verificação:** `npx vite build` ✅ (455 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência do Opus (rolar cruzando o Hero sem pulo/sem
+piscar no limiar; Categorias centralizada com os 12 cards já assentados;
+reduced-motion; desktop `>1280px` pixel-idêntico; sem overflow horizontal;
+Banner blur sem regressão). Não commitado.
+
+---
+
+## 2026-07-10 09:25 — Review ao vivo do dono: 3 pontos → instrução de ajustes (pulo do header + stagger dos grids) e carrossel confirmado pra Fase 4
+
+**Contexto (Opus, diagnóstico dos 3 pontos do dono):**
+1. **"Os mais vendidos não estão com o carrossel"** — a Fase 4 (Destaques como
+   horizontal scroll carousel) ainda não foi implementada; segue especificada e é
+   a **próxima** instrução após estes ajustes.
+2. **"Pulo" na rolagem perto do Hero** — **causa raiz confirmada no código:** o
+   `header` (`height:12vh`) fica **no fluxo** em "completo" e vira `position:fixed`
+   (`.header_flutuante`) ao sair do Hero; ao detachar, o `<main>` sobe 12vh de uma
+   vez (o pulo), e volta a descer ao retornar ao topo. Perto do limiar
+   (`0.7×innerHeight`) o estado oscila → "segura e solta".
+3. **Categorias: último card não termina no centro** — **causa raiz:** `atraso =
+   0.08 + index*0.025`; com 12 cards o último só assenta em ~0.685 do progresso,
+   enquanto a seção centraliza em ~0.5.
+
+**Encaminhamento (nada de código pelo Opus):**
+- Nova instrução ativa `sonnet/fazer/ajustes-scroll-e-stagger.md` com **P1**
+  (header sem pulo: header completo nunca vira `fixed` — barra compacta é `fixed`
+  independente que nunca ocupa fluxo; + histerese anti-flicker) e **P2** (stagger
+  dos grids normalizado pela contagem e faixa de entrada mais curta pros cards, pra
+  o último assentar em ≤ ~0.4, antes do centro).
+- **Fase 4 (carrossel do Destaques)** confirmada como a instrução seguinte (spec
+  pronta no planejamento). Ordem escolhida: **corrigir o pulo do scroll ANTES** de
+  montar uma seção pinada (sticky) por cima dele.
+
+**Docs atualizados:** `planejamento-completo.md` (status), esta entrada. **Nada
+commitado.**
+
+---
+
+## 2026-07-10 09:20 — Banner: entrada "blur por palavra" (estilo TextEffect/motion-primitives, sem dependência nova)
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/banner-blur-por-palavra.md`,
+tarefa pequena e isolada — só a animação de entrada do Banner; nenhuma outra
+seção, `src/lib/Revela.jsx`/`useEstiloRevela.js` ou `src/index.css` fora do
+bloco `.banner` foram tocados):
+
+- **`components/Banner.jsx` reescrito:** a frase deixou de ser um bloco único
+  (`Revela` com `distancia={96}`, fade+subida) e passa a **quebrar em
+  palavras**, cada uma seu próprio `motion.span` (`.palavra_banner`,
+  `display:inline-block` — nova regra em `src/index.css`). Espaço normal
+  (quebrável, não `nbsp`) entre palavras da mesma linha, pra preservar o wrap
+  natural do texto em telas estreitas — nada de travar a linha inteira e
+  criar overflow horizontal.
+- **Efeito por palavra:** `escondido` (`opacity:0`, `filter:"blur(10px)"`,
+  `y:10`) → `visivel` (`opacity:1`, `filter:"blur(0px)"`, `y:0`,
+  `duration:0.45s`, `ease` do projeto), com `staggerChildren:0.06` +
+  `delayChildren:0.05` no `motion.h1` pai — reproduz o preset `blur` do
+  `TextEffect` (motion-primitives) só com o pacote `motion` já usado no
+  projeto, **sem instalar nada novo** (motion-primitives/Tailwind/`cn()`).
+- **Disparo:** `whileInView="visivel"` (`viewport={{amount:0.4}}`) no
+  `motion.h1` — dispara quando o Banner entra na viewport e, sem `once`,
+  **re-dispara ao sair e voltar** (mesmo espírito bidirecional do reveal
+  ligado ao scroll usado nas outras seções, aqui como stagger discreto em
+  vez de scroll-scrubbed contínuo).
+- **`prefers-reduced-motion`:** `initial` já nasce em `"visivel"` quando
+  `useReducedMotion()` está ligado — frase nítida e estática desde o
+  primeiro paint, sem blur/stagger/y, nunca preso borrado.
+- **Exceção consciente de propriedade animada:** aqui também se anima
+  `filter:blur()` (fora do padrão "só transform/opacity" do resto do
+  projeto) — autorizado pelo Opus só pro Banner, por ser entrada única (não
+  loop) que sempre assenta em `blur(0)`. Documentado em `convencoes.md`
+  (já atualizado pelo Opus nessa rodada).
+- **Estado assentado inalterado:** duas linhas centralizadas (`<br/>`
+  preservado), mesma tipografia/cor/tamanho (`.banner h1` intocado, só
+  ganhou a regra `.palavra_banner{display:inline-block}`), `#texto_banner`
+  virou uma `<div>` simples (só um `motion.h1` dentro, sem wrapper motion
+  extra) — layout/box idêntico ao anterior.
+
+**Verificação:** `npx vite build` ✅ (455 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência visual do Opus (blur-in palavra a palavra, estado
+assentado idêntico, reduced-motion nítido de imediato, sem overflow, demais
+seções inalteradas). Não commitado.
+
+---
+
+## 2026-07-10 09:15 — Conferência do Opus: rodada de correção APROVADA + decisões de design (Banner blur, Fase 4 carrossel)
+
+**Conferência visual (Opus, screenshot 5 viewports, rebuild do working tree):**
+- **Overflow do footer: RESOLVIDO ✅** — `document.scrollWidth == clientWidth` em
+  **900 / 1024 / 1100 / 1280 / 1440** (antes 1024 dava 1050); zero elementos
+  estourando. Fase 2 dada como concluída/conferida.
+- **Animações reforçadas: OK ✅** — a tira de scroll mostra bem mais seções em
+  transição (títulos visíveis com cards ainda esmaecidos, seções entrando/saindo),
+  onde antes cada frame parado parecia já assentado.
+- **Sem regressão ✅** — toda imagem de conteúdo atinge opacity **1.00** em algum
+  ponto do scroll; em **reduced-motion** a menor opacity de imagem é **1.00**
+  (tudo visível).
+- **Observação menor (não bloqueia):** o **logo do footer** atinge no máx **0.98**
+  (não 1.0) porque é a última seção e não há scroll depois pra levar o progresso
+  ao ponto de assentar — visualmente imperceptível; anotado para eventual ajuste
+  fino do `offset` do footer.
+
+**Decisões de design do dono registradas:**
+- **Banner "blur por palavra"** (efeito `TextEffect`/motion-primitives
+  `per="word"` `preset="blur"`): a frase antes do footer passa a **entrar palavra
+  por palavra num blur-in**, seguindo **estática em repouso**. **Sem instalar
+  motion-primitives nem Tailwind** — reproduzir com o `motion` existente. Virou a
+  **instrução ativa** `sonnet/fazer/banner-blur-por-palavra.md` (a rodada de
+  correção anterior saiu de `fazer/` por estar concluída e aprovada).
+- **Fase 4 — Destaques como Horizontal Scroll Carousel** (`hover.dev`): aprovada
+  **exceção pontual à regra de ouro** (só essa seção muda no desktop >1280px);
+  spec completa no `planejamento-completo.md`. Entra em `fazer/` **após** o Banner.
+
+**Docs atualizados:** `convencoes.md` (exceção à regra de ouro + fronteira 1280px
++ modelo de animação scroll-linked), `instrucoes-do-dono.md`,
+`planejamento-completo.md` (Fase 4 + status), `sonnet/fazer/` (Banner). **Nada
+commitado.**
+
+---
+
+## 2026-07-10 09:10 — Correção: overflow do logo do footer + animações de entrada/saída reforçadas
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/fase-3-correcao-overflow-e-mais-animacao.md`,
+rodada de correção em cima do commit `b014deb` já aprovado — reveal ligado ao
+scroll, header 3 estados e Banner estático foram **mantidos**, nada disso foi
+regredido):
+
+**PARTE 1 — Bug de overflow (769–1280px) corrigido**
+- Causa raiz confirmada: `#logo_footer` (imagem natural 308×130px) só era
+  restringido dentro de `@media (max-width: 768px)`; na faixa 769–1280px o
+  footer já estava em 3 colunas mas o logo mantinha a largura natural e
+  estourava a lateral. **Fix:** mesma restrição (`width:140px;height:auto` no
+  `#logo_footer`, `max-width:100%` na `<img>`) estendida pro bloco
+  `@media (max-width: 1280px)` existente (`src/index.css`), sem tocar na regra
+  de `≤768px` nem no desktop `>1280px`.
+
+**PARTE 2 — Animações de entrada/saída reforçadas (mantendo o mecanismo scroll-linked)**
+- **`src/lib/useEstiloRevela.js` (novo arquivo):** o cálculo de opacity/y a
+  partir de um progresso de scroll (antes vivia dentro de
+  `RevelaComProgresso`, em `src/lib/Revela.jsx`) foi extraído pra um hook
+  próprio — reaproveitado agora também fora de `Revela.jsx` (nos botões
+  cortados, ver abaixo) e evita o aviso de Fast Refresh do oxlint por misturar
+  hook e componentes no mesmo módulo.
+- **Janela de movimento alargada:** o platô "assentado" (opacity 1 fixo)
+  encolheu de `0.28→0.72` (44% da passagem de scroll) para **`0.33→0.70`**
+  (37%) — entrada e saída ocupam mais da faixa de scroll, ficando bem mais
+  perceptíveis em qualquer ponto da rolagem.
+- **Amplitude de entrada (`distancia`) aumentada:**
+  - Blocos de título/texto de seção: **~40–56px → 100–108px** (títulos das 5
+    seções em grade, blocos de texto de Lançamento desconto/especial, Banner,
+    colunas do footer).
+  - Cards de grade: **~40px → 84px** (novo default de `RevelaComProgresso`);
+    cards de Categorias (chips pequenos) **24px → 72px**.
+- **Saída (`saida`) desacoplada da entrada e bem mais visível:** antes a saída
+  subia só `distancia*0.4` (~16–22px). Agora é um parâmetro próprio —
+  **~64–80px** — dando a sensação clara de a seção "sair de cena" antes da
+  próxima assentar (reforça a transição tela-a-tela, sem regredir o
+  fail-safe: o único elemento com opacity inicial <1 continua sendo o
+  wrapper de reveal, nunca imagem/texto isolados).
+- **Coreografia por elemento — Lançamento desconto e Lançamento especial**
+  deixaram de ser **um bloco rígido** (`Revela` único envolvendo
+  olho+título+parágrafo+botão) e passaram a ter **cada elemento como sua
+  própria unidade de reveal** (`RevelaComProgresso`), amarradas ao mesmo
+  progresso de scroll da seção com pequena defasagem entre elas (~0.05–0.15):
+  olho → título → parágrafo → botão, montando em sequência na entrada e
+  desmontando na saída. A imagem de Lançamento desconto ganhou defasagem
+  própria (0.08) pra assentar em paralelo ao texto.
+  - Sem adicionar nenhum wrapper `<div>` extra que mudasse layout: cada texto
+    virou sua própria tag motion (`as="p"`/`as="h1"`) mantendo a contagem de
+    filhos diretos idêntica à anterior (preserva o `gap:10px` de
+    `#container_texto` e o fluxo de `#texto`). O botão (`BotaoCortado`, já um
+    `motion.button`) ganhou uma prop `style` opcional pra receber o reveal
+    direto, sem precisar de wrapper.
+  - As duas seções passaram a usar `useProgressoSecao` (ref na `<section>`)
+    em vez de `Revela` com scroll próprio — mesmo mecanismo de base
+    (`useScroll`/`useTransform`), só compartilhando a fonte do progresso
+    entre os elementos da seção.
+- Demais seções em grade (Favoritos/Categorias/Território/Destaques/
+  Histórias): título mantido como uma unidade só (já se distinguia dos
+  cards), só a amplitude/janela mudou; o `atraso` inicial dos cards foi
+  empurrado um pouco pra frente (ex.: `0.06→0.10`) pra continuar a sequência
+  depois do título mais amplo.
+- Hero: `heroItem`/`heroStagger` (`src/lib/motion.js`) tiveram leve reforço —
+  `y:20→32`, `duration:0.7→0.8s`, `staggerChildren:0.12→0.14` — pra casar com
+  o novo ritmo, mantendo a entrada por sequência de *load* (não scroll) e
+  100% visível já no primeiro paint.
+- **Nada do que já estava OK foi regredido:** nenhuma imagem virou `motion`
+  aninhada, `prefers-reduced-motion` continua forçando `opacity:1;y:0` em
+  toda unidade de reveal, só `transform`/`opacity` são animados, e o estado
+  assentado continua sendo o layout final exato (desktop `>1280px`
+  intocado).
+
+**Verificação:** `npx vite build` ✅ (455 módulos) · `npm run lint` (oxlint) ✅
+sem avisos.
+
+**Pendente:** conferência visual do Opus (screenshot, 5 viewports —
+`scrollWidth===clientWidth` em 900/1024/1100/1280, entrada/saída percebidas,
+reduced-motion, desktop pixel-idêntico). Não commitado.
+
+---
+
+## 2026-07-10 08:52 — Conferência visual do Opus (Fase 3, 2ª rodada) + nova instrução de correção
+
+**O que foi feito (conferência, sem alterar código):**
+- Conferência por screenshot nos 5 viewports (390/768/1024/1280/1440) do estado
+  commitado `b014deb`, via Docker rootless + Playwright, servindo `dist/` dentro
+  do container. Passada A: layout assentado com `reducedMotion:reduce` (valida
+  imagens visíveis e overflow). Passada B: 1440 com scroll (ritmo das animações).
+  Passada C: mínimo de opacity por imagem ao longo do scroll. Prints apagados
+  após a leitura.
+- `npm run lint` (oxlint) ✅ e `npx vite build` ✅ passaram.
+
+**Aprovado (não regredir):**
+- **Todas as imagens visíveis** no estado assentado em todos os viewports — o bug
+  crítico da 1ª rodada (imagens invisíveis) está resolvido.
+- **Desktop 1440 completo e fiel** ao original; **sem overflow** em 390/768/1280/1440.
+- Header 3 estados e Banner estático com fade: OK.
+
+**Achados (viram a próxima instrução do Sonnet):**
+1. **Overflow horizontal em 769–1280px** (medido `scrollWidth`=1050 vs
+   `clientWidth`=1024 em 1024px; também ~900px e ~1100px). Causa raiz isolada por
+   diagnóstico DOM: **logo do footer** (`#logo_footer img`, 308×130px natural) só
+   é restringido em `@media (max-width:768px)`; na faixa 769–1280px o footer vira
+   3 colunas mas o logo mantém 308px e estoura. É **só o logo do footer**.
+2. **Poucas animações de entrada/saída** (feedback do dono): reveal com amplitude
+   pequena (~56px) e platô assentado largo (~0.28→0.72) fazem entrada/saída mal
+   se perceberem. Reforçar amplitude, janela e coreografia por elemento, mantendo
+   o modelo scroll-linked e todos os invariantes.
+
+**Fluxo:** substituída a instrução em `sonnet/fazer/`
+(`fase-3-refazer-animacoes-e-header.md` → `fase-3-correcao-overflow-e-mais-
+animacao.md`). Planejamento e instruções-do-dono atualizados. Aguardando o Sonnet
+executar; **nada commitado** nesta conferência.
+
+---
+
 ## 2026-07-09 13:57 — Fase 3 refeita do zero: reveal ligado ao scroll, header em 3 estados, Banner estático
 
 **O que foi feito:**
