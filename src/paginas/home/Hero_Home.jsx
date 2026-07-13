@@ -29,8 +29,8 @@ export default function Hero_Home(){
                 fora da estrada. Onde tecnologia encontra estilo.</motion.p>
             </div>
             <motion.div id="botoes" variants={heroItem}>
-                <BotaoCortado id="botao_masculino">VER MASCULINO</BotaoCortado>
-                <BotaoCortado id="botao_feminino">VER FEMININO</BotaoCortado>
+                <BotaoCortado id="botao_masculino" para="/homem">VER MASCULINO</BotaoCortado>
+                <BotaoCortado id="botao_feminino" para="/mulher">VER FEMININO</BotaoCortado>
             </motion.div>
         </motion.section>
     )

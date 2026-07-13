@@ -94,6 +94,13 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   navegáveis por URL**, coexistindo (fim do toggle temporário). É a Fase 0 das
   páginas (`backlog/paginas.md`). Em seguida: **institucional completa** (todas as
   seções + **hero com texto centralizado** no meio, pedido do dono).
+- **Tratamento das imagens — experimento na Favoritos (2026-07-13):** o dono
+  achou as imagens de seção "secas/coladas" (retângulos crus). Testando **3
+  tratamentos distintos** (1 por card) na seção **Favoritos da Home** — **exceção
+  pontual à regra de ouro** (só essa seção muda no desktop). Estilos: (1) fade pro
+  fundo, (2) corte diagonal + duotone, (3) duotone com reveal no hover. O dono
+  escolhe 1, que vira o **padrão reutilizável** das imagens. Instrução:
+  `sonnet/fazer/favoritos-tratamento-imagens.md`.
 
 ## Ordem das fases (executada)
 As **fases 1–7 estão concluídas e commitadas** (Fundação/data-driven,

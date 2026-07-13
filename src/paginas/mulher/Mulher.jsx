@@ -1,10 +1,7 @@
-// Scaffold — página "Mulher" (página da navegação). Estrutura pronta pra receber conteúdo;
-// Header/Footer/tokens/lib são compartilhados de src/padrao/. Sem rota ainda
-// (roteamento entra no shell src/App.jsx quando as páginas forem implementadas).
+import Produtos from "@/paginas/produtos/Produtos";
+
+// Página "Mulher" — PLP (listagem de produtos) compartilhada com Homem.jsx
+// via <Produtos/>; só o `genero` muda (breadcrumb). Ver src/paginas/produtos/.
 export default function Mulher(){
-    return (
-        <main className="pagina_scaffold">
-            <h1>Mulher</h1>
-        </main>
-    )
+    return <Produtos genero="Mulher" />
 }

@@ -116,7 +116,19 @@ header img{
 }
 .hero{
   position: relative;
-  z-index: -1;
+  /* FIX 2026-07-13 (diagnóstico do Opus via Playwright): era z-index:-1 —
+     como .hero não tinha um ancestral que isolasse esse contexto, o hero
+     INTEIRO (inclusive os botões) afundava atrás do próprio <main>, que
+     capturava os cliques (document.elementFromPoint no botão retornava
+     MAIN). Passou despercebido até agora porque os botões eram decorativos
+     (sem onClick) — ninguém notaria a interceptação. `z-index:0` (em vez de
+     `-1`) AINDA cria o contexto de empilhamento local que `.hero_bg`
+     precisa (position:relative + z-index não-auto, qualquer valor, já
+     basta) — só deixa de ser NEGATIVO, então `.hero` não "escapa" pra trás
+     do próprio pai. Internamente nada muda: `.hero_bg` (z-index:-1) continua
+     atrás de #escrito/#botoes (z-index:auto), exatamente como antes —
+     repouso visual idêntico. */
+  z-index: 0;
   overflow: hidden;
   min-height: 88vh;
   /* Fase 3: o background-image foi para a camada .hero_bg (mesmo asset,
@@ -215,6 +227,14 @@ button{
   width: 30%;
   position: relative;
   left: 6.6vw;
+  /* Card virou <a> (2026-07-13, clicável — ver Favoritos.jsx) — reset do
+     estilo nativo de âncora; nome/desc já têm `color` próprio, isso é só
+     precaução pra nada herdar azul/sublinhado do <a>. Sem anel/borda no
+     hover (2026-07-13, fica só em Categorias Populares) — só
+     elevação+sombra, ver bloco de hover compartilhado. */
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .nome{
   padding-top: 1vh;
@@ -233,10 +253,17 @@ button{
   font-size: 0.9rem;
   line-height: 1.4;
 }
-.card a{
+.card .cta_comprar{
+  /* Era `.card a` (a própria CTA era o link) — virou <span> visual desde
+     que o card inteiro passou a ser o <a> (2026-07-13). Sublinhado
+     preparado via `text-decoration-color:transparent→laranja` no hover
+     (ver bloco de hover compartilhado) — anima liso, sem trocar
+     `text-decoration-line` (não-animável). */
   margin-top: auto;
   padding-top: 1vh;
-  text-decoration: none;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
   color: var(--laranja);
   font-family: var(--fonte-rotulo);
   font-weight: 700;
@@ -244,7 +271,7 @@ button{
   letter-spacing: 0.1em;
   font-size: 1.3rem;
   padding-bottom: 8vh;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), text-decoration-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card img {
   width: 26vw;
@@ -371,6 +398,7 @@ button{
   height: 130px;
   text-decoration: none;
   color: #fff;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .icone_seta {
@@ -483,6 +511,9 @@ button{
 .card_territorio {
     display: flex;
     flex-direction: column;
+    /* Sem anel/borda no hover (fica só em Categorias Populares) — só
+       elevação+sombra. */
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .imagem_territorio {
@@ -557,6 +588,9 @@ button{
 .card_produto{
   display: flex;
   flex-direction: column;
+  /* Sem anel/borda no hover (fica só em Categorias Populares) — só
+     elevação+sombra. */
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .imagem_produto_destaque{
   width: 100%;
@@ -702,6 +736,9 @@ button{
 .card_historia{
   display: flex;
   flex-direction: column;
+  /* Sem anel/borda no hover (fica só em Categorias Populares) — só
+     elevação+sombra. */
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .card_historia h3, .card_historia p{
@@ -719,13 +756,18 @@ button{
   letter-spacing: 1px;
 }
 .card_historia a{
+  /* "LEIA MAIS" continua decorativo (sem página de blog ainda, dono define
+     depois) — só ganhou o mesmo sublinhado animado do .cta_comprar, pra
+     coerência visual do hover em toda a Home. */
   color: var(--laranja);
   font-family: var(--fonte-rotulo);
   font-size: 1.3rem;
-  text-decoration: none;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
   letter-spacing: 0.19rem;
   margin-top: auto;
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), text-decoration-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card_historia img{
   width: 29vw;
@@ -962,20 +1004,71 @@ button{
 }
 /* Hover só em dispositivos com ponteiro de verdade (evita "hover preso"
    depois de tocar em telas sensíveis ao toque). Zoom na imagem + CTA/seta
-   deslizando, disparados pelo hover do CARD inteiro (não só da imagem/CTA). */
+   deslizando, disparados pelo hover do CARD inteiro (não só da imagem/CTA).
+   Reforçado 2026-07-13 (Home: mais interatividade nos cards) — sombra sutil
+   coerente em Favoritos/Categorias/Território/Histórias/Destaques, e
+   sublinhado animado nos CTAs de texto. Anel/borda laranja no hover fica
+   **só em Categorias Populares** (pedido do dono) — os outros 4 ganham
+   elevação/sombra/zoom, sem borda. Só propriedades que NÃO causam reflow
+   (transform/box-shadow/cor) — a ELEVAÇÃO (translateY, é transform) fica
+   numa query separada abaixo, com guarda extra de prefers-reduced-motion
+   (pedido explícito da instrução; o zoom/slide que já existiam antes desta
+   rodada continuam como estavam, sem essa guarda extra). */
 @media (hover: hover) and (pointer: fine){
   .card:hover .zoom_imagem img,
   .card_territorio:hover .zoom_imagem img,
   .card_historia:hover .zoom_imagem img,
   .card_produto:hover .zoom_imagem img{
-    transform: scale(1.03);
+    transform: scale(1.05);
   }
-  .card:hover > a,
-  .card_historia:hover > a{
+  .card:hover .cta_comprar,
+  .card_historia:hover a{
     transform: translateX(6px);
+    text-decoration-color: var(--laranja);
   }
   .card_categoria:hover .icone_seta{
     transform: translateX(6px);
+  }
+  /* Anel/borda no hover — só Categorias Populares (2026-07-13, pedido do
+     dono: "isso deve ter apenas nos CATEGORIAS POPULARES"). Os outros 4
+     (Favoritos/Território/Histórias/Destaques) NÃO ganham outline-color
+     aqui — o `outline:1px solid transparent` que ainda têm na regra base
+     fica sempre transparente pra eles (só a transição/elevação/sombra
+     valem). */
+  .card_categoria:hover{
+    border-color: var(--laranja);
+  }
+  .card:hover,
+  .card_categoria:hover,
+  .card_territorio:hover,
+  .card_historia:hover,
+  .card_produto:hover{
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  }
+}
+/* Elevação (translateY) isolada — só com prefers-reduced-motion:no-preference
+   (a instrução pede explicitamente pra não elevar/transformar quando o
+   usuário pediu menos movimento; o resto do hover acima — zoom, sombra,
+   sublinhado — não é "movimento" no mesmo sentido e continua igual
+   independente dessa preferência, como já era antes desta rodada).
+   `!important` (2026-07-13, achado ao investigar "só a imagem reage ao
+   hover"): estes cards são `RevelaComProgresso` (motion.div) — o reveal por
+   scroll aplica `y` via `style` inline (Framer Motion escreve
+   `element.style.transform` direto no DOM pra performance), e um `style`
+   inline SEMPRE vence uma regra `:hover` de stylesheet externo, mesmo já
+   "assentado" em `y:0`. Sem `!important` aqui, a elevação nunca aparecia —
+   só o zoom da imagem (elemento à parte, sem esse conflito) reagia de
+   verdade, dando a impressão de "só a imagem é interativa". Seguro porque
+   o Framer só reescreve esse inline style quando `scrollYProgress` muda
+   (scroll), não em resposta a `:hover` — enquanto o mouse está parado sobre
+   o card, nada compete com a regra `!important`. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference){
+  .card:hover,
+  .card_categoria:hover,
+  .card_territorio:hover,
+  .card_historia:hover,
+  .card_produto:hover{
+    transform: translateY(-6px) !important;
   }
 }
 
@@ -1004,7 +1097,12 @@ button{
    — era à esquerda/embaixo; instrução institucional-completa.md). */
 .hero_institucional{
   position: relative;
-  z-index: -1;
+  /* z-index:0 (era -1) — mesmo fix do .hero da Home (2026-07-13): evita que
+     a seção inteira "afunde" atrás do <main>. Aqui não há botões/links pra
+     um clique ser bloqueado, mas alinhar o padrão evita o mesmo problema
+     latente se algo clicável entrar aqui depois. Continua criando o
+     contexto de empilhamento local que .hero_institucional_bg precisa. */
+  z-index: 0;
   overflow: hidden;
   min-height: 92vh;
   display: flex;
@@ -1324,6 +1422,436 @@ button{
 
 
 /* ==================================================================== */
+/* PRODUTOS — PLP (listagem Homem/Mulher, página compartilhada) */
+/* Classes próprias (namespace `produtos`/nomes específicos), nenhum seletor
+   da Home ou da Institucional tocado. Nota importante: `.aba_categoria`,
+   `.botao_tamanho`, `.dropdown_ordenar` e `.botao_filtros_mobile` são
+   <button> — a regra base global `button{width:14vw;height:7.3vh;margin:8px;
+   clip-path:...}` (pensada pro Hero da Home) alcançaria todo <button> do
+   site; por isso cada uma reseta width/height/margin/clip-path
+   explicitamente (exceto o `botao_cortado` do Bloco Editorial, que É pra
+   herdar o corte diagonal do Hero — mesmo padrão de Lançamento
+   desconto/especial). */
+
+/* ---- Hero-faixa da coleção (~45vh, NÃO tela cheia) ---- */
+.colecao_hero{
+  position: relative;
+  z-index: -1;
+  overflow: hidden;
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  padding: 0 6vw;
+}
+.colecao_hero_bg{
+  /* Correção 2026-07-13 (conferência vs PDF): era colecao-hero.jpg (clara,
+     verde/vermelha — destoava do clima urbano-escuro do PDF). Trocada por
+     jaqueta_fav.jpg (piloto de jaqueta em fundo grafite, escura/urbana) —
+     PLACEHOLDER ainda; a imagem definitiva da coleção o dono pode fornecer
+     depois (mesmo asset usado no Hero da Institucional, mas aqui sozinho,
+     não é reaproveitamento de seletor). */
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('../assets/images/jaqueta_fav.jpg');
+  background-size: cover;
+  /* background-position: ; */
+}
+.colecao_hero::after{
+  /* Overlay reforçado (era rgba(0,0,0,.75→.35→transparent) — fraco demais
+     pro PDF). Mesma técnica em 2 camadas do hero da Institucional: gradiente
+     forte partindo da esquerda (onde o texto assenta) + leve escurecimento
+     de base, garantindo contraste "COLEÇÃO LAB CRAFTED"/"COLEÇÃO SPORADIC"
+     mesmo em cima de qualquer imagem. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to right, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.2) 75%, transparent 100%),
+    linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 45%);
+  pointer-events: none;
+}
+.colecao_hero_escrito{
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.colecao_hero_escrito h1{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  line-height: 1.05;
+  font-size: clamp(2.2rem, 4vw + 1rem, 3.6rem);
+}
+
+/* ---- Barra de categorias ---- */
+.barra_categorias{
+  background-color: var(--background_escuro);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 6vw;
+  flex-wrap: wrap;
+}
+.breadcrumb_produtos{
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.9rem;
+}
+.abas_categorias{
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.abas_categorias::-webkit-scrollbar{ display: none; }
+.aba_categoria{
+  width: auto;
+  height: auto;
+  margin: 0;
+  clip-path: none;
+  flex: 0 0 auto;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  outline: none;
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  padding: 0.55rem 1.1rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.aba_categoria_ativa{
+  border-color: var(--laranja);
+  color: var(--laranja);
+}
+@media (hover: hover) and (pointer: fine){
+  .aba_categoria:hover{ border-color: var(--laranja); color: var(--laranja); }
+}
+
+/* ---- Corpo: sidebar + grade ---- */
+.produtos_corpo{
+  background-color: var(--background_escuro);
+  display: grid;
+  /* Coluna da sidebar compactada (2026-07-13, pedido do dono): era 240px —
+     mesmo valor que o breakpoint de tablet (≤1280px) já usava, agora
+     consistente nas duas faixas; sobra mais espaço pra grade de produtos. */
+  grid-template-columns: 200px 1fr;
+  /* align-items:start (2026-07-13, correção 3) — sem isso, o grid estica
+     .sidebar_filtros pra altura inteira da linha (mesma altura da grade),
+     e o `position:sticky` não teria espaço pra "andar": a caixa já nasce do
+     tamanho máximo. Com start, a sidebar fica com sua altura natural
+     (menor que a grade de 12 cards) e o sticky consegue acompanhar o
+     scroll de verdade. */
+  align-items: start;
+  gap: 48px;
+  padding: 8vh 6vw;
+}
+
+/* Sidebar de filtros — 5 blocos, todos decorativos (hover só, sem lógica de
+   filtro real, padrão do projeto). STICKY (2026-07-13, correção 3): a
+   coluna acompanha o scroll enquanto a grade rola ao lado. `top:80px` —
+   60px da barra `.header_minimalista` (fixed, sempre visível fora do topo)
+   + ~20px de respiro; por essa altura de página, o header já está no
+   estado minimalista quando a sidebar começaria a "descolar" do topo, então
+   o valor cobre o caso real sem precisar variar por breakpoint. Cancelado
+   no mobile (≤768px, sidebar vira bloco colapsável — ver responsividade). */
+.sidebar_filtros{
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 80px;
+}
+.botao_filtros_mobile{
+  display: none;
+}
+.sidebar_filtros_conteudo{
+  display: flex;
+  flex-direction: column;
+  /* Compactado (2026-07-13, pedido do dono): era 2.5rem entre blocos. */
+  gap: 1.75rem;
+}
+.filtro_bloco{
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+/* Kicker (.p_laranja, utilitário compartilhado — 1.3rem no resto do site)
+   reduzido só aqui, escopado ao bloco de filtro — a coluna compactada
+   (200px) fica apertada com o tamanho padrão. */
+.filtro_bloco > .p_laranja{
+  font-size: 1rem;
+}
+.filtro_tamanhos_grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+.botao_tamanho{
+  width: auto;
+  height: auto;
+  margin: 0;
+  clip-path: none;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.25);
+  outline: none;
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-size: 0.75rem;
+  padding: 0.4rem 0;
+  cursor: pointer;
+  transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine){
+  .botao_tamanho:hover{ border-color: var(--laranja); color: var(--laranja); }
+}
+.filtro_preco_trilho{
+  position: relative;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+}
+.filtro_preco_preenchido{
+  position: absolute;
+  inset: 0;
+  width: 62%;
+  background: var(--laranja);
+}
+.filtro_preco_alca{
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--laranja);
+  border: 2px solid var(--branco);
+}
+.filtro_preco_labels{
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255,255,255,0.65);
+  font-family: var(--fonte-rotulo);
+  font-size: 0.75rem;
+}
+.filtro_checkbox_lista{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.filtro_checkbox_item{
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255,255,255,0.85);
+  font-family: var(--fonte-rotulo);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.checkbox_decorativo{
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(255,255,255,0.35);
+  flex-shrink: 0;
+}
+.filtro_cores_swatches{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.swatch_cor{
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(255,255,255,0.25);
+}
+.filtro_cores_swatches .swatch_cor{
+  cursor: pointer;
+}
+.swatch_cor_pequeno{
+  width: 14px;
+  height: 14px;
+  /* Era rgba(0,0,0,.15) — pensada pro card claro; card agora é escuro
+     (correção 2026-07-13), borda precisa ser clara pra continuar visível. */
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* ---- Grade de produtos ---- */
+.grade_produtos_container{
+  display: flex;
+  flex-direction: column;
+}
+.grade_topo{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.contador_produtos{
+  color: rgba(255,255,255,0.65);
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.85rem;
+}
+.dropdown_ordenar{
+  width: auto;
+  height: auto;
+  margin: 0;
+  clip-path: none;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  outline: none;
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  padding: 0.55rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.seta_dropdown,
+.seta_filtros{
+  font-size: 0.7rem;
+  color: var(--laranja);
+}
+.grade_produtos{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.card_produto_plp{
+  /* Correção 2026-07-13 (feedback do dono): era --background_claro — branco
+     destoava do dark e fazia as imagens parecerem "coladas/figurinhas".
+     Agora integrado ao escuro, com --background_cinza (tom sutilmente
+     diferente do --background_escuro do .produtos_corpo) pra dar uma
+     separação leve entre os cards sem voltar pro branco. */
+  background-color: var(--background_cinza);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1rem;
+  /* Hover (2026-07-13, pedido do dono) — elevação+sombra+zoom no card
+     inteiro, sem anel/borda (pedido: "tire a borda do hover nos
+     equipamentos"). Sem `cursor:pointer` — o card ainda não navega pra
+     lugar nenhum (pendência: página de produto/detalhe, ver backlog), só o
+     hover é visual por ora. */
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card_produto_plp_imagem img{
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+}
+@media (hover: hover) and (pointer: fine){
+  .card_produto_plp:hover .zoom_imagem img{
+    transform: scale(1.05);
+  }
+  .card_produto_plp:hover{
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  }
+}
+/* `!important` — achado 2026-07-13 (ver bloco de hover da Home pro
+   racional completo): `.card_produto_plp` é `RevelaComProgresso`
+   (motion.div), o reveal por scroll aplica `y` via `style` inline (Framer
+   Motion escreve `element.style.transform` direto no DOM) — um `style`
+   inline sempre vence uma regra `:hover` de stylesheet externo, mesmo já
+   "assentado" em `y:0`. Sem isso, só o zoom da imagem (elemento à parte)
+   reagia de verdade — o card inteiro parecia não se mover. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference){
+  .card_produto_plp:hover{
+    transform: translateY(-6px) !important;
+  }
+}
+.card_produto_plp_tag{
+  margin: 14px 14px 4px;
+  color: var(--laranja);
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.7rem;
+}
+.card_produto_plp_nome{
+  margin: 0 14px 4px;
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.95rem;
+}
+.card_produto_plp_preco{
+  margin: 0 14px 10px;
+  color: rgba(255,255,255,0.85);
+  font-family: var(--fonte-titulo);
+  font-size: 1.1rem;
+}
+.card_produto_plp_cores{
+  margin: 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card_produto_plp_mais{
+  color: rgba(255,255,255,0.5);
+  font-family: var(--fonte-rotulo);
+  font-size: 0.75rem;
+  margin-left: 2px;
+}
+
+/* ---- Bloco editorial ---- */
+.bloco_editorial_secao{
+  background-color: var(--background_cinza);
+  padding: 8vh 6vw;
+  display: flex;
+  justify-content: center;
+}
+.bloco_editorial{
+  width: 100%;
+  max-width: 1200px;
+  background-color: var(--background_escuro);
+  padding: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.bloco_editorial_texto_grupo{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 560px;
+}
+.bloco_editorial h2{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.6rem, 3vw + 0.6rem, 2.4rem);
+}
+.bloco_editorial_texto{
+  color: rgba(255,255,255,0.75);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.bloco_editorial .botao_cortado{
+  background-color: var(--laranja);
+  color: var(--branco);
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+/* FIM PRODUTOS — PLP */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
 /* ==================================================================== */
 /* RESPONSIVIDADE (FASE 2) — NOVO SISTEMA DE DESIGN MOBILE */
 /* Desktop > 1280px = INTOCADO. Todo o design abaixo vive em @media
@@ -1431,6 +1959,15 @@ button{
   /* ---- INSTITUCIONAL — NOSSOS VALORES: padding de tablet ---- */
   .valores_secao{ padding: 8vh 20px; }
   .valores_grid{ gap: 32px 24px; }
+
+  /* ---- PRODUTOS — PLP: grade 2 col, sidebar mais estreita, paddings de tablet ---- */
+  .colecao_hero{ min-height: 38vh; padding: 0 20px; }
+  .barra_categorias{ padding: 20px; }
+  /* grid-template-columns não repetido — já é 200px 1fr no base (compactado
+     2026-07-13), essa faixa só ajusta gap/padding. */
+  .produtos_corpo{ gap: 32px; padding: 6vh 20px; }
+  .grade_produtos{ grid-template-columns: repeat(2, 1fr); }
+  .bloco_editorial{ padding: 32px; }
 
   /* CTAs de Lançamento desconto/especial: largura por conteúdo, texto inteiro */
   #texto button,
@@ -1560,6 +2097,40 @@ button{
   .valores_secao{ padding: 64px 20px; }
   .valores_grid{ grid-template-columns: 1fr; gap: 40px; max-width: 420px; }
 
+  /* PRODUTOS — PLP: sidebar sai da lateral (bloco colapsável no topo),
+     grade 1 coluna, barra de categorias empilha */
+  .colecao_hero{ min-height: 34vh; }
+  .barra_categorias{ flex-direction: column; align-items: flex-start; gap: 16px; }
+  .abas_categorias{ width: 100%; }
+  .produtos_corpo{ grid-template-columns: 1fr; gap: 24px; padding: 48px 20px; }
+  /* Sticky (correção 3) NÃO se aplica no mobile — sidebar colapsada vira
+     bloco no topo do fluxo normal, comportamento inalterado. */
+  .sidebar_filtros{ position: static; top: auto; }
+  .botao_filtros_mobile{
+    display: flex;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    clip-path: none;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    outline: none;
+    color: var(--branco);
+    font-family: var(--fonte-rotulo);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+  }
+  .seta_filtros{ transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+  .seta_filtros_aberta{ transform: rotate(180deg); }
+  .sidebar_filtros_conteudo{ display: none; margin-top: 20px; }
+  .sidebar_filtros_conteudo.sidebar_filtros_aberta{ display: flex; }
+  .grade_produtos{ grid-template-columns: 1fr; gap: 20px; }
+  .bloco_editorial{ flex-direction: column; align-items: flex-start; padding: 28px; }
+
   /* FAVORITOS — 1 coluna */
   #imagens{ flex-direction: column; gap: 40px; }
   .card{ flex: none; width: 100%; }
@@ -1616,6 +2187,11 @@ button{
 
   /* INSTITUCIONAL — MISSÃO: frase mais compacta */
   .missao_frase{ font-size: clamp(1.6rem, 9vw, 2.2rem); }
+
+  /* PRODUTOS — PLP: título do hero e grade mais compactos */
+  .colecao_hero_escrito h1{ font-size: clamp(1.8rem, 9vw, 2.4rem); }
+  .grade_produtos{ gap: 16px; }
+  .filtro_tamanhos_grid{ gap: 6px; }
 }
 /* FIM RESPONSIVIDADE */
 /* ==================================================================== */

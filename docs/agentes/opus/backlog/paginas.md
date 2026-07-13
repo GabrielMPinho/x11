@@ -49,6 +49,12 @@ Header com `<Link>`/`useNavigate`; toggle removido. `vite build`/`lint` ok.
 - **Reaproveitar** do `padrao/`: Header, Footer, tokens, `BotaoCortado`, o
   hover-zoom de imagem, o reveal. Estética de moto mantida.
 
+## Homem / Mulher (PRODUTOS — listagem) ⏳ ATIVA — `sonnet/fazer/produtos-listagem.md`
+Página de listagem (PLP) reutilizável (`src/paginas/produtos/`), **iguais
+inicialmente**. Levantamento (visual + textos + dados) em
+[`produtos.md`](./produtos.md). Filtros visuais nesta passada; imagens placeholder.
+Depois vem **produto** (detalhe, `produto.pdf`).
+
 ## 2–6. Páginas da navegação ⬜ pendentes
 Cada uma na sua pasta (`src/paginas/<nome>/`). Precisam de **conteúdo e design
 definidos pelo dono** — hoje só há o stub.

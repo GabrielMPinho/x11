@@ -69,7 +69,14 @@ Regras que **o agente executor** deve seguir ao atuar neste projeto.
 ## O que NÃO fazer sem autorização explícita
 - Corrigir typos de conteúdo (`MOTOCILISMO`, `COMBRO`, título cortado em
   Historias) — o dono decide.
-- Tornar elementos decorativos funcionais (setas de carrossel, botões, links).
+- Tornar elementos decorativos funcionais **sem pedido explícito**. **Parcialmente
+  revertido (2026-07-13, "Home: ligar os botões"):** os botões do Hero (VER
+  MASCULINO/FEMININO), Lançamento especial (EXPLORAR COLEÇÃO), os cards de
+  Favoritos (COMPRAR) e Categorias **agora navegam de verdade** — ver
+  `componentes.md`. **Continuam decorativos** (sem pedido ainda): setas do
+  carrossel de Destaques, Histórias "LEIA MAIS", Lançamento desconto "COMO
+  PARTICIPAR", links de categoria do footer. Não estender a navegação a
+  esses sem pedido novo do dono.
 - Migrar para TypeScript, Tailwind, ou qualquer nova dependência pesada.
 - Alterar o layout desktop "para melhorar" — mesmo que pareça frágil.
 

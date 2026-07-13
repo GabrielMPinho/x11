@@ -5,6 +5,351 @@
 
 ---
 
+## 2026-07-13 13:58 — Fix: clique dos botões do Hero bloqueado pelo `<main>` (z-index)
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/home-hero-clique-fix.md` — diagnóstico do Opus via
+teste Playwright real: `document.elementFromPoint` no botão retornava
+`MAIN`, `page.click`/`hover` davam timeout com "`<main>…</main> intercepts
+pointer events"`):
+
+- **Causa raiz:** `.hero{position:relative;z-index:-1}` — sem um ancestral
+  que isolasse esse contexto de empilhamento, o hero **inteiro** (título,
+  parágrafo, botões) afundava atrás do próprio `<main>`, que capturava
+  clique e hover. Passou despercebido até agora porque os botões eram
+  decorativos (sem `onClick`) antes da rodada "Home: botões navegando" —
+  não havia nada pra notar a interceptação.
+- **`.hero`:** `z-index:-1` → **`z-index:0`**. Ainda cria o contexto de
+  empilhamento local que `.hero_bg` (parallax) precisa pra ficar atrás do
+  conteúdo (`position:relative` + `z-index` **não-auto**, qualquer valor,
+  já basta) — só deixa de ser **negativo**, então o hero não "escapa" pra
+  trás do próprio pai. Internamente nada muda: `.hero_bg` (`z-index:-1`)
+  continua atrás de `#escrito`/`#botoes` (`z-index:auto`), exatamente como
+  antes — **repouso visual idêntico**, só o stacking.
+- **`.hero_institucional`:** mesmo fix (`-1`→`0`), verificação "de
+  passagem" pedida na instrução — lá não há botões/links hoje, então não
+  bloqueava nada, mas alinha o padrão pra não repetir o problema se algo
+  clicável entrar ali depois.
+- **Confirmado no código** (pedido da instrução): `.lancamento_especial`,
+  `.favoritos`, `.categorias` (as outras seções com botões/cards ligados)
+  **não têm** `z-index` negativo — sem o mesmo problema.
+
+**Achado extra (fora do escopo, só reportando pro Opus):** `.missao_secao`
+(Institucional) e `.colecao_hero` (Produtos) têm o **mesmo padrão**
+(`position:relative;z-index:-1`) — bug latente idêntico, mas sem
+consequência hoje (nenhuma tem conteúdo clicável dentro). Não toquei —
+instrução escopou só a Home + verificação pontual da Institucional.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos.
+Checagem no código: `.hero`/`.hero_institucional` sem `z-index` negativo;
+`.hero_bg`/`.hero_institucional_bg` (camadas internas) continuam
+`z-index:-1`, corretamente contidas agora. **Não testei o clique nem tirei
+prints** — a instrução pediu explicitamente pra deixar essa reconferência
+pro Opus (que já tem o Playwright rodando pro diagnóstico original).
+
+**Não commitado.** O Opus re-testa o clique.
+
+---
+
+## 2026-07-13 13:41 — Fix: hover não movia o card inteiro (só a imagem) + ajustes de borda
+
+**O que foi feito e por quê** (sequência de pedidos diretos do dono, fora do
+fluxo Opus → Sonnet — todos sobre o mesmo problema/área):
+
+### Achado: elevação do hover não funcionava (bug sistêmico)
+Investigando "o card inteiro não fica interativo, só a imagem reage",
+encontrei a causa: `.card`, `.card_categoria`, `.card_territorio`,
+`.card_historia`, `.card_produto` (Home) e `.card_produto_plp` (Produtos)
+são todos `RevelaComProgresso` (`motion.div`) — o reveal por scroll aplica
+`y` via `style` inline (Framer Motion escreve `element.style.transform`
+direto no DOM pra performance). Um `style` inline **sempre** vence uma
+regra `:hover` de stylesheet externo, mesmo já "assentado" em `y:0` — por
+isso a `translateY(-6px)` do hover (adicionado nas 2 rodadas anteriores)
+nunca aparecia de verdade, só o zoom da imagem (`.zoom_imagem img`, elemento
+à parte sem esse conflito) reagia. **Fix:** `!important` só na
+`translateY` do hover (seguro aqui — o Framer só reescreve esse inline
+style em resposta a scroll, não a `:hover`, então nada compete com a regra
+enquanto o mouse está parado sobre o card).
+
+### Borda/anel do hover — só em Categorias Populares
+Pedido do dono: a borda/anel laranja do hover deve aparecer **só** em
+`.card_categoria` (Categorias Populares). Removida de `.card` (Favoritos),
+`.card_territorio`, `.card_historia`, `.card_produto` (Destaques) e
+`.card_produto_plp` (Produtos) — esses 5 ficam só com elevação+sombra+zoom.
+Limpeza: os `outline:1px solid transparent`/`outline-offset` (órfãos, sem
+mais uso) removidos das regras base desses 5 seletores.
+
+### Confirmado (sem mudança): botões do Hero já navegam
+Checagem pedida pelo dono — `Hero_Home.jsx` já tinha `para="/homem"`/
+`para="/mulher"` nos 2 botões (`BotaoCortado`), implementado na rodada
+"Home: botões navegando". Código confere, sem necessidade de alteração.
+
+### ⚠️ Incidente: `src/App.jsx` sumiu do disco durante esta sessão
+No meio do trabalho, `npx vite build` começou a falhar com
+`Could not resolve './App' in src/index.jsx` — `src/App.jsx` tinha sido
+**apagado** (`git status` mostrou `D src/App.jsx`, deleção não commitada,
+provavelmente um imprevisto no editor do dono, que estava com o arquivo
+aberto). O último commit no git (`b9e1d7f`) é de **antes** do roteamento
+desta sessão — restaurar via `git checkout` teria revertido todo o
+`BrowserRouter`/`<Routes>`/`RolarAoTopoNaRota`. Comecei a reconstruir o
+arquivo a partir do conteúdo exato escrito na rodada de roteamento
+(confirmado sem mudanças em todo `git diff --stat` das rodadas seguintes),
+mas o próprio dono restaurou o arquivo (provável desfazer no editor) antes
+da minha escrita ser concluída — o conteúdo final bate exatamente com o
+esperado. **Nada foi perdido**, mas fica registrado — se `App.jsx` sumir de
+novo, o conteúdo correto está neste CHANGELOG (rodada "Roteamento (React
+Router)", 2026-07-13 10:37) pra reconstrução rápida.
+
+**Verificação:** `npx vite build` ✅ (496 módulos) · `npm run lint` ✅ sem
+avisos, depois de cada mudança (incluindo depois da recuperação do
+`App.jsx`). **Não tirei nem analisei screenshots.**
+
+**Não commitado.**
+
+---
+
+## 2026-07-13 13:13 — Produtos: hover nos cards + sidebar de filtros compactada
+
+**O que foi feito e por quê** (pedido direto do dono, fora do fluxo Opus →
+Sonnet — "coloque um hover nos cards e compacte os filtros na esquerda".
+"Filtros" só existe na página de Produtos, então card = `.card_produto_plp`
+e filtros = `SidebarFiltros`):
+
+- **Hover nos cards de produto (`.card_produto_plp`):** não tinha nenhum
+  tratamento de hover ainda. Mesma técnica já usada na Home (elevação/
+  sombra/anel/zoom): `outline` (não `border` — zero impacto de layout) +
+  `box-shadow` + zoom da imagem (`scale(1.05)`, via `.zoom_imagem`, já
+  presente no wrapper) no hover; elevação (`translateY(-6px)`) isolada numa
+  media query com guarda `prefers-reduced-motion:no-preference`. **Sem**
+  `cursor:pointer` — o card ainda não navega pra lugar nenhum (pendência:
+  página de produto/detalhe).
+- **Sidebar de filtros compactada:**
+  - Coluna da sidebar: `240px`→`200px` (`.produtos_corpo`, agora igual ao
+    breakpoint de tablet — ganhou espaço a mais pra grade de produtos).
+  - Espaço entre os 5 blocos: `2.5rem`→`1.75rem`; dentro de cada bloco:
+    `0.9rem`→`0.6rem`.
+  - Kicker de cada bloco (`.p_laranja`, 1.3rem no resto do site) reduzido
+    pra `1rem` **só dentro de `.filtro_bloco`** (escopado — não mexe no
+    utilitário compartilhado).
+  - Botões de tamanho: padding/fonte reduzidos; grade de tamanhos com gap
+    menor (`8px`→`6px`).
+  - Checkboxes (Estação/Especificações): gap e fonte reduzidos; quadrado
+    decorativo `16px`→`14px`.
+  - Swatches de cor: `22px`→`18px`, gap `10px`→`8px`.
+  - Labels de preço (R$ 200/R$ 2.200): fonte reduzida.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos. Só
+`src/padrao/estilos/base.css` tocado nesta rodada — Home/Institucional/App.jsx
+não mudaram. **Não tirei nem analisei screenshots.**
+
+**Não commitado.**
+
+---
+
+## 2026-07-13 13:08 — Home: botões navegando + mais interatividade nos cards
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/home-interacao.md`
+— **reverte a regra antiga "botões decorativos"**: agora os listados abaixo
+navegam de verdade). Só a Home (e o `BotaoCortado` compartilhado, sem
+quebrar usos existentes) — outras páginas não tocadas.
+
+### Parte 1 — Botões ligados
+- **`BotaoCortado.jsx`:** ganhou prop opcional `para` — com ela, o clique
+  navega via `useNavigate()`; sem ela, o botão é **idêntico** a antes
+  (Lançamento desconto continua sem `para`, decorativo). Continua
+  renderizando `<button>` (não `<a>`/`<Link>`) de propósito — precisa bater
+  com o seletor global `button{clip-path:...}`.
+- **Hero:** `VER MASCULINO`→`/homem` · `VER FEMININO`→`/mulher`.
+- **Lançamento especial:** `EXPLORAR COLEÇÃO`→`/homem`.
+- **Favoritos:** o **card inteiro** virou o link (`COMPRAR`→`/equipamento`)
+  — `RevelaComProgresso as="a"` com `href` real + `onClick`/
+  `preventDefault` (mesmo padrão do logo/link "INSTITUCIONAL" no Header,
+  não `react-router-dom`'s `<Link>`, que exigiria "motion-ificar" um
+  componente customizado dentro de `Revela.jsx` — mais risco pra um shared
+  primitive usado em ~9 lugares). "COMPRAR" virou `<span class="cta_comprar">`
+  (não mais `<a>` — dois `<a>` aninhados seria HTML inválido).
+- **Categorias:** `dados/categorias.js` trocou `link:"/categoria/…"` (rota
+  inexistente) por `genero:"masculino"|"feminino"|"neutro"` (atributo real
+  do conteúdo); `Categorias.jsx` mapeia gênero→rota
+  (masculino/neutro→`/homem`, feminino→`/mulher`, pedido explícito do
+  dono) e navega via `onClick`/`preventDefault`, mesmo padrão de Favoritos.
+- **Mantidos decorativos** (sem página de destino ainda, dono define
+  depois): Histórias `LEIA MAIS`, Lançamento desconto `COMO PARTICIPAR`.
+- **Território e Destaques:** sem destino definido na instrução — **não**
+  ganharam navegação (só o hover da Parte 2, abaixo).
+
+### Parte 2 — Hover mais rico, coeso em Favoritos/Categorias/Território/Histórias/Destaques
+- **Elevação leve** (`translateY(-6px)`) + **sombra sutil**
+  (`box-shadow`) + **anel laranja** que aparece no hover — em `.card`,
+  `.card_categoria`, `.card_territorio`, `.card_historia`, `.card_produto`.
+  ⚠️ **`outline`, não `border`** nos 4 primeiros (Categorias já tinha
+  `border` real, mantido) — `outline` nunca participa do box model, então o
+  anel transparente em repouso tem **zero impacto de layout** mesmo com
+  `box-sizing:border-box` (a regra de ouro pede repouso pixel-idêntico;
+  `border` mudaria a largura de conteúdo em ~2px).
+  - **Zoom da imagem intensificado** (`.zoom_imagem img`): `scale(1.03)` →
+    `scale(1.05)`.
+  - **CTA em destaque:** `.cta_comprar` (Favoritos) e `LEIA MAIS`
+    (Histórias) ganharam sublinhado animado (`text-decoration-color`
+    transparente→laranja, transição lisa — `text-decoration-line` não é
+    animável) somado ao slide (`translateX`) que já existia.
+- **`prefers-reduced-motion`:** a **elevação** (`translateY`, é `transform`)
+  fica numa `@media` **separada**, só ativa com
+  `prefers-reduced-motion:no-preference` (pedido explícito da instrução).
+  Zoom/slide/sublinhado/sombra **não** ganharam essa guarda — já existiam
+  (zoom/slide) ou não são "movimento" no mesmo sentido (sombra/sublinhado),
+  mantidos como sempre estiveram.
+- Transições ~0.3s com o `cubic-bezier(0.22,1,0.36,1)` já usado no resto do
+  projeto (equivalente ao `EASE` do `motion.js`).
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos. Checagem
+no código: `para=` presente nos 3 botões certos; `Lancamento_desconto.jsx`
+sem `para` (idêntico); `Historias.jsx` com `LEIA MAIS` ainda `href="#"`;
+Favoritos/Categorias com `as="a"`+`onClick`; Território/Destaques **sem**
+`useNavigate`/`onClick` (só hover); `git diff --stat` confirma **zero
+mudanças** em Institucional, Produtos, `App.jsx`, `Header.jsx`, `Footer.jsx`.
+**Não tirei nem analisei screenshots** — a conferência visual é do
+Opus/dono.
+
+**Não commitado.**
+
+---
+
+## 2026-07-13 12:50 — Produtos: 3 correções (cards escuros, hero, sidebar sticky)
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/produtos-correcao.md` — conferência do Opus vs
+PDF + feedback do dono; **só a página Produtos**, resto inalterado):
+
+1. **Cards de produto — fundo escuro:** `.card_produto_plp` era
+   `--background_claro` (branco destoava do dark, imagens pareciam
+   "coladas/figurinhas" — queixa do dono). Trocado por `--background_cinza`
+   (tom sutilmente diferente do `--background_escuro` do `.produtos_corpo`,
+   separação leve sem voltar pro branco). Como o texto era escuro (pensado
+   pro fundo claro), também troquei: `.card_produto_plp_nome`
+   (`--background_escuro`→`--branco`), `.card_produto_plp_preco`
+   (`#333`→`rgba(255,255,255,.85)`), `.card_produto_plp_mais`
+   (`#666`→`rgba(255,255,255,.5)`), `.swatch_cor_pequeno` (borda
+   `rgba(0,0,0,.15)`→`rgba(255,255,255,.25)`, senão ficava invisível no
+   fundo escuro).
+2. **Hero-faixa — imagem e overlay:** `colecao-hero.jpg` (clara, verde/
+   vermelha) destoava do clima urbano-escuro do PDF → trocada por
+   **`jaqueta_fav.jpg`** (piloto de jaqueta em fundo grafite, ainda
+   placeholder — comentado no código que a imagem definitiva da coleção o
+   dono pode fornecer depois). Overlay reforçado: 2 camadas (gradiente
+   forte partindo da esquerda, onde o texto assenta, + leve escurecimento de
+   base), mesma técnica do hero da Institucional. Altura da faixa (~45vh)
+   mantida.
+3. **Sidebar de filtros — sticky:** `.sidebar_filtros` ganhou
+   `position:sticky;top:80px` (60px da barra `.header_minimalista` fixa +
+   respiro) — acompanha o scroll enquanto a grade de produtos rola ao lado.
+   Precisou de `.produtos_corpo{align-items:start}` também (sem isso o grid
+   esticava a sidebar pra altura da grade inteira, e o sticky não tinha
+   espaço pra "andar"). **Cancelado no mobile** (`≤768px`,
+   `.sidebar_filtros{position:static}`) — lá a sidebar já colapsa num bloco
+   no topo, comportamento inalterado.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos. Checagem
+no código: card sem `--background_claro`; hero com `jaqueta_fav.jpg` +
+overlay reforçado; `.sidebar_filtros{position:sticky}` presente (e
+`position:static` no bloco `≤768px`). `git diff --stat` confirma **zero
+mudanças** em Home/Institucional/Header/Footer/App.jsx — só
+`src/padrao/estilos/base.css` e `src/paginas/produtos/HeroColecao.jsx`
+(comentário) tocados. **Não tirei nem analisei screenshots** — a
+reconferência contra o PDF é do Opus/dono.
+
+**Não commitado.**
+
+---
+
+## 2026-07-13 12:30 — Páginas de PRODUTOS (PLP): listagem Homem/Mulher
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/produtos-listagem.md`, estrutura/textos de
+`docs/agentes/opus/backlog/produtos.md`): `/homem` e `/mulher` deixam de ser
+scaffold — ambas renderizam a mesma página de listagem (PLP), reutilizável,
+só o breadcrumb muda entre os dois gêneros.
+
+- **`src/paginas/produtos/`** (novo): `Produtos.jsx` (orquestrador, prop
+  `genero`) + 5 sub-componentes + `dados/`:
+  - **`HeroColecao.jsx`** — faixa curta (~45vh, **não** tela cheia, diferente
+    dos heroes da Home/Institucional) com `colecao-hero.jpg` + overlay +
+    kicker "COLEÇÃO LAB CRAFTED" + título "COLEÇÃO SPORADIC". Entrada em
+    stagger no load, sem parallax.
+  - **`BarraCategorias.jsx`** — breadcrumb `{genero} / JAQUETAS` + 6 abas
+    decorativas (TUDO/ADVENTURE/TOURING/SPORT/URBAN/CLÁSSICO,
+    data-driven, ADVENTURE ativa por padrão, fiel ao PDF).
+  - **`SidebarFiltros.jsx`** — 5 blocos decorativos (TAMANHOS, PREÇOS —
+    slider falso com trilho+alça, ESTAÇÃO, COR — swatches, ESPECIFICAÇÕES),
+    **sem lógica de filtro real** (padrão do projeto). No mobile (≤768px)
+    vira bloco colapsável (botão "FILTROS", `useState` local).
+  - **`GradeProdutos.jsx`** — contador "12 DE 24 PRODUTOS" + dropdown "EM
+    DESTAQUE" (decorativos) + grade 3×4 de 12 cards em **fundo claro**
+    (`--background_claro`, único bloco claro da página — packshot precisa de
+    contraste, fiel ao PDF). Reveal por card (`atrasoCard`/
+    `LARGURA_ENTRADA_CARD`, mesmo padrão de Favoritos/Categorias/Território).
+  - **`BlocoEditorial.jsx`** — card escuro com kicker + "Como escolher sua
+    jaqueta?" + texto + `BotaoCortado` "EM DESTAQUE".
+  - **`dados/produtos.js`** — 12 produtos (nomes/tag/preço reais do PDF,
+    `docs/agentes/opus/backlog/produtos.md`); **imagens placeholder**
+    (não há 12 packshots reais ainda — alternando entre os assets
+    disponíveis, ver achado abaixo).
+  - **`dados/filtros.js`** — categorias/tamanhos/estações/cores/
+    especificações. Typos do PDF corrigidos (conteúdo novo, autorizado pelo
+    backlog): "TAMNHOS"→"TAMANHOS", "INVERSO"→"INVERNO",
+    "ESPECIFICAÇÃOES"→"ESPECIFICAÇÕES".
+- **`Homem.jsx`/`Mulher.jsx`:** deixam de ser scaffold — cada um vira
+  `return <Produtos genero="Homem|Mulher" />` (2 linhas). Roteamento
+  (`/homem`, `/mulher`) já existia, não foi tocado.
+- **`base.css`:** bloco novo "PRODUTOS — PLP" (classes próprias) + adaptações
+  nos 3 `@media` existentes (grade 3→2→1 col; sidebar sai da lateral e vira
+  colapsável só ≤768px, conforme pedido). ⚠️ Nota técnica: `.aba_categoria`,
+  `.botao_tamanho`, `.dropdown_ordenar` e `.botao_filtros_mobile` são
+  `<button>` — a regra base global `button{width:14vw;height:7.3vh;
+  clip-path:...}` (pensada pro Hero da Home) alcançaria qualquer `<button>`
+  do site, então cada uma reseta `width`/`height`/`margin`/`clip-path`
+  explicitamente (só o `botao_cortado` do Bloco Editorial herda o corte
+  diagonal de propósito, como em Lançamento desconto/especial).
+
+### 🔎 Achado: `conjunto1_fav.jpg` é BYTE A BYTE IDÊNTICO a `colecao-hero.jpg`
+Ao investigar por que uma das 4 imagens placeholder de Produtos não aparecia
+no `dist/` do build de produção, encontrei a causa: `conjunto1_fav.jpg` e
+`colecao-hero.jpg` (`src/padrao/assets/images/`) têm o **mesmo MD5**
+(mesmo arquivo, nomes diferentes) — bug de asset **pré-existente**, de antes
+desta tarefa (mesma data de criação dos 2 arquivos, `Jul 3`), não algo que eu
+quebrei. O Vite deduplica assets por hash de conteúdo (comportamento correto
+dele), então as duas importações sempre resolveram pro mesmo arquivo final.
+
+**Efeito colateral real, na Home:** o card "CALÇA RIDE FIT 2" da seção
+**Favoritos** (`src/paginas/home/dados/favoritos.js`, `conj1`) mostra a foto
+do **hero da coleção** por engano, silenciosamente, em produção — não é um
+`<img>` quebrado (por isso passou despercebido: a imagem carrega normal,
+só é a **errada**). **Não toquei em `Favoritos.jsx`/`favoritos.js`** (fora do
+escopo desta tarefa, que é só Produtos) — só **removi `conjunto1_fav.jpg`
+do ciclo de placeholders de `dados/produtos.js`** (ficou com 3 imagens
+distintas em vez de 4), pra não repetir a mesma foto do `HeroColecao` dentro
+da própria grade de produtos.
+
+**Pendência pro dono:** decidir se `conjunto1_fav.jpg` deve virar um asset
+de verdade (Favoritos, Home, perderia a imagem "extra" que hoje é só uma
+cópia disfarçada do hero) — fora do escopo desta tarefa, só reportando o
+achado.
+
+**Verificação:** `npx vite build` ✅ (496 módulos, todos os assets únicos no
+bundle — reconfirmado após o achado acima) · `npm run lint` ✅ sem avisos.
+Checagem no código: `/homem` e `/mulher` renderizam `<Produtos/>`; `git diff
+--stat` confirma **zero mudanças** em `src/paginas/home/`,
+`src/paginas/institucional/`, `src/padrao/componentes/` e `src/App.jsx`;
+todos os imports de `src/paginas/produtos/` usam o alias `@`. **Não tirei
+nem analisei screenshots** — a comparação com o PDF é do Opus/dono.
+
+**Pendências pro dono** (herdadas do backlog): 12 packshots reais (hoje 3
+placeholders alternados); filtros devem funcionar de verdade numa fase
+futura, ou seguem visuais?; clique no card deve levar pra uma página de
+produto (detalhe) — próxima página, ainda não existe. **Não commitado.**
+
+---
+
 ## 2026-07-13 11:50 — Header: link "INSTITUCIONAL" sempre rola ao topo
 
 **O que foi feito e por quê** (pedido direto do dono, fora do fluxo Opus →
