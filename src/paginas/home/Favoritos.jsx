@@ -31,7 +31,7 @@ export default function Favoritos(){
                         </div>
                         <p className="nome">{item.nome}</p>
                         <p className="desc">{item.desc}</p>
-                        <a href="#">COMPRAR ➜</a>
+                        <a href="#">COMPRAR </a>
                     </RevelaComProgresso>
                 ))}
             </div>

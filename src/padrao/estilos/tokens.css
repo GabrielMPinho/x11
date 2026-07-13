@@ -15,9 +15,19 @@
   /* Espaçamento: hoje os valores ainda são aplicados direto nas regras
      (vw/rem/px). Tokens de espaçamento (ex.: --espaco-1, --espaco-2…)
      podem ser adicionados aqui numa próxima passada, sem mudar o visual. */
+
+  /* Tipografia (2026-07-13) — identidade nova, 3 fontes do próprio layout
+     (pdffonts em docs/layout/*.pdf), todas Google Fonts. Pesos carregados
+     em index.html: Chakra Petch 700; IBM Plex Sans Condensed 500/600; Open
+     Sans Condensed 300/700 (essa família NÃO tem peso 400 no Google Fonts —
+     confirmado na API — 300 é o "regular" condensado disponível). */
+  --fonte-titulo: "Chakra Petch", sans-serif;
+  --fonte-rotulo: "IBM Plex Sans Condensed", sans-serif;
+  --fonte-corpo: "Open Sans Condensed", sans-serif;
 }
 
 /* Tipografia base */
 body {
-  font-family: "Roboto", sans-serif;
+  font-family: var(--fonte-corpo);
+  font-weight: 300;
 }

@@ -12,7 +12,9 @@ qualidade, a instrução planejada pelo Opus.
 3. **Respeite as regras de ouro** (ver `convencoes.md`), em especial:
    **nunca altere o visual atual em desktop** e mantenha tudo **data-driven**.
 4. **Verifique** ao terminar: `npx vite build` deve passar e `npm run lint` deve
-   ficar limpo; confira o visual nos breakpoints pedidos.
+   ficar limpo (+ as checagens objetivas de código pedidas na instrução). ⚠️ **A
+   conferência visual por screenshot (nos viewports) é do Opus e do dono — você
+   NÃO tira nem analisa prints.**
 5. **Documente:** adicione uma entrada no topo de
    `docs/agentes/alterações/CHANGELOG.md` (formato `AAAA-MM-DD HH:MM — TÍTULO`,
    com o que foi feito e por quê) e atualize `contexto/*` se algo estrutural

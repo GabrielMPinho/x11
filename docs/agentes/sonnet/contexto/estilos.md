@@ -7,7 +7,27 @@ CSS do Lenis e **todas as regras** — organizado por seção com comentários
 
 ## Reset e fontes
 - Reset global: `* { margin:0; padding:0; box-sizing:border-box; }`
-- Fonte: `Roboto` (via Google Fonts no `index.html`). `Inter` também é carregada.
+
+### Tipografia (migração global, 2026-07-13)
+Identidade nova de **3 fontes** (Google Fonts, confirmadas por `pdffonts` nos
+PDFs de `docs/layout/`), substituindo `Roboto`/`Inter`. Carregadas em
+`index.html`, só com os pesos usados; tokens em `tokens.css`, aplicadas por
+seletor em `base.css`. **Única exceção documentada à regra "desktop >1280px
+intocado"** além do carrossel de Destaques — ver `convencoes.md`.
+
+| Token | Fonte | Pesos carregados | Papel |
+|---|---|---|---|
+| `--fonte-titulo` | Chakra Petch | 700 | `h1`/`h2`/títulos de seção (`.hero>#escrito>h1`, `.titulo>.escrito_fav/escrito_cat>h2`, `#titulo_principal`, `#container_texto h1`, `.banner h1`), títulos de card/seção em `h3` (`.card_territorio h3`, `.card_historia h3`, `#escrito_destaques h3`, `.cabecalho_carrossel_destaques h3`) e **preços** (`.preco_produto_destaque`) |
+| `--fonte-rotulo` | IBM Plex Sans Condensed | 500, 600 | kickers (`.p_laranja`), nav (`header>nav>a`, `.header_minimalista nav a`), botões (`.texto_botao`), labels curtos de card/coluna (`.nome`, `.card_categoria p`, `.titulo_produto_destaque`, `.coluna_footer p`) e CTAs em caixa-alta (`.card a`, `.card_historia a`) |
+| `--fonte-corpo` | Open Sans Condensed | 300, 700 | `body` (padrão, `font-weight:300`) — corpo/parágrafos/descrições/links de conteúdo herdam sem regra própria (`.desc`, `.card_historia p`, `.coluna_footer a`, `#rodape_footer p`, etc.) |
+
+**Nota de pesos:** `Open Sans Condensed` **não tem peso 400** no Google Fonts
+(só 300 e 700, confirmado na API `fonts.googleapis.com/css2`) — por isso
+`--fonte-corpo` usa `font-weight:300` como "regular". Declarações existentes
+com peso não carregado (ex.: `.desc{font-weight:200}`, `.card_categoria
+p{font-weight:700}` em rótulo) renderizam no peso carregado mais próximo —
+comportamento nativo do navegador, não corrigido (fora do escopo desta
+migração, que não mexeu em `font-size`/`font-weight` além da troca de família).
 
 ## Lenis — CSS mínimo (Fase 5, 2026-07-10)
 Logo depois do reset/fontes, um bloco `/* LENIS */` colado do

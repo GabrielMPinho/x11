@@ -8,9 +8,34 @@ economia de tokens.
 ## Arquivos desta pasta
 - `README.md` — este arquivo: seu papel e o fluxo de trabalho.
 - `instrucoes-do-dono.md` — todas as instruções e decisões que o dono deu.
-- `backlog/planejamento-completo.md` — **o plano completo de todas as fases**,
-  com o prompt detalhado de cada uma e o status (concluída / ativa / pendente).
-  Ao concluir uma fase, marcá-la como concluída aqui.
+- `backlog/planejamento-completo.md` — **o plano das fases 1–7** (UX/animação/
+  reestruturação), todas ✅ concluídas e commitadas.
+- `backlog/paginas.md` — **frente atual:** as páginas novas (roteamento +
+  equipamento + páginas da navegação), com as decisões abertas do dono.
+- `backlog/institucional.md` — levantamento da **página institucional**
+  (estrutura, textos reais, assets) — em execução, começando pelo Hero.
+
+## Contexto técnico do projeto (LEIA ANTES DE PLANEJAR — não releia o código)
+Para planejar sem perder tempo relendo `src/`, o contexto técnico do projeto
+vive em **`../sonnet/contexto/`** (mesma fonte de verdade do executor). Ordem:
+1. `../sonnet/contexto/arquitetura.md` — pastas, shell, fluxo de dados, alias `@`.
+2. `../sonnet/contexto/padrao-api.md` — **API exata do `src/padrao/`**: props de
+   `BotaoCortado`/Header/Footer, os 4 exports de `motion.js`, hooks de reveal
+   (`Revela`/`RevelaComProgresso`/`useProgressoSecao`/`useEstiloRevela`), tokens
+   de cor, breakpoints (1280/768/480) e o **passo-a-passo de página nova**.
+3. `../sonnet/contexto/componentes.md` e `estilos.md` — seções da Home e o CSS.
+4. `../sonnet/contexto/convencoes.md` — regras de ouro e padrões.
+5. `../../../docs/layout/README.md` — material de referência das **páginas novas**
+   (PDFs/PNGs), ressalvas (espaçamento ruim, imagens baixa-res) e extração.
+
+> Só abra o código-fonte se precisar de um detalhe que a doc não cobre — e, se
+> abrir, **atualize a doc** para o próximo Opus não repetir a leitura.
+
+## Como conferir (visual)
+Rodar/servir e validar por **screenshot nos 5 viewports (390/768/1024/1280/
+1440)** via Docker rootless + Playwright (servir dentro do container); **apagar
+os prints depois**. `npx vite build` e `npm run lint` devem passar. O
+**desktop > 1280px** de tudo que já existe permanece pixel-idêntico.
 
 ## Regras do fluxo (decididas pelo dono — valem sempre)
 - **O Opus NUNCA edita o código de produção diretamente.** Toda correção/mudança

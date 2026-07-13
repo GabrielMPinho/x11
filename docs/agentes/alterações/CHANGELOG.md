@@ -5,6 +5,95 @@
 
 ---
 
+## 2026-07-13 09:32 — Hero: parágrafo branco maior (legibilidade)
+
+**O que foi feito e por quê** (pedido direto do dono, fora do fluxo Opus →
+Sonnet: o parágrafo do Hero — "Equipamento desenvolvido em laboratório para
+proteger dentro e fora da estrada. Onde tecnologia encontra estilo." —
+ficou "muito pequeno, quase ilegível" depois da migração tipográfica de
+09:27, que trocou a fonte do corpo para Open Sans Condensed peso 300 sem
+tocar em tamanhos):
+
+- **`#p_branco` (`base.css`):** ganhou `font-size: 1.2rem` (antes sem
+  regra própria — herdava o tamanho padrão do navegador, ~16px, que renderiza
+  pequeno/fino na fonte condensada nova). `1.2rem` casa com a escala já usada
+  no kicker `.p_laranja` da mesma seção. Nada mais no Hero foi tocado (cor,
+  `position`/`top`, o `h1`, os botões).
+- Ajuste pontual só neste seletor — não mexi em outros parágrafos do site
+  (fora do escopo pedido); se aparecerem outros textos pequenos demais em
+  outras seções, é um pedido novo.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos.
+Conferência visual não feita nesta rodada (mudança de 1 propriedade, baixo
+risco de overflow — texto já reflui livremente no container do Hero em
+todos os breakpoints). **Não commitado.**
+
+---
+
+## 2026-07-13 09:27 — Migração tipográfica GLOBAL: 3 fontes (Chakra Petch / IBM Plex Sans Condensed / Open Sans Condensed)
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/tipografia-global.md`,
+decisão do dono de 2026-07-13: nova identidade tipográfica global, as 3 fontes
+do próprio layout — confirmadas por `pdffonts` em `docs/layout/*.pdf`):
+
+> ⚠️ **Exceção explícita à regra de ouro** (autorizada pelo dono, "Global"):
+> esta mudança altera a **fonte** da Home no desktop **> 1280px** — a **2ª
+> exceção** documentada do projeto (a 1ª foi o carrossel de Destaques, Fase 4).
+> **Layout/estrutura preservados**; só a tipografia muda.
+
+- **`index.html`:** troca do `<link>` do Google Fonts — carrega **Chakra
+  Petch (700)**, **IBM Plex Sans Condensed (500/600)** e **Open Sans
+  Condensed (300/700)**, só com os pesos usados. **Removidas `Inter` e
+  `Roboto`** (não usadas em nenhum seletor). Também limpos 2 `<link
+  rel="preconnect">` duplicados que já existiam no arquivo.
+- **`tokens.css`:** 3 novos tokens em `:root` — `--fonte-titulo`,
+  `--fonte-rotulo`, `--fonte-corpo` (fallback `sans-serif` nos três).
+  `body` passou a apontar pra `--fonte-corpo` (era `"Roboto"` direto).
+- **`base.css`:** `font-family` aplicado por seletor, seguindo a hierarquia
+  definida pelo Opus (ver `contexto/estilos.md` pra tabela completa):
+  - **`--fonte-titulo` (Chakra Petch):** todo `h1`/`h2` de título de seção
+    (Hero, Favoritos, Categorias/Território/Histórias via `.escrito_cat`,
+    Lançamento desconto/especial, Banner) **+ os `h3` que funcionam como
+    título de seção/card** (Destaques "OS MAIS VENDIDOS" nos modos hijack e
+    estático, título dos cards de Território e Histórias — todos 26px/800,
+    escala de headline, não de rótulo) **+ `.preco_produto_destaque`**
+    (preço dos produtos, citado explicitamente na instrução como "número de
+    destaque").
+  - **`--fonte-rotulo` (IBM Plex Sans Condensed):** `.p_laranja` (kicker),
+    nav dos 2 headers, `.texto_botao`, e labels curtos de
+    card/coluna — `.nome` (Favoritos), `.card_categoria p`,
+    `.titulo_produto_destaque` (Destaques), `.coluna_footer p` (títulos das
+    3 colunas do rodapé) — e os CTAs em caixa-alta `.card a`
+    ("COMPRAR")/`.card_historia a` ("LEIA MAIS"), mesma família de "botão"
+    da diretiva.
+  - **`--fonte-corpo` (Open Sans Condensed):** só via `body` — todo texto
+    sem regra própria herda (`.desc`, `.card_historia p`, links do footer,
+    copyright).
+- **Decisão de projeto (não estava na instrução, exigiu checar a API do
+  Google Fonts):** `Open Sans Condensed` **não tem peso 400** nessa família
+  condensada (só 300 e 700 — confirmado direto em
+  `fonts.googleapis.com/css2`, pedir `wght@400` não retorna nada). Por isso
+  `body` usa `font-weight:300` como "regular" em vez de 400. Nenhum
+  `font-size`/`font-weight` existente foi tocado — onde o peso declarado no
+  CSS não bate com o que foi carregado (ex.: `.desc{font-weight:200}`,
+  `.card_categoria p{font-weight:700}` em rótulo, `h3{font-weight:800}` em
+  título), o navegador usa o peso carregado mais próximo (comportamento
+  nativo, sem `font-synthesis`) — fora do escopo desta migração (só troca de
+  família, "sem redesenhar").
+
+**Verificação:** `npx vite build` ✅ (460 módulos) · `npm run lint` (oxlint) ✅
+sem avisos. **Conferência visual nos 5 breakpoints (390/768/1024/1280/1440)
+NÃO feita nesta rodada** — pulada a pedido direto do dono ("pode seguir sem
+mexer com prints"); fica pendente pro Opus/dono conferir manualmente
+(`npm run dev`) antes do commit.
+
+**Pendente:** conferência do Opus/dono (fonte nova em toda a Home, nada
+estourando/quebrando nos 5 breakpoints, nav/botões legíveis). Docs
+sincronizados (`contexto/estilos.md`, `contexto/padrao-api.md`;
+`contexto/convencoes.md` já registrava a exceção). **Não commitado.**
+
+---
+
 ## 2026-07-10 13:57 — Docs sincronizados com a nova estrutura + criado o backlog de páginas
 
 **O que foi feito** (a pedido do dono: "atualize todos os documentos; ainda não

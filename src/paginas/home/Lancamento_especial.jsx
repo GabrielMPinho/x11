@@ -17,7 +17,7 @@ export default function Lancamento_especial(){
                 <RevelaComProgresso as="p" progresso={progresso} atraso={0.10} distancia={80}>Equipamento de aventura que não abre mão de qualidade,
                 design e desempenho. Cada peça é testada para acompanhar
                 você onde a estrada terminar.</RevelaComProgresso>
-                <BotaoCortado style={estiloBotao}>EXPLORAR COLEÇÃO ➜</BotaoCortado>
+                <BotaoCortado style={estiloBotao}>EXPLORAR COLEÇÃO</BotaoCortado>
             </div>
         </section>
     )

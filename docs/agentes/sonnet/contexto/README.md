@@ -8,15 +8,27 @@
 2. [`arquitetura.md`](./arquitetura.md) — estrutura de pastas e fluxo de dados.
 3. [`componentes.md`](./componentes.md) — o que cada componente/seção faz.
 4. [`estilos.md`](./estilos.md) — sistema de CSS, variáveis e o estado do layout.
-5. [`convencoes.md`](./convencoes.md) — regras e padrões a seguir SEMPRE.
+5. [`padrao-api.md`](./padrao-api.md) — **API exata do `src/padrao/`** (props de
+   componentes, exports de `motion.js`, hooks de reveal, tokens, breakpoints).
+   Consulte-o para planejar/codar **sem reler o código**.
+6. [`convencoes.md`](./convencoes.md) — regras e padrões a seguir SEMPRE.
 
 ## Referência de design (fonte da verdade do visual)
-A referência do visual é **o próprio site rodando em desktop** — ele deve ser
-preservado 100%. Não há PDF de layout versionado no projeto. Atualmente só a
-página **HOME** está implementada; o projeto foi reestruturado (2026-07-10) em
-`src/padrao/` (comum) + `src/paginas/` (uma pasta por página) para **receber as
-novas páginas** — as da navegação + a de equipamento (detalhe do produto), hoje
-scaffolds. Ver `arquitetura.md` e o backlog em `docs/agentes/opus/backlog/`.
+- **HOME (já implementada):** a fonte da verdade é **o próprio site rodando em
+  desktop** — preservado 100% (> 1280px intocável).
+- **PÁGINAS NOVAS (institucional, equipamento, …):** a referência é o material
+  de layout em **`docs/layout/`** (1 PDF por página + PNG que o dono envia). Ver
+  [`docs/layout/README.md`](../../../../docs/layout/README.md) para origem e
+  ressalvas — **espaçamento problemático** (não copiar métricas do PDF), SVG do
+  Canva inútil, imagens embutidas em baixa-res — e como extrair texto/imagens
+  (Docker rootless + poppler). Levantamento da institucional em
+  `docs/agentes/opus/backlog/institucional.md`.
+
+Atualmente só a página **HOME** está implementada; o projeto foi reestruturado
+(2026-07-10) em `src/padrao/` (comum) + `src/paginas/` (uma pasta por página)
+para **receber as novas páginas** — as da navegação + a de equipamento (detalhe
+do produto), hoje scaffolds. Ver `arquitetura.md` e o backlog em
+`docs/agentes/opus/backlog/`.
 
 ## O que é o projeto
 Landing page (single-page) de e-commerce da marca **X11**, de equipamentos de

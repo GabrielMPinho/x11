@@ -19,7 +19,7 @@ export default function Lancamento(){
                     <RevelaComProgresso as="p" className="p_laranja" progresso={progresso} distancia={100}>LANÇAMENTO ESPECIAL</RevelaComProgresso>
                     <RevelaComProgresso as="h1" id="titulo_principal" progresso={progresso} atraso={0.05} distancia={108}>CONCORRA AO COMBRO DE PROTEÇÃO NO BIKE FEST</RevelaComProgresso>
                     <RevelaComProgresso as="p" className="p_preto" progresso={progresso} atraso={0.10} distancia={80}>Monte o conjunto perfeito para a próxima aventura: escolha uma jaqueta e uma calça e garanta 20% de desconto no look</RevelaComProgresso>
-                    <BotaoCortado style={estiloBotao}>COMO PARTICIPAR ➜</BotaoCortado>
+                    <BotaoCortado style={estiloBotao}>COMO PARTICIPAR </BotaoCortado>
                 </div>
             </div>
             <RevelaComProgresso as="div" id="container_imagem" progresso={progresso} atraso={0.08} distancia={108}>

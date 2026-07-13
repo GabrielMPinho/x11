@@ -80,16 +80,23 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   footer o efeito do `TextEffect` de motion-primitives (`per="word"`,
   `preset="blur"`) — cada palavra entra num blur-in em sequência. **Continua sem
   marquee e estática em repouso** (só a entrada muda). **Sem instalar
-  motion-primitives nem Tailwind:** reproduzir com o `motion` já existente. É a
-  **instrução ativa** em `sonnet/fazer/banner-blur-por-palavra.md` (a rodada de
-  correção anterior foi concluída e aprovada pelo Opus).
+  motion-primitives nem Tailwind:** reproduzir com o `motion` já existente. ✅
+  **Concluído** (Fase 3) e commitado.
+- **Tipografia GLOBAL — sistema de 3 fontes (2026-07-13):** o dono trocou a
+  identidade tipográfica de **TODO o projeto** para **Chakra Petch** (títulos/
+  números), **IBM Plex Sans Condensed** (kickers/nav/botões) e **Open Sans
+  Condensed** (corpo) — as 3 fontes do layout, confirmadas por `pdffonts`.
+  **Exceção explícita à regra de ouro:** a **fonte** da Home muda no desktop
+  > 1280px (autorizado — "Global"); o **layout permanece**. Feita como fundação
+  **antes** do hero da institucional. Instrução: `sonnet/fazer/tipografia-global.md`.
 
-## Ordem das fases (definida pelo dono)
-Numeração pela **ordem real de execução**:
-1. **Fase 1 — Fundação + Data-driven** ✅ concluída.
-2. **Fase 2 — Responsividade + Mobile** ⏳ ativa (antes das animações, para
-   animar sobre base estável).
-3. **Fase 3 — Animações** ⬜ pendente.
+## Ordem das fases (executada)
+As **fases 1–7 estão concluídas e commitadas** (Fundação/data-driven,
+Responsividade+mobile, Animações, Carrossel de Destaques, Lenis, Refinos e a
+Reestruturação multi-página). Ver `backlog/planejamento-completo.md`.
+**Frente atual:** as **páginas novas** (roteamento → equipamento → páginas da
+navegação) — backlog em `backlog/paginas.md`. A **institucional** está em
+execução (começando pelo **Hero**); levantamento em `backlog/institucional.md`.
 
 ## Documentação (estrutura exigida pelo dono)
 - **`docs/agentes/sonnet/`** — tudo que o agente de código precisa **saber**

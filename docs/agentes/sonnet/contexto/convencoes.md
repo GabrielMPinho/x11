@@ -11,6 +11,11 @@ Regras que **o agente executor** deve seguir ao atuar neste projeto.
      ("OS MAIS VENDIDOS")** PODE mudar no desktop, pois vira um **horizontal
      scroll carousel** (ver Fase 4 no planejamento). Todas as **demais** seções
      seguem pixel-idênticas > 1280px.
+   - **Exceção tipográfica (dono, 2026-07-13):** a **fonte** do site inteiro
+     mudou para o sistema de 3 fontes (**Chakra Petch** / **IBM Plex Sans
+     Condensed** / **Open Sans Condensed**) — isso altera a tipografia da Home
+     no desktop > 1280px, **autorizado**. O **layout/estrutura** segue
+     preservado; **só a fonte** muda. Ver `padrao-api.md` (tipografia).
 2. **Data-driven sempre.** Conteúdo repetido vive em `dados/` da página
    (`src/paginas/<pagina>/dados/`) ou em `src/padrao/dados/` se for compartilhado,
    nunca hardcoded no JSX. Componente só percorre os dados com `.map()`.
@@ -79,3 +84,8 @@ tokens). O funcionamento:
 4. O commit só acontece com o sinal verde do dono.
 
 > Regra da pasta `fazer/`: **sempre apenas 1 instrução por vez**.
+
+> **Conferência visual = só Opus + dono.** O **Sonnet nunca** tira nem analisa
+> screenshots. Ele verifica por `npx vite build`, `npm run lint` e checagens
+> objetivas no código. A validação por print nos viewports (390/768/1024/1280/
+> 1440) é feita pelo **Opus** (e pelo dono), na etapa de conferência.
