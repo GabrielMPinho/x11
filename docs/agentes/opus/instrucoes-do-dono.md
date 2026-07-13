@@ -89,6 +89,11 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   **Exceção explícita à regra de ouro:** a **fonte** da Home muda no desktop
   > 1280px (autorizado — "Global"); o **layout permanece**. Feita como fundação
   **antes** do hero da institucional. Instrução: `sonnet/fazer/tipografia-global.md`.
+- **Roteamento com React Router (2026-07-13):** o dono aprovou adicionar
+  `react-router-dom` para ter **Home + Institucional (e as demais páginas)
+  navegáveis por URL**, coexistindo (fim do toggle temporário). É a Fase 0 das
+  páginas (`backlog/paginas.md`). Em seguida: **institucional completa** (todas as
+  seções + **hero com texto centralizado** no meio, pedido do dono).
 
 ## Ordem das fases (executada)
 As **fases 1–7 estão concluídas e commitadas** (Fundação/data-driven,

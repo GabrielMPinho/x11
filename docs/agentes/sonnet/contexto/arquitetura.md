@@ -49,15 +49,42 @@ Imports usam **`@/...`** (absoluto a partir de `src/`), configurado em
 profundidade** — mover/criar páginas não quebra caminhos. Imports de irmãos na
 mesma pasta podem ser relativos (`./Favoritos`).
 
-## Fluxo de renderização
-`index.html` → `src/index.jsx` (createRoot) → `src/App.jsx` (shell) → `<Home/>`.
+## Fluxo de renderização e roteamento (React Router, 2026-07-13)
+`index.html` → `src/index.jsx` (createRoot) → `src/App.jsx` (shell, agora com
+`<BrowserRouter>`) → `<Routes>` → a página da rota atual.
 
-O **shell** (`App.jsx`) é comum a todas as páginas: envolve tudo no
-`<ReactLenis root>` (smooth scroll) + `<MotionConfig>` e renderiza
-`<Header/>` + a página + `<Footer/>`. Hoje a página é fixa (`<Home/>`); ao
-implementar as demais, o **roteamento** entra aqui, trocando só o componente da
-página e mantendo Header/Footer/Lenis em volta. **Não há router ainda**
-(decisão: só a reestruturação de pastas nesta passada).
+O **shell** (`App.jsx`) é comum a todas as páginas: `<BrowserRouter>` é o
+wrapper **mais externo** (o `Header` usa `<Link>`/`useNavigate`, precisa estar
+dentro do contexto do Router); dentro dele, `<MotionConfig>` + `<ReactLenis
+root>` (smooth scroll, ou o ramo reduced-motion sem Lenis) envolvem
+`<Header/>` + `<Routes>` + `<Footer/>` — Header/Footer/Lenis **persistem**
+entre trocas de rota, só o miolo (`<Routes>`) troca. Mapa de rotas:
+
+| Rota | Componente | Pasta |
+|---|---|---|
+| `/` | `Home` | `src/paginas/home/` |
+| `/institucional` | `Institucional` | `src/paginas/institucional/` |
+| `/homem` | `Homem` | `src/paginas/homem/` |
+| `/mulher` | `Mulher` | `src/paginas/mulher/` |
+| `/guia-de-equipamento` | `GuiaDeEquipamento` | `src/paginas/guia-de-equipamento/` |
+| `/onde-encontrar` | `OndeEncontrar` | `src/paginas/onde-encontrar/` |
+| `/equipamento` | `Equipamento` | `src/paginas/equipamento/` |
+
+O **toggle temporário de dev** (que trocava `<Home/>` por `<Institucional/>`
+direto no `App.jsx`, usado enquanto não havia roteamento) foi **removido** —
+cada página agora tem URL própria e coexistem.
+
+**Reset de scroll na troca de rota:** `RolarAoTopoNaRota` (componente interno
+de `App.jsx`, ao lado do `SincroniaLenisFramer`) observa
+`useLocation().pathname` e rola ao topo a cada mudança —
+`lenis.scrollTo(0,{immediate:true})` se o Lenis estiver montado, senão
+`window.scrollTo(0,0)` (ramo reduced-motion). Sem isso, navegar por `<Link>`
+preservaria a posição de scroll da página anterior.
+
+**Débito conhecido:** em produção estática, `BrowserRouter` precisa de
+*fallback SPA* no servidor (todas as rotas servindo `index.html`) — combinar
+com o admin ao publicar o vhost. `vite dev`/`vite preview` já cobrem isso
+nativamente.
 
 ### Smooth scroll global — Lenis (Fase 5)
 `App.jsx` envolve a árvore num `<ReactLenis root>` (pacote **`lenis`**) —

@@ -6,10 +6,10 @@
 > (2026-07-13). Se divergir do código, o código vence — corrija aqui.
 
 ## Stack e comandos
-- **React 19.2** + **Vite 8** + **motion 12** (Framer) + **lenis 1.3** + **oxlint**. CSS puro. `.jsx` (sem TypeScript de fato).
+- **React 19.2** + **Vite 8** + **motion 12** (Framer) + **lenis 1.3** + **react-router-dom 7** (2026-07-13) + **oxlint**. CSS puro. `.jsx` (sem TypeScript de fato).
 - `npm run dev` → Vite em **:5173**. `npm run lint` → oxlint. **Build: `npx vite build`** (NÃO `npm run build` — ele roda `tsc -b` antes e falha em projeto `.jsx`).
 - **Alias `@` → `src/`** (em `vite.config.ts` + `tsconfig.app.json`; não há `jsconfig`). Ex.: `import Header from "@/padrao/componentes/Header"`.
-- **Sem roteamento.** `App.jsx` monta `<Header/> <Home/> <Footer/>` fixo (Home hardcoded). Header/Footer/Lenis/MotionConfig vivem no shell. Reduced-motion → Lenis **não** monta (scroll nativo).
+- **Roteamento (React Router, 2026-07-13).** `App.jsx` envolve tudo num `<BrowserRouter>` (wrapper mais externo) e monta `<Header/> <Routes/> <Footer/>` — o miolo troca por rota (`/`→Home, `/institucional`→Institucional, `/homem`, `/mulher`, `/guia-de-equipamento`, `/onde-encontrar`, `/equipamento`). Header/Footer/Lenis/MotionConfig vivem no shell, persistem entre rotas. Reset de scroll na troca de rota via `RolarAoTopoNaRota` (em `App.jsx`). Reduced-motion → Lenis **não** monta (scroll nativo), mas o roteamento e o reset de scroll funcionam igual. Ver `arquitetura.md` (tabela de rotas).
 
 ## Componentes (`src/padrao/componentes/`)
 
@@ -17,7 +17,7 @@
 Props: **`{ id, className, style, children }`**. Renderiza `<motion.button>` (`whileHover/whileTap="hover"`) com uma camada `.preenchimento_botao` que cresce (`scaleX 0→1`) no hover, + `<span class="texto_botao">{children}</span>`. O **corte diagonal vem do CSS** (`button { clip-path: polygon(0 0,100% 0,100% 70%,92% 100%,0 100%) }`), não do JSX. A prop `style` aceita `{opacity,y}` de reveal (o botão pode ser sua própria unidade de reveal). `className` é somada a `botao_cortado`.
 
 ### `Header` — 2 estados, sempre presente
-`<header>` **completo** (sempre em fluxo, nunca `fixed`) no topo/Hero; `.header_minimalista` (barra `fixed` independente, via `AnimatePresence`) no resto. Histerese: entra em minimalista com `scrollY > 0.7×altura da janela`, volta a completo com `< 0.5×`. Logo é `<button class="logo_home_botao">` → volta ao topo (`lenis.scrollTo(0)` / fallback nativo). Drawer mobile (`#drawer_menu` slide + `.overlay_menu`) compartilhado. Consome `navegacao`. `EASE = [0.22,1,0.36,1]`.
+`<header>` **completo** (sempre em fluxo, nunca `fixed`) no topo/Hero; `.header_minimalista` (barra `fixed` independente, via `AnimatePresence`) no resto. Histerese: entra em minimalista com `scrollY > 0.7×altura da janela`, volta a completo com `< 0.5×`. Nav usa **`<Link to={item.link}>`** (react-router-dom, 2026-07-13 — era `<a href>`; CSS `header nav a` etc. não muda, `Link` renderiza um `<a>` de verdade) nos **3** pontos: nav completo, nav minimalista, drawer mobile. Logo é `<button class="logo_home_botao">` → **navega pra `/`** (`useNavigate`) **e** volta ao topo (`lenis.scrollTo(0)` / fallback nativo). Drawer mobile (`#drawer_menu` slide + `.overlay_menu`) compartilhado, fecha ao navegar. Consome `navegacao` (rotas reais desde 2026-07-13). `EASE = [0.22,1,0.36,1]`.
 
 ### `Footer` — 3 colunas + rodapé
 Consome `colunasFooter` (`dados/footer.js`). Usa `<Revela as="div" distancia={100/64}>` nos dois blocos. Estrutura: `#conteudo_footer` (colunas `.coluna_footer` com `.p_laranja` + links) e `#rodape_footer` (copyright + `#logo_footer`). **Reaproveitar em toda página** — não recriar.
@@ -45,8 +45,8 @@ Consome `colunasFooter` (`dados/footer.js`). Usa `<Revela as="div" distancia={10
 - **Nomenclatura CSS:** `#id` para elementos únicos de uma seção, `.classe` para repetidos; nomes em `snake_case` português. Não renomear classes existentes.
 
 ## Dados compartilhados (`src/padrao/dados/`)
-- **`navegacao.js`** → `navegacao = [{nome,link}]`: HOMEM · MULHER · GUIA DE EQUIPAMENTO · ONDE ENCONTRAR · INSTITUCIONAL (todos `link:""` — sem rota ainda).
-- **`footer.js`** → `colunasFooter = [{titulo,links[]}]`: ATENDIMENTO · X11 · NOVIDADES.
+- **`navegacao.js`** → `navegacao = [{nome,link}]`: HOMEM (`/homem`) · MULHER (`/mulher`) · GUIA DE EQUIPAMENTO (`/guia-de-equipamento`) · ONDE ENCONTRAR (`/onde-encontrar`) · INSTITUCIONAL (`/institucional`) — rotas reais desde 2026-07-13 (Roteamento), consumidas por `<Link>` no `Header`.
+- **`footer.js`** → `colunasFooter = [{titulo,links[]}]`: ATENDIMENTO · X11 · NOVIDADES (ainda `href` placeholder — fora do escopo do roteamento desta rodada, que cobriu só a nav do header).
 
 ## Padrão de PÁGINA nova (o que replicar)
 1. Pasta `src/paginas/<pagina>/<Pagina>.jsx` (+ `dados/` se tiver conteúdo repetido). **Data-driven**: arrays em `dados/`, imagens via `import` (nunca string de caminho).

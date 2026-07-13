@@ -5,7 +5,9 @@ Cada componente representa uma seção visual da página **Home**. Os
 `src/padrao/componentes/`; as **seções da Home** em `src/paginas/home/`. Dados
 compartilhados (`navegacao`, `footer`) em `src/padrao/dados/`; dados da Home em
 `src/paginas/home/dados/` (a coluna "Dados" abaixo cita o nome do arquivo).
-Classes CSS relevantes ficam em `src/padrao/estilos/base.css`.
+Classes CSS relevantes ficam em `src/padrao/estilos/base.css`. (A tabela
+abaixo é da **Home**; a página **Institucional**, em construção, tem sua
+própria seção mais adiante.)
 
 | Componente | Classe raiz | Dados | Fundo | Descrição |
 |---|---|---|---|---|
@@ -45,3 +47,37 @@ o conteúdo precisar variar, extrair para `src/paginas/home/dados/` (ou
 Existem typos no texto original (`MOTOCILISMO` no Banner, `COMBRO` em
 Lancamento_desconto, título cortado em Historias). O dono ainda não autorizou
 correção — manter como está até haver pedido explícito.
+
+## Página Institucional (`src/paginas/institucional/`) — COMPLETA (2026-07-13)
+`Institucional.jsx` é `<main className="institucional">` renderizando o Hero
++ 6 seções, na ordem do layout (`docs/agentes/opus/backlog/institucional.md`).
+Acessível em **`/institucional`** (roteamento, ver `arquitetura.md`) — não
+depende mais de toggle no `App.jsx`. Diferente da Home, esta página **não**
+tem a trava de "desktop >1280px pixel-idêntico" — total liberdade de layout,
+desde que preserve estética/conteúdo da marca e não reutilize/edite
+seletores da Home. Dados repetidos em `src/paginas/institucional/dados/`
+(`features.js`, `timeline.js`, `valores.js`, `textosQuemSomos.js`).
+
+| Componente | Classe raiz | Dados | Fundo | Descrição |
+|---|---|---|---|---|
+| `HeroInstitucional` | `.hero_institucional` | — (estático, texto no JSX) | imagem `testado-minas.jpg` | Espelha a arquitetura do `Hero_Home.jsx` (**não** os seletores): full-bleed (~92vh) com `.hero_institucional_bg` (parallax via `useScroll`+`useTransform`, fallback `useReducedMotion`) + overlay `::after` **radial centrado** (2026-07-13: era gradiente lateral, texto foi CENTRALIZADO — correção do dono) + bloco de texto centralizado (`text-align:center`, `max-width:640px`) com entrada em stagger: kicker `.p_laranja` ("INSTITUCIONAL") → `h1` `--fonte-titulo` ("Movidos pela mesma paixão.") → subtítulo laranja ("A liberdade sobre duas rodas"). Sem botões/CTA. **Imagem é placeholder** — dono pode trocar por foto oficial em alta-res depois. |
+| `QuemSomos1` | `.quemsomos1_secao` | `dados/features.js` + `dados/textosQuemSomos.js` | `--background_escuro` | Kicker+título+3 parágrafos (split 2col, topo) + grade de **4 features** (ícone SVG inline laranja via `IconesFeatures.jsx` + título + texto), filete superior. Reveal coreografado (`useProgressoSecao`+`RevelaComProgresso` por elemento, como `Lancamento_desconto`); cards de grade usam `atrasoCard`/`LARGURA_ENTRADA_CARD`. Responsivo 4→2→1 colunas nas features. |
+| `QuemSomos2` | `.quemsomos_split.quemsomos2_secao` | `dados/textosQuemSomos.js` | `--background_cinza` | Split: imagem (**`jaqueta_fav.jpg`**, esquerda, `.zoom_imagem` — corrigido 2026-07-13, era `institucional-quemsomos.jpg`, uma foto de grupo que não batia com o detalhe de jaqueta do PDF) + kicker/título/texto (direita). Compartilha `.quemsomos_split` com `QuemSomos3` — a inversão de lado é só ordem no JSX. Empilha em mobile (imagem em cima, ordem natural). |
+| `Timeline` | `.timeline_secao` | `dados/timeline.js` | `--background_escuro` | 4 marcos (2007/2009/2015/2021), número grande `--fonte-titulo` laranja + filete superior. **Sem kicker/título próprio** (o layout não tem cabeçalho pra esta seção). Responsivo 4→2→1. |
+| `QuemSomos3` | `.quemsomos_split.quemsomos3_secao` | — (parágrafo único no JSX) | `--background_cinza` | Split invertido: texto (esquerda) + imagem (`institucional-detalhe.jpg`, direita, `.zoom_imagem`). Empilha em mobile. |
+| `Missao` | `.missao_secao` | — (estático, texto no JSX) | foto `institucional-quemsomos.jpg` (grupo de motociclistas) + overlay | Faixa-citação "no espírito do `Banner`" da Home (frase grande centralizada + bordas superior/inferior), mas com o reveal padrão da página (não o blur-por-palavra do `Banner`). **Fundo com foto (corrigido 2026-07-13)** — mesma técnica em camadas do Hero: `.missao_bg` (imagem `cover` via CSS, não import) atrás + `.missao_secao::after` (gradiente escuro) na frente + `.missao_conteudo` (`z-index:1`) por cima, sem parallax. Frase sem itálico (removido na mesma correção). |
+| `Valores` | `.valores_secao` | `dados/valores.js` | `--background_cinza` | Kicker+título centralizados + 3 colunas numeradas (01/02/03). Responsivo 3→1 (pedido explícito da instrução). |
+
+**Ícones das features (`IconesFeatures.jsx`):** 4 SVGs inline minimalistas
+(escudo/raio/camadas/capacete), `viewBox 24×24`, cor via `currentColor` +
+`.feature_icone svg{color:var(--laranja)}` — primeiro corte, sem dependência
+nova; mapeados por chave (`icone` em `dados/features.js`) pra manter a data
+só com texto. Podem ser refinados numa conferência visual futura.
+
+**Pendências herdadas do backlog** (não resolvidas — fora do escopo decidir
+sozinho): texto duplicado entre Quem Somos #1/#2 (placeholder no PDF
+original); título "02" de Valores repete o nome de uma feature de Quem Somos
+#1. A foto da Missão usa o mesmo asset que saiu do QS#2
+(`institucional-quemsomos.jpg`, grupo de motociclistas) — serve por ora, mas
+pode ser trocada por uma foto oficial em alta-res dedicada à Missão depois.
+Ver `docs/agentes/opus/backlog/institucional.md`.

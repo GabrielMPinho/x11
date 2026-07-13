@@ -5,6 +5,305 @@
 
 ---
 
+## 2026-07-13 11:50 — Header: link "INSTITUCIONAL" sempre rola ao topo
+
+**O que foi feito e por quê** (pedido direto do dono, fora do fluxo Opus →
+Sonnet — mesmo padrão das entradas de 09:32/11:27): clicar em "INSTITUCIONAL"
+no nav devia levar ao **topo** da página Institucional, estando em **qualquer
+página, inclusive já na própria Institucional** rolada pra baixo.
+
+- **`src/padrao/componentes/Header.jsx`:** novo `irParaInstitucional`
+  (mesmo raciocínio do `irParaHome` da logo) — `navegar("/institucional")` +
+  `lenis.scrollTo(0)` (fallback `window.scrollTo` sem Lenis). **Por quê o
+  scroll explícito:** o reset de rota (`RolarAoTopoNaRota`, `App.jsx`) só
+  dispara quando o `pathname` **muda** — clicar no link estando já em
+  `/institucional` faz do `navigate` um no-op (mesma rota), então sem essa
+  chamada explícita o clique pareceria não fazer nada com a página rolada.
+  Conectado nos **3** pontos onde o nav é renderizado (nav completo, nav
+  minimalista, drawer mobile — este último compõe com o `onClick` que já
+  fechava o drawer). Só o item cujo `link === "/institucional"` recebe o
+  handler; os demais links do nav continuam `<Link>` simples (fora do escopo
+  pedido).
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos. Checagem
+no código: os 3 pontos de renderização do nav (`grep irParaInstitucional`)
+usam o handler.
+
+**Não commitado.**
+
+---
+
+## 2026-07-13 11:38 — Institucional: 3 correções vs PDF (QS#2, Missão)
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/institucional-correcao.md` — conferência do Opus
+comparando `/institucional` com o PDF renderizado achou 3 divergências;
+**Hero e demais seções não foram tocados**, confirmado por `git diff --stat`):
+
+1. **Quem Somos #2 — imagem trocada:** `QuemSomos2.jsx` importava
+   `institucional-quemsomos.jpg` (na verdade uma foto de **grupo**, 3 pessoas
+   + moto — não batia com o PDF, que mostra um **detalhe de jaqueta**).
+   Trocado por **`jaqueta_fav.jpg`** (mesmo diretório de assets); alt text
+   ajustado (`"Detalhe de jaqueta X11"`). Nada mais da seção mudou.
+2. **Missão — fundo com foto de grupo:** a foto de grupo que saiu do QS#2
+   (`institucional-quemsomos.jpg`) virou o **fundo da Missão**, que antes era
+   cor lisa. Mesma técnica em camadas do Hero — `.missao_bg` (imagem `cover`,
+   referenciada em CSS via `url()`, não por import no JSX, igual ao
+   `.hero_institucional_bg`) atrás + `.missao_secao::after` (gradiente
+   escuro) na frente — com **classes próprias** (`.missao_bg`/
+   `.missao_conteudo`), não reaproveitando os seletores do Hero.
+   `Missao.jsx` ganhou um wrapper `.missao_conteudo` (kicker+frase+assinatura)
+   com `z-index:1` pra ficar acima do overlay; `.missao_secao` virou o
+   container de camadas (`position:relative;z-index:-1;overflow:hidden`,
+   mesmo truque de empilhamento do `.hero_institucional`). Sem parallax — só
+   a estrutura em 2 camadas pedida.
+3. **Missão — itálico removido:** `.missao_frase` perdia `font-style:italic`;
+   frase agora reta, como no PDF.
+
+**Verificação:** `npx vite build` ✅ (487 módulos) · `npm run lint` ✅ sem
+avisos. Checagem no código: `QuemSomos2.jsx` importa `jaqueta_fav.jpg`;
+`.missao_bg`+`::after` presentes; `grep "font-style"` no `base.css` não
+retorna nada (itálico removido do arquivo inteiro, não só da Missão — não
+havia outro uso). **Não tirei nem analisei screenshots** — a comparação
+visual com o PDF é do Opus/dono.
+
+**Não commitado.**
+
+---
+
+## 2026-07-13 11:27 — Institucional: textos pequenos maiores (legibilidade)
+
+**O que foi feito e por quê** (pedido direto do dono, fora do fluxo Opus →
+Sonnet — mesmo padrão da entrada de 09:32: tweak pontual de tamanho de fonte,
+sem replanejar layout/estrutura. Escopo confirmado com o dono: **página
+Institucional inteira**, não o site todo):
+
+- **`base.css`, corpo/legendas das 6 seções da Institucional** (títulos —
+  `h2`/`h3` de seção, `marco_ano`, `valor_numero` — **não** foram tocados,
+  só o texto secundário):
+  - `.hero_institucional_subtitulo` — `1.1rem` → `1.25rem`.
+  - `.quemsomos1_texto p` (parágrafos do topo) — `1rem` → `1.1rem`.
+  - `.feature_card h3` — `1rem` → `1.1rem`; `.feature_card p` — `0.9rem` → `1rem`.
+  - `.quemsomos_split_texto p` (parágrafos de Quem Somos #2/#3) — `1rem` → `1.1rem`.
+  - `.marco_titulo` — `0.95rem` → `1.05rem`; `.marco_texto` — `0.9rem` → `1rem`.
+  - `.missao_assinatura` — `0.95rem` → `1.05rem`.
+  - `.valor_card h3` — `1rem` → `1.1rem`; `.valor_texto` — `0.9rem` → `1rem`.
+- Nenhuma mudança de layout/cor/peso — só `font-size`. Home **não** foi
+  tocada (fora do escopo confirmado).
+
+**Nota:** ao conferir o arquivo, vi que o Hero da Institucional já tinha sido
+ajustado manualmente por você desde a última rodada (alinhamento voltou pra
+`start`/esquerda, `max-width:840px`, subtítulo em branco em vez de laranja)
+— mantive essas mudanças como estão, só ajustei o `font-size` do subtítulo
+por cima.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos.
+
+**Não commitado.**
+
+---
+
+## 2026-07-13 10:57 — Institucional COMPLETA: hero centralizado + 6 seções novas
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/institucional-completa.md`,
+textos/estrutura de `docs/agentes/opus/backlog/institucional.md`): a Institucional
+tinha só o Hero; esta rodada completa a página inteira e corrige o Hero
+(texto centralizado, pedido do dono).
+
+- **Hero centralizado (correção):** `.hero_institucional` passou de
+  `align-items:flex-end` (texto à esquerda-embaixo) para `align-items:center;
+  justify-content:center`; `.hero_institucional_escrito` ganhou
+  `text-align:center`+`align-items:center`+`max-width:640px` (era `width:42vw`
+  alinhado à esquerda). Overlay trocado de gradiente lateral (`to right`) para
+  **radial centrado** (`radial-gradient(ellipse... at center)`) + leve base —
+  escurecimento uniforme em volta do texto centralizado, onde quer que ele
+  caia. Imagem (`testado-minas.jpg`), parallax e stagger de entrada
+  **mantidos**. As 3 media queries do hero foram revistas (removido o
+  `width`/padding assimétrico, ajustado pra `max-width` fluido).
+- **6 seções novas** em `src/paginas/institucional/` (todas com
+  `useProgressoSecao`+`RevelaComProgresso`, padrão de reveal da Home,
+  fallback reduced-motion herdado):
+  - **`QuemSomos1.jsx`** — kicker+título+3 parágrafos (split 2 colunas) +
+    grade de **4 features** (data-driven, `dados/features.js`), cada uma com
+    ícone SVG inline minimalista laranja (`IconesFeatures.jsx`, 4 ícones
+    novos — escudo/raio/camadas/capacete — sem dependência nova) + filete
+    superior. Responsivo 4→2→1 colunas.
+  - **`QuemSomos2.jsx`** — split imagem (`institucional-quemsomos.jpg`,
+    esquerda) + kicker/título/texto (direita). Empilha em mobile (imagem em
+    cima, ordem natural do JSX).
+  - **`Timeline.jsx`** — 4 marcos (`dados/timeline.js`: 2007/2009/2015/2021),
+    números grandes em Chakra Petch laranja + filete superior. Responsivo
+    4→2→1. Sem kicker/título próprio — o material de layout não tem
+    cabeçalho pra esta seção.
+  - **`QuemSomos3.jsx`** — split invertido: texto (esquerda) +
+    `institucional-detalhe.jpg` (direita). Empilha em mobile.
+  - **`Missao.jsx`** — faixa-citação "no espírito do Banner" da Home (frase
+    grande centralizada + bordas superior/inferior), mas com o reveal padrão
+    da página. **Sem imagem** (asset de grupo ainda não entregue) — fundo
+    escuro com leve tingimento laranja; comentário no código marcando onde a
+    foto entra depois.
+  - **`Valores.jsx`** — kicker+título centralizados + 3 colunas numeradas
+    (`dados/valores.js`, 01/02/03). Responsivo 3→1 (pedido explícito da
+    instrução).
+  - **`QuemSomos2.jsx`**/**`QuemSomos3.jsx`** compartilham a classe de layout
+    `.quemsomos_split` (grid 2 colunas) — a inversão de lado vem só da ordem
+    no JSX, sem CSS de `order`.
+- **Dados novos:** `src/paginas/institucional/dados/{features,timeline,valores,textosQuemSomos}.js`.
+  `textosQuemSomos.js` centraliza os 3 parágrafos **repetidos** entre Quem
+  Somos #1 e #2 (o PDF traz o texto idêntico nas duas seções — mantido assim,
+  pendência de confirmar variação já registrada no backlog).
+- **`Institucional.jsx`:** monta Hero + as 6 seções na ordem do layout;
+  Footer vem do shell (não recriado).
+- **`base.css`:** ~350 linhas novas (bloco base por seção + adaptações nos 3
+  `@media` já existentes) — só **classes próprias** da institucional,
+  reaproveitando apenas os utilitários genéricos já autorizados (`.p_laranja`,
+  `.zoom_imagem`) e os tokens de cor/fonte. Fundos alternam
+  `--background_escuro`/`--background_cinza` seção a seção, como a Home.
+
+**Correções de fonte aplicadas ao digitar os textos** (comparado ao
+`institucional.txt`, extração crua do PDF que tem ruído de OCR): "Minas
+Gerias" → "Minas Gerais" (typo óbvio de extração, não uma grafia da marca);
+espaços/quebras de palavra colados (`AX11`, `juntodo`) corrigidos pro texto
+corrido normal. **Pendências herdadas do backlog, não resolvidas aqui**
+(fora do meu escopo decidir sozinho): texto duplicado em Quem Somos #1/#2,
+título "02" de Valores repetindo o nome de uma feature.
+
+**Regra de ouro:** nenhum seletor/arquivo de `src/paginas/home/` foi tocado
+(confirmado por `git diff --stat` — diff vazio nesse caminho).
+
+**Verificação:** `npx vite build` ✅ (488 módulos, as 2 imagens novas no
+bundle) · `npm run lint` (oxlint) ✅ sem avisos, inclusive nos arquivos que só
+exportam um objeto com JSX (`IconesFeatures.jsx` — `allowConstantExport` no
+`.oxlintrc.json` cobre esse caso). Checagem no código: títulos/textos
+conferidos contra o backlog um a um; `font-family` só via `var(--fonte-*)`
+(grep confirmado); as 2 imagens novas via `import`. **Não tirei nem analisei
+screenshots** — a comparação visual com o PDF/PNG nos 5 viewports é do
+Opus/dono.
+
+**Pendências pro dono (herdadas do backlog):** foto em alta-res da Missão
+(grupo de motociclistas); confirmar se o texto de Quem Somos #1/#2 deve
+variar; confirmar o título "02" de Valores; os 4 ícones das features são um
+primeiro corte minimalista — o Opus/dono pode querer refinar o traço na
+conferência visual. **Não commitado.**
+
+---
+
+## 2026-07-13 10:37 — Roteamento (React Router): Home + Institucional + scaffolds navegáveis
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/roteamento.md`,
+decisão do dono de 2026-07-13: fim do toggle temporário, páginas navegáveis
+por URL real):
+
+- **Instalada `react-router-dom`** (nova dependência, `^7.18.1`).
+- **`src/App.jsx`:** shell agora envolve tudo num `<BrowserRouter>` (wrapper
+  mais externo — o Header usa `<Link>`/`useNavigate` e precisa estar dentro
+  do Router). O miolo, que antes era o toggle `<Home/>`/`<Institucional/>`,
+  virou `<Routes>`: `/`→`Home`, `/institucional`→`Institucional`,
+  `/homem`→`Homem`, `/mulher`→`Mulher`,
+  `/guia-de-equipamento`→`GuiaDeEquipamento`,
+  `/onde-encontrar`→`OndeEncontrar`, `/equipamento`→`Equipamento`. **Toggle
+  removido** (import comentado da Home some, `<Institucional/>` fixo some).
+  Resto do shell (MotionConfig, ReactLenis/reduced-motion, Header, Footer)
+  **intocado**.
+- **`RolarAoTopoNaRota` (novo, em `App.jsx`):** observa `useLocation().pathname`
+  e, na troca, rola ao topo — `lenis.scrollTo(0,{immediate:true})` se o Lenis
+  estiver montado, `window.scrollTo(0,0)` senão (ramo reduced-motion, onde o
+  Lenis nem existe). Vive dentro do Router e do provider do Lenis, junto do
+  `SincroniaLenisFramer`, e também é renderizado no ramo reduced-motion.
+- **`src/padrao/componentes/Header.jsx`:** os `<a href={item.link}>` viraram
+  `<Link to={item.link}>` nos **3** pontos (nav completo, nav minimalista,
+  drawer mobile — fecha o drawer via `onClick` ao navegar, mantido). O CSS
+  (`header nav a` etc.) continua valendo sem mudança nenhuma, porque `<Link>`
+  renderiza um `<a>` de verdade. **Logo (`irParaHome`):** ganhou
+  `navegar("/")` (via `useNavigate`) antes do `lenis.scrollTo(0)`/
+  `window.scrollTo` já existente — navega pra Home e rola ao topo; se já
+  estiver em `/`, o `navigate` é um no-op e só o scroll acontece (mesmo
+  comportamento de sempre).
+- **`src/padrao/dados/navegacao.js`:** os 5 `link` (antes `""`) preenchidos
+  com as rotas reais (`/homem`, `/mulher`, `/guia-de-equipamento`,
+  `/onde-encontrar`, `/institucional`).
+
+**Regra de ouro:** nenhum seletor/arquivo de `src/paginas/home/` ou de
+`src/padrao/estilos/base.css` foi tocado (confirmado por `git diff --stat` —
+zero mudanças nesses caminhos); a Home em `/` é a mesma árvore de componentes
+de antes, só que agora montada pelo `<Routes>` em vez do toggle fixo.
+
+**Verificação:** `npx vite build` ✅ (475 módulos, todas as páginas no bundle)
+· `npm run lint` (oxlint) ✅ sem avisos. Checagem no código: `/` renderiza
+`Home`, `/institucional` renderiza a Institucional, os 3 pontos de nav usam
+`Link` e a navegação não recarrega a página (garantia do próprio React
+Router). **Não tirei nem analisei screenshots** — conferência visual é do
+Opus/dono.
+
+**Nota operacional (fora do código):** a instalação do `react-router-dom`
+esbarrou na **cota de disco do servidor** (`quota -s` acusou 6144M/6144M, o
+`Bash` chegou a parar de responder por completo). O dono limpou espaço
+(`~/.npm/_cacache`) manualmente pelo terminal; a instalação foi concluída
+depois disso. Cota segue **acima do soft limit** (5120M) com grace period de
+3 dias rodando — vale um cuidado geral do dono com o espaço em `~/.npm`/
+`~/.cache`/`~/.vscode-server` antes do grace period expirar.
+
+**Débito a anotar:** em produção estática, `BrowserRouter` exige *fallback
+SPA* no servidor (todas as rotas → `index.html`) — pedir ao admin ao publicar
+o vhost. No `vite dev` já funciona nativamente.
+
+**Não commitado.** O Opus confere; depois vem a institucional completa
+(todas as seções + hero com texto centralizado).
+
+---
+
+## 2026-07-13 09:55 — Institucional: casca da página + Hero (1ª etapa)
+
+**O que foi feito e por quê** (instrução `docs/agentes/sonnet/fazer/institucional-hero.md`,
+1ª de várias etapas da página Institucional — Quem Somos, Timeline, Missão e
+Valores virão em instruções seguintes):
+
+- **`src/paginas/institucional/Institucional.jsx`:** deixou de ser scaffold
+  (`<h1>Institucional</h1>`) e virou `<main className="institucional">`
+  renderizando `<HeroInstitucional/>`, com comentário marcando onde as
+  próximas seções entram.
+- **`src/paginas/institucional/HeroInstitucional.jsx` (novo):** espelha a
+  arquitetura do `Hero_Home.jsx` — entrada em stagger no load (`heroStagger`/
+  `heroItem` de `@/padrao/lib/motion`), camada de fundo própria
+  (`.hero_institucional_bg`) com parallax leve ligado ao scroll (`useScroll`+
+  `useTransform`, com fallback `useReducedMotion` → sem parallax). Kicker
+  laranja (`.p_laranja`, "INSTITUCIONAL") → título `h1` branco ("Movidos pela
+  mesma paixão.", `--fonte-titulo`, caixa mista) → subtítulo laranja ("A
+  liberdade sobre duas rodas", `--fonte-rotulo`). Sem botões/CTA. **Imagem:
+  `testado-minas.jpg`** (placeholder escolhido pelo dono pra não repetir
+  `hero-home.jpg` — pode trocar por foto oficial em alta-res depois).
+- **`src/padrao/estilos/base.css`:** bloco novo `INSTITUCIONAL — HERO` (classes
+  próprias, `snake_case` PT, nenhum seletor do hero da Home tocado/reutilizado)
+  com overlay em gradiente escuro (esquerda + base, mesma técnica `::after` já
+  usada em Lançamento Especial) para legibilidade do texto sobre a imagem.
+  Adaptações responsivas adicionadas dentro dos 3 `@media` já existentes
+  (1280/768/480): texto sai de `42vw` (desktop) para `60vw` (tablet) e `100%`
+  (mobile), paddings fluidos, título com `clamp` reduzido no mobile pequeno.
+  Só **adições** (nenhuma linha existente alterada — confirmado por `git
+  diff --stat`, `base.css` só ganhou inserções).
+- **`src/App.jsx`:** **toggle temporário de dev** — `<Home/>` comentada,
+  `<Institucional/>` renderizada em seu lugar, pra dar visibilidade à página
+  em construção sem roteamento ainda. Import da Home deixado comentado
+  (pronto pra reverter). Nada mais do shell (Header/Footer/Lenis/MotionConfig)
+  foi tocado.
+
+**Regra de ouro:** nenhum arquivo/seletor da Home foi alterado — reverter o
+toggle em `App.jsx` (`<Home/>` no lugar de `<Institucional/>`) devolve a Home
+idêntica.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` (oxlint) ✅ sem avisos.
+Checagem no código: `font-family` só via `var(--fonte-*)` no bloco novo;
+imports via alias `@`; classes novas confirmadas no bundle de produção
+(`dist/assets/index-*.css`). **Não tirei nem analisei screenshots** — a
+conferência visual nos 5 viewports é do Opus/dono.
+
+**Pendências:** foto oficial em alta-res do Hero (placeholder atual:
+`testado-minas.jpg`); demais seções da Institucional (Quem Somos, Timeline,
+Missão, Valores) em instruções seguintes; reverter o toggle de `App.jsx`
+quando o roteamento real entrar. **Não commitado.**
+
+---
+
 ## 2026-07-13 09:32 — Hero: parágrafo branco maior (legibilidade)
 
 **O que foi feito e por quê** (pedido direto do dono, fora do fluxo Opus →

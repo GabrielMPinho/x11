@@ -18,9 +18,11 @@ clicar num produto):
 
 ---
 
-## 0. Roteamento (INFRA — habilita tudo) ⬜ pendente
-Sem rotas hoje o app só renderiza a Home. Antes de qualquer página nova, decidir
-e montar a navegação entre páginas.
+## 0. Roteamento (INFRA — habilita tudo) ✅ CONCLUÍDO (2026-07-13, não commitado)
+**React Router** (`^7.18.1`) no shell: Home (`/`) + Institucional (`/institucional`)
++ scaffolds navegáveis; `RolarAoTopoNaRota` reseta o scroll na troca de rota;
+Header com `<Link>`/`useNavigate`; toggle removido. `vite build`/`lint` ok.
+**Débito:** em produção o `BrowserRouter` precisa de *fallback SPA* no vhost.
 - **Onde encaixa:** no **shell** (`src/App.jsx`) — troca o `<Home/>` central pela
   página da rota, mantendo Header/Footer/Lenis em volta.
 - **Decisões abertas (dono):**

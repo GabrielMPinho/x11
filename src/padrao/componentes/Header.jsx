@@ -7,6 +7,7 @@ import {
     useMotionValueEvent,
 } from "motion/react";
 import { useLenis } from "lenis/react";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "@/padrao/assets/images/logo.png";
 import { navegacao } from "@/padrao/dados/navegacao";
 
@@ -33,6 +34,7 @@ export default function Header(){
     const prefereMenosMovimento = useReducedMotion();
     const { scrollY } = useScroll();
     const lenis = useLenis();
+    const navegar = useNavigate();
 
     useMotionValueEvent(scrollY, "change", (y) => {
         const alturaJanela = typeof window !== "undefined" ? window.innerHeight : 800;
@@ -46,14 +48,33 @@ export default function Header(){
 
     const minimalista = estado === "minimalista";
 
-    // Logo clicável → "Home" (landing de página única = topo da página, sem
-    // recarregar). Usa o Lenis já montado pela Fase 5 pra rolar suave;
-    // `useLenis()` retorna `undefined` quando o Lenis não está ativo
-    // (reduced-motion, App.jsx nem monta o <ReactLenis> nesse caso) — cai
-    // pro `scrollTo` nativo, instantâneo (sem "smooth" que o dono de
-    // reduced-motion não pediu).
+    // Logo clicável → navega pra "/" (Roteamento) e rola ao topo. Usa o
+    // Lenis já montado pela Fase 5 pra rolar suave; `useLenis()` retorna
+    // `undefined` quando o Lenis não está ativo (reduced-motion, App.jsx nem
+    // monta o <ReactLenis> nesse caso) — cai pro `scrollTo` nativo,
+    // instantâneo (sem "smooth" que o dono de reduced-motion não pediu). Se
+    // já estiver em "/", o `navigate` é um no-op e só o scroll acontece
+    // (mesmo efeito de "voltar ao topo" que a logo sempre teve).
     function irParaHome(evento){
         evento.preventDefault();
+        navegar("/");
+        if (lenis) {
+            lenis.scrollTo(0);
+        } else {
+            window.scrollTo({ top: 0 });
+        }
+    }
+
+    // Link "INSTITUCIONAL" do nav → mesmo raciocínio do logo: navega pra
+    // /institucional e rola ao topo. Precisa do scroll EXPLÍCITO (não só do
+    // reset automático de rota em App.jsx) porque, se já estiver em
+    // /institucional, o `navigate` é um no-op — o pathname não muda, o
+    // `RolarAoTopoNaRota` (que só dispara no `useEffect` quando o pathname
+    // muda) nunca rodaria, e o clique pareceria não fazer nada estando
+    // rolado pra baixo na própria página.
+    function irParaInstitucional(evento){
+        evento.preventDefault();
+        navegar("/institucional");
         if (lenis) {
             lenis.scrollTo(0);
         } else {
@@ -79,7 +100,13 @@ export default function Header(){
                 </button>
                 <nav>
                     {navegacao.map((item, index) => (
-                        <a href={item.link} key={index}>{item.nome}</a>
+                        <Link
+                            to={item.link}
+                            key={index}
+                            onClick={item.link === "/institucional" ? irParaInstitucional : undefined}
+                        >
+                            {item.nome}
+                        </Link>
                     ))}
                 </nav>
                 <button
@@ -119,7 +146,13 @@ export default function Header(){
                         </button>
                         <nav>
                             {navegacao.map((item, index) => (
-                                <a href={item.link} key={index}>{item.nome}</a>
+                                <Link
+                                    to={item.link}
+                                    key={index}
+                                    onClick={item.link === "/institucional" ? irParaInstitucional : undefined}
+                                >
+                                    {item.nome}
+                                </Link>
                             ))}
                         </nav>
                         <button
@@ -159,13 +192,16 @@ export default function Header(){
                             transition={{ duration: prefereMenosMovimento ? 0 : 0.3, ease: "easeInOut" }}
                         >
                             {navegacao.map((item, index) => (
-                                <a
-                                    href={item.link}
+                                <Link
+                                    to={item.link}
                                     key={index}
-                                    onClick={() => setMenuAberto(false)}
+                                    onClick={(evento) => {
+                                        setMenuAberto(false);
+                                        if (item.link === "/institucional") irParaInstitucional(evento);
+                                    }}
                                 >
                                     {item.nome}
-                                </a>
+                                </Link>
                             ))}
                         </motion.nav>
                     </>

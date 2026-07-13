@@ -21,14 +21,14 @@
 ## Assets
 | Seção | Imagem | Situação |
 |---|---|---|
-| Hero | motociclista + moto vermelha na floresta | ❌ **falta** (alta-res) |
-| Quem Somos #2 | jaqueta (detalhe do peito/zíper) | ✅ `institucional-quemsomos.jpg` |
+| Hero | dois motociclistas em trilha (cerrado/Minas) | ✅ `testado-minas.jpg` (escolhida — não repete a home) |
+| Quem Somos #2 | jaqueta (detalhe do peito/zíper) | ✅ `jaqueta_fav.jpg` (⚠️ `institucional-quemsomos.jpg` é foto de GRUPO, não jaqueta — foi realocada p/ a Missão) |
 | Quem Somos #3 | proteção/armadura (malha preta) | ✅ `institucional-detalhe.jpg` |
-| Missão (quote) | grupo de motociclistas | ❌ **falta** (alta-res) |
+| Missão (quote) | grupo de motociclistas | ✅ `institucional-quemsomos.jpg` (foto de grupo, fundo com overlay) |
 
 ## Estrutura (topo → base) e textos reais
 
-### 1. HERO ⭐ (primeira instrução)
+### 1. HERO ⭐ — feito (texto à esquerda); **será CENTRALIZADO** na instrução ativa `sonnet/fazer/institucional-completa.md` (correção do dono)
 - Kicker (laranja): `INSTITUCIONAL`
 - Título (branco, condensado, **caixa mista com ponto** — difere da Home que é
   all-caps): `Movidos pela mesma paixão.` (no layout quebra em 2 linhas:
@@ -90,7 +90,8 @@
   layout, ajustar os **dados**, não o componente.
 
 ## Pendências pro dono
-1. Imagens alta-res do **Hero** e da **Missão** (as demais já existem nos assets).
+1. Imagem alta-res da **Missão** (o **Hero** usa `testado-minas.jpg`; as demais
+   seções já têm asset).
 2. Textos repetidos em Quem Somos #1/#2 — variar? (placeholder no layout).
 3. Títulos/typos a confirmar: "Minas Gerais", título do valor "02".
 4. Como ver a página antes do roteamento (toggle temporário vs roteamento antes).
