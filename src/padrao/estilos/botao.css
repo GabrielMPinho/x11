@@ -1,0 +1,20 @@
+/* Botão cortado com preenchimento animado no hover (Hero, Lançamento
+   desconto/especial) — ver components/BotaoCortado.jsx. O clip-path do
+   botão (regra base `button`) recorta a camada de preenchimento também. */
+.botao_cortado{
+  position: relative;
+  overflow: hidden;
+}
+.preenchimento_botao{
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.14);
+  transform-origin: left;
+  pointer-events: none;
+}
+.texto_botao{
+  position: relative;
+  font-family: var(--fonte-rotulo);
+  font-size: 1.3rem;
+  z-index: 1;
+}

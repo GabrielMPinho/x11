@@ -1,10 +1,11 @@
 # Plano — Quebrar o `base.css` gigante em arquivos por página (CSS puro)
 
-> **Status:** ✅ APROVADO — **executar logo após a página Produto** (dono,
-> 2026-07-14: "assim que acabarmos com a página do produto nós iremos fazer
-> isso"). Quando a Produto for concluída/conferida, esta refatoração vira a
-> próxima instrução em `sonnet/fazer/`. Até lá, **não** mexer no `fazer/` (a
-> Produto segue ativa).
+> **Status:** ⏳ EM EXECUÇÃO — **passe 1 ativo** em `sonnet/fazer/
+> css-split-passe-1.md` (Produto concluída e commitada, `3cc0ea1`). Passe 1 =
+> split mecânico (fundação + arquivos por página; mobile global fica inteiro em
+> `responsividade.css`). **Passe 2** (co-locar o mobile de Home/Institucional/
+> Produtos em cada página) vira instrução própria depois — a Equipamento já
+> nasceu com o mobile self-contained.
 >
 > **Intenção do dono:** "cada página vai ter seu CSS" — o alvo é a **co-locação
 > por página** (o CSS exclusivo de cada página no arquivo dela; o compartilhado

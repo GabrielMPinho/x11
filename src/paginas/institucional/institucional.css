@@ -1,0 +1,331 @@
+/* ==================================================================== */
+/* INSTITUCIONAL — HERO */
+/* Classes próprias (não reutilizam/editam nenhum seletor do .hero da Home)
+   reproduzindo a mesma linguagem visual: seção full-bleed, camada de fundo
+   com parallax, overlay escuro pra legibilidade, kicker + título + subtítulo
+   com os tokens de fonte. Texto CENTRALIZADO (correção do dono, 2026-07-13
+   — era à esquerda/embaixo; instrução institucional-completa.md). */
+.hero_institucional{
+  position: relative;
+  /* z-index:0 (era -1) — mesmo fix do .hero da Home (2026-07-13): evita que
+     a seção inteira "afunde" atrás do <main>. Aqui não há botões/links pra
+     um clique ser bloqueado, mas alinhar o padrão evita o mesmo problema
+     latente se algo clicável entrar aqui depois. Continua criando o
+     contexto de empilhamento local que .hero_institucional_bg precisa. */
+  z-index: 0;
+  overflow: hidden;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.hero_institucional_bg{
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('../../padrao/assets/images/testado-minas.jpg');
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+/* Overlay em gradiente escuro mais UNIFORME/CENTRAL (era só da esquerda,
+   pensado pro texto à esquerda) — radial centrado (onde o texto assenta
+   agora) + leve escurecimento de base, garantindo contraste em qualquer
+   ponto onde o texto centralizado caia. Mesma técnica de ::after já usada em
+   Lançamento Especial. */
+.hero_institucional::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 55% at center, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.38) 55%, rgba(0,0,0,0.22) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 40%);
+  pointer-events: none;
+}
+.hero_institucional_escrito{
+  position: relative;
+  z-index: 1;
+  max-width: 840px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  text-align: start ;
+  gap: 10px;
+  padding: 0 6vw;
+}
+.hero_institucional_escrito h1{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
+}
+.hero_institucional_subtitulo{
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-size: 1.25rem;
+}
+/* FIM INSTITUCIONAL — HERO */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* INSTITUCIONAL — QUEM SOMOS #1 (título+texto+features) */
+.quemsomos1_secao{
+  background-color: var(--background_escuro);
+  padding: 10vh 6vw;
+}
+.quemsomos1_topo{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4vw;
+  margin-bottom: 8vh;
+}
+.quemsomos1_titulo_bloco h2{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.8rem, 3vw + 0.7rem, 2.8rem);
+  margin-top: 0.5rem;
+}
+.quemsomos1_texto{
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.quemsomos1_texto p{
+  color: rgba(255,255,255,0.78);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.quemsomos1_features{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2vw;
+}
+.feature_card{
+  border-top: 2px solid var(--laranja);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.feature_icone svg{
+  width: 32px;
+  height: 32px;
+  color: var(--laranja);
+}
+.feature_card h3{
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 1.1rem;
+}
+.feature_card p{
+  color: rgba(255,255,255,0.65);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+/* FIM INSTITUCIONAL — QUEM SOMOS #1 */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* INSTITUCIONAL — QUEM SOMOS #2 / #3 (split imagem+texto, compartilhado) */
+.quemsomos_split{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4vw;
+  padding: 10vh 6vw;
+  min-height: 80vh;
+}
+.quemsomos2_secao,
+.quemsomos3_secao{
+  background-color: var(--background_cinza);
+}
+.quemsomos_split_imagem img{
+  width: 100%;
+  height: 70vh;
+  object-fit: cover;
+}
+.quemsomos_split_texto{
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.quemsomos_split_texto h2{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.8rem, 3vw + 0.7rem, 2.8rem);
+}
+.quemsomos_split_texto p{
+  color: rgba(255,255,255,0.78);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+/* FIM INSTITUCIONAL — QUEM SOMOS #2 / #3 */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* INSTITUCIONAL — TIMELINE */
+.timeline_secao{
+  background-color: var(--background_escuro);
+  padding: 10vh 6vw;
+}
+.timeline_grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2vw;
+}
+.marco_timeline{
+  border-top: 2px solid var(--laranja);
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.marco_ano{
+  color: var(--laranja);
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  font-size: clamp(2rem, 3vw + 0.8rem, 3rem);
+}
+.marco_titulo{
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 1.05rem;
+}
+.marco_texto{
+  color: rgba(255,255,255,0.78);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+/* FIM INSTITUCIONAL — TIMELINE */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* INSTITUCIONAL — MISSÃO (quote) */
+/* Correção 2026-07-13 (conferência do Opus vs PDF): fundo passou de cor
+   lisa pra foto de grupo de motociclistas, mesma técnica de camadas do
+   Hero (`.missao_bg` atrás, `::after` em overlay escuro na frente) — seção
+   cria seu próprio contexto de empilhamento (`position:relative;z-index:-1`)
+   pra `.missao_bg` (também `z-index:-1`) ficar atrás do `::after` (auto) e
+   do `.missao_conteudo` (explicitamente `z-index:1`), igual ao Hero. */
+.missao_secao{
+  position: relative;
+  z-index: -1;
+  overflow: hidden;
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8vh 6vw;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+.missao_bg{
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('../../padrao/assets/images/institucional-quemsomos.jpg');
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+.missao_secao::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.72) 100%);
+  pointer-events: none;
+}
+.missao_conteudo{
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.missao_frase{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  line-height: 1.25;
+  max-width: 900px;
+  font-size: clamp(4.8rem, 4vw + 1rem, 3.2rem);
+}
+.missao_assinatura{
+  margin-top: 1.5rem;
+  color: var(--laranja);
+  font-family: var(--fonte-rotulo);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 1.4rem;
+}
+/* FIM INSTITUCIONAL — MISSÃO */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* INSTITUCIONAL — NOSSOS VALORES */
+.valores_secao{
+  background-color: var(--background_cinza);
+  padding: 10vh 6vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.valores_cabecalho{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 6vh;
+}
+.valores_cabecalho h2{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem);
+}
+.valores_grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3vw;
+  width: 100%;
+  max-width: 1200px;
+}
+.valor_card{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: center;
+}
+.valor_numero{
+  color: var(--laranja);
+  font-family: var(--fonte-titulo);
+  font-weight: 700;
+  font-size: clamp(1.8rem, 3vw + 0.6rem, 2.4rem);
+}
+.valor_card h3{
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 1.1rem;
+}
+.valor_texto{
+  color: rgba(255,255,255,0.78);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+/* FIM INSTITUCIONAL — NOSSOS VALORES */
+/* ==================================================================== */

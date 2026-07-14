@@ -5,6 +5,79 @@
 
 ---
 
+## 2026-07-14 11:59 — Split do `base.css` em fundação + CSS por página (PASSE 1)
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/css-split-passe-1.md`, plano completo em
+`docs/agentes/opus/backlog/refatoracao-css.md` — motivação do dono: "não
+estou gostando de ter um arquivo css enorme", `base.css` tinha 2988 linhas):
+
+`base.css` virou um **manifesto** (só `@import`, comentário no topo
+explicando a ordem e o cuidado de não reordenar) — o `<link>` do
+`index.html` continua apontando pra ele, sem mudança. O conteúdo foi
+recortado **mecanicamente** (via `sed` por faixa de linha, não digitado à
+mão — zero risco de erro de transcrição) em 10 arquivos novos, na ordem
+exata em que os blocos apareciam no arquivo antigo:
+
+| # | Arquivo novo | Conteúdo (linhas de origem) |
+|---|---|---|
+| 1 | `src/padrao/estilos/reset.css` | Reset `*{}` + `body{background}` + bloco Lenis (5–56) |
+| 2 | `src/padrao/estilos/header.css` | HEADER base (58–117) **+** header minimalista, antes solto na Fase 3 (935–991) — unidos no mesmo arquivo |
+| 3 | `src/paginas/home/home.css` | HERO·FAVORITOS·LANÇ. DESCONTO·CATEGORIAS·LANÇ. ESPECIAL·TERRITÓRIO·DESTAQUES·HISTORIAS·BANNER (120–845) |
+| 4 | `src/padrao/estilos/footer.css` | FOOTER (848–925) |
+| 5 | `src/padrao/estilos/botao.css` | Botão cortado com preenchimento (993–1012) |
+| 6 | `src/padrao/estilos/animacoes.css` | Resto da Fase 3: zoom/moldura, elevação hover, `.hero_bg` parallax (928–934 + 1014–1116) |
+| 7 | `src/paginas/institucional/institucional.css` | Todas as seções da Institucional (1119–1449) |
+| 8 | `src/paginas/produtos/produtos.css` | PLP (1452–1881) |
+| 9 | `src/padrao/estilos/responsividade.css` | Bloco global de mobile (Home+Institucional+Produtos, 3 `@media`, 1884–2227) — **não distribuído por página neste passe** (passe 2, pendente) |
+| 10 | `src/paginas/equipamento/equipamento.css` | PDP inteira, já com mobile self-contained (2230–2988) |
+
+**Ordem do manifesto (`base.css`):** `tokens → reset → header → home →
+footer → botao → animacoes → institucional → produtos → responsividade →
+equipamento` — idêntica à ordem dos blocos no arquivo antigo, com **uma
+única reorganização deliberada e pré-aprovada pela instrução**: o header
+minimalista (antes fisicamente depois de Home+Footer, dentro da Fase 3)
+passou a vir logo após o header base, ainda antes do `home.css`. Seguro
+porque os seletores de header (`header`, `.header_minimalista`,
+`#drawer_menu`…) não colidem em especificidade com nenhum seletor de
+Home/Footer.
+
+**⚠️ Achado real durante a prova de equivalência (não estava na instrução,
+corrigido):** 5 regras `background-image:url(...)` nos arquivos que
+mudaram de pasta (`home.css`, `institucional.css` ×2, `produtos.css`,
+`equipamento.css`) usavam caminho relativo (`../assets/images/...`)
+calculado a partir da posição ANTIGA (`src/padrao/estilos/`). Ao mover o
+arquivo pra `src/paginas/<página>/`, esse relativo quebrava (resolvia pra
+uma pasta inexistente — o build não erra, só silenciosamente deixa de
+achar a imagem). Corrigido pra `../../padrao/assets/images/...` (2 níveis
+acima + `padrao/assets/images/`, caminho correto a partir da nova pasta) —
+sem isso, `cat-aventura.jpg` (Lançamento Especial, Home),
+`testado-minas.jpg`/`institucional-quemsomos.jpg` (Institucional),
+`jaqueta_fav.jpg` (PLP) e `testado-minas.jpg` (PDP) quebrariam em produção.
+
+**Prova de equivalência do CSS compilado (essencial, pedida na instrução):**
+1. `npx vite build` **antes** do split → guardado `dist/assets/index-*.css`
+   (43.791 bytes).
+2. Split + fix dos 5 `url()` acima.
+3. `npx vite build` **depois** → novo CSS compilado, **também 43.791
+   bytes**.
+4. Comparação byte a byte (script Python, não só `diff` visual): reconstruí
+   o CSS "antes" aplicando SÓ a reordenação do header (movendo o bloco
+   `.header_minimalista{...}` pra logo antes do Hero, exatamente a mudança
+   pré-aprovada pela instrução) — o resultado bateu **byte a byte idêntico**
+   com o CSS "depois". ✅ **Nenhuma outra diferença** (nenhuma regra
+   perdida, duplicada ou fora de ordem além do esperado).
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos.
+`base.css` conferido como só `@import`/comentários (`grep -c "{"` = 0, zero
+regras soltas). `index.html` não tocado.
+
+**Não commitado.** Resumo acima (com o resultado da prova de
+equivalência). O Opus confere os 5 viewports antes×depois (diferença
+esperada: zero) e o dono dá o sinal verde.
+
+---
+
 ## 2026-07-14 11:29 — PDP: setas do DESTAQUES nos 2 extremos do carrossel
 
 **O que foi feito e por quê** (pedido direto do dono: "as setas do carrossel

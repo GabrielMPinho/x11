@@ -1,0 +1,120 @@
+/* ==================================================================== */
+/* HEADER */
+header{
+  background-color: black;
+  height: 12vh;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0 2vw;
+}
+header > nav{
+  display: flex;
+  align-items: center;
+  margin-left: 10vw;
+  gap: 6rem;
+}
+header > nav > a{
+  color: #afb3ae;
+  font-family: var(--fonte-rotulo);
+  text-decoration: none;
+  font-size: medium;
+}
+/* Descendente (não mais filho direto) desde 2026-07-10: o logo virou
+   clicável ("voltar ao topo"), envolvido num <button class="logo_home_
+   botao"> — o <img> deixou de ser filho DIRETO de <header>. Tamanho/
+   posição/z-index do logo continuam aplicados direto na <img> (idênticos),
+   só o seletor precisou alcançar mais um nível. */
+header img{
+  position: relative;
+  height: auto;
+  width: auto;
+  top: 2.9vh;
+  left: 4vw;
+  z-index: 1;
+}
+/* Botão-wrapper do logo (2026-07-10, "voltar ao topo"), usado nos DOIS
+   headers (completo e minimalista). FIX (mesmo dia, rodada seguinte): a
+   1ª versão usava `display:block;line-height:0` (pensando no padrão de
+   `.zoom_imagem`) — mas ali o `img` da regra também ganha `display:block`
+   explícito; aqui `header img`/`.header_minimalista img` NÃO definem
+   `display` (a `<img>` continua inline), então o `line-height:0` do
+   wrapper colapsava a caixa do botão (medido: 66px de altura pra uma
+   imagem de 130px) e cortava o logo. Fix: `display:contents` — o botão
+   **não gera caixa própria**, a `<img>` volta a se comportar como se fosse
+   filha DIRETA do header (o que `header img`/`.header_minimalista img`
+   já esperam), sem nenhum `line-height`/`overflow` pra colapsar/recortar
+   nada. Continua clicável/focável (âncora com `display:contents` também
+   mantém isso, mas `<button>` já funciona nos navegadores-alvo do
+   projeto). Reset de fundo/borda/padding mantido por precaução (não tem
+   efeito visual com `display:contents`, mas documenta a intenção). */
+.logo_home_botao{
+  display: contents;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+/* FIM HEADER */
+/* ==================================================================== */
+
+/* Header minimalista (Fase 3) — junto do header base agora, ver o
+   split original em docs/agentes/alterações/CHANGELOG.md (passe 1 do CSS). */
+/* Header minimalista (novo design, 2026-07-10 — substitui os antigos
+   header_flutuante/header_compacto de 3 estados). O <header> "completo"
+   (regras acima) fica SEMPRE em fluxo normal, sem exceção — nunca vira
+   fixed, então nunca causa pulo em <main> (não precisa mais de espaçador:
+   o completo simplesmente rola pra fora como qualquer elemento normal). A
+   barra minimalista é um elemento FIXED **independente** (não é o mesmo
+   <header>, ver components/Header.jsx), montado/desmontado via
+   AnimatePresence só quando fora do Hero — como nunca ocupou fluxo, seu
+   fade de entrada/saída não desloca nada. Ela é SEMPRE visível enquanto
+   montada (não some ao rolar pra baixo, diferente do antigo "escondido"). */
+.header_minimalista{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2vw;
+  background-color: black;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+}
+/* Logo maior que a barra de 60px, mas SEM chegar ao tamanho natural
+   (2026-07-10, 3ª rodada — o tamanho natural/308px do header completo
+   ficou grande demais pro dono; alvo agora é só "um pouco maior que o
+   header pequeno"): `170px` de largura (~72px de altura) — pouco acima dos
+   60px da barra, sobreposição sutil, não o logo inteiro (tamanho aprovado
+   pelo dono). Mesmo mecanismo de sobreposição do completo
+   (`header img{position:relative;top:2.9vh;z-index:1}`): `position:
+   relative` + `top` empurra o logo pra baixo do fluxo normal, sem
+   `overflow:hidden` no `.header_minimalista` (não definido) pra ela vazar
+   por cima do conteúdo abaixo da barra. `top` reduzido de `12px` pra
+   `4px` (4ª rodada — o dono pediu pra "arredar ela um pouco pra cima",
+   tamanho mantido). */
+.header_minimalista img{
+  position: relative;
+  width: 170px;
+  height: auto;
+  top: 4px;
+  z-index: 1;
+}
+.header_minimalista nav{
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.header_minimalista nav a{
+  color: #afb3ae;
+  font-family: var(--fonte-rotulo);
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+.header_minimalista nav a:hover{
+  color: var(--laranja);
+}

@@ -1,0 +1,344 @@
+/* ==================================================================== */
+/* ==================================================================== */
+/* RESPONSIVIDADE (FASE 2) — NOVO SISTEMA DE DESIGN MOBILE */
+/* Desktop > 1280px = INTOCADO. Todo o design abaixo vive em @media
+   (max-width) ou em elementos novos ocultos por padrão. O novo sistema
+   (cabeçalho com barra laranja + tokens de espaçamento) vale de 1280px
+   para baixo; ao cruzar 1280px a página volta a ser o desktop atual.
+   Breakpoint superior subido de 1024→1280px (Fase 2, parte A): entre
+   ~1025 e ~1280px o desktop original só "cabe" a partir de ~1360px
+   (logo em tamanho natural + nav larga estouravam) — a faixa responsiva
+   foi estendida até 1280px para cobrir esse intervalo sem overflow. */
+
+/* ---------- Elementos novos do menu mobile (ocultos por padrão) ---------- */
+/* Classe (não mais id) — o header minimalista (2026-07-10) tem seu PRÓPRIO
+   botão hambúrguer (mobile ≤768px), independente do botão do header
+   completo; os dois abrem o MESMO drawer/overlay compartilhado abaixo. */
+.botao_hamburguer{
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px; height: 20px;
+  padding: 0; margin: 0;
+  background: transparent; border: none; outline: none;
+  clip-path: none; cursor: pointer; z-index: 20;
+}
+.botao_hamburguer span{ display: block; width: 100%; height: 2px; background-color: var(--branco); }
+.overlay_menu{ display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.6); z-index: 90; }
+#drawer_menu{
+  display: none; position: fixed; top: 0; right: 0;
+  height: 100vh; width: min(78vw, 320px);
+  background-color: var(--background_escuro);
+  z-index: 100; flex-direction: column; gap: 2rem; padding: 96px 32px 32px;
+}
+#drawer_menu a{ color: var(--branco); text-decoration: none; font-size: 1.1rem; letter-spacing: 0.05em; }
+#drawer_menu a:hover{ color: var(--laranja); }
+
+
+/* ==================================================================== */
+/* ---- TABLET + base do novo design (<= 1280px) ---- */
+@media (max-width: 1280px){
+  body{ overflow-x: hidden; }
+
+  /* HEADER — nav horizontal ainda ativa (hambúrguer só <=768px), bem mais
+     enxuta; LARGURA do logo restrita de forma explícita (não só a altura —
+     a imagem original é 308×130px; height:36px sozinho não impedia o
+     navegador de manter a largura próxima do natural em algumas condições
+     de medição) e sem os offsets de desktop (top/left). */
+  header > nav{ margin-left: 2vw; gap: 1.25rem; }
+  header > nav > a{ font-size: 0.85rem; }
+  header img{ position: static; top: auto; left: auto; width: 110px; height: auto; }
+
+  /* Logo do header MINIMALISTA acompanha a mesma largura do completo neste
+     breakpoint (110px) — o completo vira `position:static` aqui (contido,
+     sem overlap, ajuste da Fase 2 pra não estourar no tablet), mas a barra
+     minimalista é um elemento à parte e mantém seu próprio mecanismo de
+     sobreposição (`position:relative`+`top`+`z-index`) em qualquer largura,
+     só reduzindo o `top` proporcionalmente ao logo menor. */
+  .header_minimalista img{ width: 110px; top: 18px; }
+
+  /* ---- CABEÇALHO DE SEÇÃO: padrão único (esquerda + barra laranja) ---- */
+  .titulo{
+    position: static; top: auto;
+    justify-content: flex-start;
+    padding: 0 20px;
+    margin-bottom: 28px;
+  }
+  .escrito_fav, .escrito_cat{ align-items: flex-start; text-align: left; }
+  .escrito_fav h2::after,
+  .escrito_cat h2::after,
+  #titulo_destaque h3::after{
+    content: ""; display: block;
+    width: 44px; height: 3px;
+    background: var(--laranja);
+    margin-top: 12px;
+  }
+
+  /* ---- HERO: sai do posicionamento absoluto já no tablet ---- */
+  .hero{
+    min-height: 78vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 96px 20px 56px;
+  }
+  #escrito{ position: static; top: auto; left: auto; width: 100%; }
+  #botoes{ position: static; top: auto; left: auto; width: auto; }
+
+  /* ---- INSTITUCIONAL — HERO: centralizado, mesmo em tablet ---- */
+  .hero_institucional{ min-height: 82vh; }
+  .hero_institucional_escrito{ max-width: 520px; padding: 0 20px; }
+
+  /* ---- INSTITUCIONAL — QUEM SOMOS #1: título/texto empilham, features 2 col ---- */
+  .quemsomos1_secao{ padding: 8vh 20px; }
+  .quemsomos1_topo{ grid-template-columns: 1fr; gap: 32px; margin-bottom: 6vh; }
+  .quemsomos1_features{ grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+  /* ---- INSTITUCIONAL — QUEM SOMOS #2/#3 (split): paddings de tablet ---- */
+  .quemsomos_split{ padding: 8vh 20px; gap: 32px; }
+  .quemsomos_split_imagem img{ height: 56vh; }
+
+  /* ---- INSTITUCIONAL — TIMELINE: 2 colunas ---- */
+  .timeline_secao{ padding: 8vh 20px; }
+  .timeline_grid{ grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
+
+  /* ---- INSTITUCIONAL — MISSÃO: padding de tablet ---- */
+  .missao_secao{ padding: 7vh 20px; }
+
+  /* ---- INSTITUCIONAL — NOSSOS VALORES: padding de tablet ---- */
+  .valores_secao{ padding: 8vh 20px; }
+  .valores_grid{ gap: 32px 24px; }
+
+  /* ---- PRODUTOS — PLP: grade 2 col, sidebar mais estreita, paddings de tablet ---- */
+  .colecao_hero{ min-height: 38vh; padding: 0 20px; }
+  .barra_categorias{ padding: 20px; }
+  /* grid-template-columns não repetido — já é 200px 1fr no base (compactado
+     2026-07-13), essa faixa só ajusta gap/padding. */
+  .produtos_corpo{ gap: 32px; padding: 6vh 20px; }
+  .grade_produtos{ grid-template-columns: repeat(2, 1fr); }
+  .bloco_editorial{ padding: 32px; }
+
+  /* CTAs de Lançamento desconto/especial: largura por conteúdo, texto inteiro */
+  #texto button,
+  #container_texto button{
+    width: auto;
+    height: 48px;
+    padding: 0 30px 0 22px;
+    white-space: nowrap;
+  }
+
+  /* ---- LANÇAMENTO DESCONTO: empilha texto + imagem ---- */
+  .lancamento_desconto{ height: auto; min-height: 0; grid-template-columns: 1fr; grid-template-rows: auto; }
+  #container_escrito{ grid-column: 1 / -1; grid-row: auto; padding: 64px 20px; }
+  #texto{ width: 100%; left: 0; top: 0; }
+  #container_imagem{ grid-column: 1 / -1; grid-column-start: auto; grid-row: auto; aspect-ratio: 4/3; height: auto; }
+
+  /* ---- FAVORITOS: 3 colunas (tablet) ---- */
+  .favoritos{ min-height: 0; padding: 64px 0; }
+  #imagens{ padding: 0 20px; gap: 20px; }
+  .card{ width: auto; flex: 1 1 0; min-width: 0; left: 0; }
+  .card img{ width: 100%; height: auto; aspect-ratio: 4/5; }
+  .card a{ padding-bottom: 0; }
+
+  /* ---- CATEGORIAS: 3 colunas (tablet) ---- */
+  .categorias{ min-height: 0; padding: 64px 0; }
+  #conteiner_categorias{
+    grid-template-columns: repeat(3, 1fr);
+    position: static; top: auto; width: auto; height: auto;
+    margin: 0 20px; padding: 0; gap: 12px;
+  }
+
+  /* ---- LANÇAMENTO ESPECIAL: sai do offset em vh ---- */
+  .lancamento_especial{ height: auto; min-height: 60vh; padding: 64px 0; }
+  #container_texto{ width: auto; left: 0; top: 0; padding: 0 20px; }
+
+  /* ---- TERRITÓRIO: 2 colunas (tablet) ---- */
+  .territorio{ min-height: 0; padding: 64px 0; }
+  #container_cards{ grid-template-columns: repeat(2, 1fr); width: auto; margin: 0 20px; gap: 20px; }
+  .imagem_territorio{ height: auto; aspect-ratio: 4/5; }
+
+  /* ---- DESTAQUES: vitrine horizontal com snap (tablet) ---- */
+  /* Fase 4: era grade estática de 3 colunas; o dono pediu o mecanismo
+     binário "carrossel (>1280px + ponteiro fino) OU swipe nativo" — sem
+     grade estática no meio. ≤1280px cai no swipe/snap (já usado no
+     mobile), só com card mais largo pro tablet; o próprio Destaques.jsx
+     nunca ativa o carrossel/300vh/pin fora de >1280px+ponteiro fino. */
+  .destaques{ display: block; min-height: 0; padding: 64px 0; }
+  #conteudo_destaques{ width: auto; height: auto; margin: 0 20px; }
+  #escrito_destaques{ height: auto; margin-bottom: 28px; }
+  #produtos_destaques{
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 38vw;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 20px;
+    height: auto;
+    padding-bottom: 16px;
+  }
+  .card_produto{ scroll-snap-align: start; }
+
+  /* ---- HISTÓRIAS: 3 colunas (tablet) ---- */
+  .historias{ min-height: 0; padding: 64px 0; }
+  #container_historias{ grid-template-columns: repeat(3, 1fr); width: auto; margin: 0 20px; gap: 20px; }
+  .card_historia img{ width: 100%; height: auto; aspect-ratio: 4/5; }
+
+  /* ---- BANNER ---- */
+  .banner{ min-height: 0; padding: 64px 20px; }
+  #texto_banner{ height: auto; }
+
+  /* ---- FOOTER: 3 colunas fluidas ---- */
+  #conteudo_footer{ grid-template-columns: repeat(3, 1fr); gap: 4vw; width: auto; margin: 0 20px; height: auto; }
+  #fim_footer{ height: 0; }
+
+  /* Logo do rodapé (308×130px natural) estourava a lateral em 769–1280px:
+     só era restringido dentro do bloco ≤768px. Estende a mesma restrição
+     de largura pra toda a faixa ≤1280px (correção Fase 3). */
+  #logo_footer{ width: 140px; height: auto; }
+  #logo_footer img{ max-width: 100%; height: auto; }
+}
+
+
+/* ==================================================================== */
+/* ---- MOBILE (<= 768px) ---- */
+@media (max-width: 768px){
+  /* HEADER — hambúrguer assume */
+  header{ justify-content: space-between; padding: 0 20px; height: 64px; }
+  header img{ position: static; top: auto; left: auto; width: 90px; height: auto; }
+  header > nav{ display: none; }
+  .botao_hamburguer{ display: flex; }
+  .overlay_menu{ display: block; }
+  #drawer_menu{ display: flex; }
+
+  /* HEADER MINIMALISTA — mesma resolução: nav condensada vira hambúrguer
+     (o botão já mostra via `.botao_hamburguer{display:flex}` acima, que
+     vale pros dois gatilhos, completo e minimalista). Logo um pouco menor
+     que no tablet/desktop pra sobrar folga ao lado do hambúrguer. */
+  .header_minimalista{ padding: 0 20px; }
+  .header_minimalista nav{ display: none; }
+  .header_minimalista img{ width: 90px; top: 14px; }
+
+  /* HERO — botões empilham com respiro */
+  .hero{ min-height: 100vh; padding: 96px 20px 56px; }
+  #botoes{ display: flex; flex-direction: column; gap: 14px; margin-top: 28px; }
+  #botoes button{ margin: 0; width: 100%; height: 54px; }
+
+  /* INSTITUCIONAL — HERO: texto ocupa a largura toda, fluida */
+  .hero_institucional{ min-height: 100vh; }
+  .hero_institucional_escrito{ max-width: 100%; padding: 0 20px; }
+
+  /* INSTITUCIONAL — QUEM SOMOS #1: features 1 coluna */
+  .quemsomos1_features{ grid-template-columns: 1fr; gap: 28px; }
+
+  /* INSTITUCIONAL — QUEM SOMOS #2/#3 (split): empilha, imagem conforme a
+     ordem do JSX (QuemSomos2 tem a imagem primeiro — "imagem em cima" do
+     layout; QuemSomos3 é o inverso, sem pedido explícito de reordenar). */
+  .quemsomos_split{ grid-template-columns: 1fr; min-height: 0; padding: 64px 20px; }
+  .quemsomos_split_imagem img{ height: 50vh; }
+
+  /* INSTITUCIONAL — TIMELINE: 1 coluna */
+  .timeline_grid{ grid-template-columns: 1fr; gap: 28px; }
+
+  /* INSTITUCIONAL — MISSÃO: padding de mobile */
+  .missao_secao{ min-height: 40vh; padding: 56px 20px; }
+
+  /* INSTITUCIONAL — NOSSOS VALORES: 1 coluna (responsivo 3→1) */
+  .valores_secao{ padding: 64px 20px; }
+  .valores_grid{ grid-template-columns: 1fr; gap: 40px; max-width: 420px; }
+
+  /* PRODUTOS — PLP: sidebar sai da lateral (bloco colapsável no topo),
+     grade 1 coluna, barra de categorias empilha */
+  .colecao_hero{ min-height: 34vh; }
+  .barra_categorias{ flex-direction: column; align-items: flex-start; gap: 16px; }
+  .abas_categorias{ width: 100%; }
+  .produtos_corpo{ grid-template-columns: 1fr; gap: 24px; padding: 48px 20px; }
+  /* Sticky (correção 3) NÃO se aplica no mobile — sidebar colapsada vira
+     bloco no topo do fluxo normal, comportamento inalterado. */
+  .sidebar_filtros{ position: static; top: auto; }
+  .botao_filtros_mobile{
+    display: flex;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    clip-path: none;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    outline: none;
+    color: var(--branco);
+    font-family: var(--fonte-rotulo);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+  }
+  .seta_filtros{ transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+  .seta_filtros_aberta{ transform: rotate(180deg); }
+  .sidebar_filtros_conteudo{ display: none; margin-top: 20px; }
+  .sidebar_filtros_conteudo.sidebar_filtros_aberta{ display: flex; }
+  .grade_produtos{ grid-template-columns: 1fr; gap: 20px; }
+  .bloco_editorial{ flex-direction: column; align-items: flex-start; padding: 28px; }
+
+  /* FAVORITOS — 1 coluna */
+  #imagens{ flex-direction: column; gap: 40px; }
+  .card{ flex: none; width: 100%; }
+
+  /* CATEGORIAS — 2 colunas */
+  #conteiner_categorias{ grid-template-columns: repeat(2, 1fr); }
+
+  /* TERRITÓRIO — 1 coluna */
+  #container_cards{ grid-template-columns: 1fr; }
+  .imagem_territorio{ aspect-ratio: 16/11; }
+
+  /* DESTAQUES — modo arrastável: card mais largo no mobile ("espia" o
+     próximo, convida o arraste) — alvo do dono, ~78vw. */
+  .card_arrastavel{ flex: 0 0 78vw; width: 78vw; }
+
+  /* DESTAQUES (reduced-motion) — vitrine horizontal com snap */
+  #produtos_destaques{
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 62vw;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 16px;
+  }
+  .card_produto{ scroll-snap-align: start; }
+
+  /* HISTÓRIAS — 1 coluna */
+  #container_historias{ grid-template-columns: 1fr; }
+  .card_historia img{ aspect-ratio: 16/10; }
+
+  /* FOOTER — 1 coluna, rodapé empilha e centraliza */
+  #conteudo_footer{ grid-template-columns: 1fr; gap: 32px; }
+  #rodape_footer{ flex-direction: column; height: auto; gap: 16px; text-align: center; padding: 24px 20px; }
+  #rodape_footer p{ margin: 0; }
+  #logo_footer{ width: 140px; height: auto; }
+  #logo_footer img{ max-width: 100%; height: auto; }
+  #fim_footer{ height: 0; }
+}
+
+
+/* ==================================================================== */
+/* ---- MOBILE PEQUENO (<= 480px) ---- */
+@media (max-width: 480px){
+  /* CATEGORIAS — respiro menor */
+  #conteiner_categorias{ gap: 10px; }
+  .card_categoria{ height: 120px; padding: 16px; }
+
+  /* DESTAQUES — card um pouco mais largo */
+  #produtos_destaques{ grid-auto-columns: 66vw; }
+
+  /* INSTITUCIONAL — HERO: padding/título mais compactos */
+  .hero_institucional_escrito h1{ font-size: clamp(1.8rem, 9vw, 2.6rem); }
+
+  /* INSTITUCIONAL — MISSÃO: frase mais compacta */
+  .missao_frase{ font-size: clamp(1.6rem, 9vw, 2.2rem); }
+
+  /* PRODUTOS — PLP: título do hero e grade mais compactos */
+  .colecao_hero_escrito h1{ font-size: clamp(1.8rem, 9vw, 2.4rem); }
+  .grade_produtos{ gap: 16px; }
+  .filtro_tamanhos_grid{ gap: 6px; }
+}
+/* FIM RESPONSIVIDADE */
+/* ==================================================================== */

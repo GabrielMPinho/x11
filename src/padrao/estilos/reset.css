@@ -1,0 +1,52 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* Fundo escuro no body (fix de RAIZ, 2026-07-14, 2ª conferência do dono) —
+   sem isso, qualquer reveal que desloque uma seção/bloco via `transform`
+   (Revela/RevelaComProgresso) abre um vão que expõe o branco padrão do
+   navegador durante o scroll ("faixa branca" entrando/saindo, achado 1ª vez
+   na PDP/FaixaSpecs, mas o mesmo bug existia latente em QUALQUER página —
+   ex.: o Footer, que fica no shell/App.jsx, fora do `<main>` de qualquer
+   página, então nenhum fundo de página o cobria). Toda seção de toda
+   página já cobre o body no repouso, então isso é ZERO mudança visual em
+   desktop >1280px (regra de ouro preservada) — só os vãos de reveal passam
+   a mostrar escuro em vez de branco. O `background` que a PDP ganhou na 1ª
+   rodada (`.equipamento_pdp`) fica redundante mas inofensivo — não removido. */
+body{
+  background-color: var(--background_escuro);
+}
+/* ==================================================================== */
+/* LENIS (Fase 5) — CSS mínimo exigido pela lib (copiado de
+   node_modules/lenis/dist/lenis.css — projeto usa um arquivo CSS só, sem
+   imports externos, daí colado aqui em vez de importado do pacote). Não
+   altera nada em repouso: só entra em jogo enquanto o scroll está de fato
+   rolando/parado via Lenis (classes que o próprio Lenis adiciona/remove no
+   <html>). Só existe quando <ReactLenis> monta (App.jsx) — se
+   prefers-reduced-motion estiver ativo, o Lenis nem inicializa e nenhuma
+   dessas classes é aplicada (scroll 100% nativo). */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+.lenis.lenis-autoToggle {
+  transition-property: overflow;
+  transition-duration: 1ms;
+  transition-behavior: allow-discrete;
+}
+/* FIM LENIS */
+/* ==================================================================== */

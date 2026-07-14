@@ -1,0 +1,759 @@
+/* ==================================================================== */
+/* ===== PÁGINA EQUIPAMENTO (PDP) ===== */
+/* Detalhe do produto (destino dos cards de Favoritos/PLP). Mesma liberdade
+   de layout da Institucional/PLP (sem a trava "desktop >1280px
+   pixel-idêntico") — seletores 100% próprios desta página, nenhum
+   reaproveitado/editado de Home/PLP/Institucional. Reaproveita só os
+   utilitários compartilhados de `padrao/` (.p_laranja, .zoom_imagem,
+   .botao_cortado, tokens de `:root`). Breakpoints self-contained aqui
+   (1280/768/480), fiel à instrução — não mistura com o bloco de
+   responsividade cascata acima. Ver docs/agentes/sonnet/fazer/
+   equipamento-pagina-produto.md e docs/agentes/opus/backlog/produto.md. */
+
+/* Fundo escuro no <main> (fix 2026-07-14, 1ª conferência do dono) — sem
+   isso, o reveal de `FaixaSpecs` (`Revela distancia={100}`, que desloca a
+   SEÇÃO INTEIRA via `transform:translateY`) abre um vão entre as seções
+   durante o scroll que expunha o branco padrão do navegador ("faixa branca"
+   entrando/saindo). Resolve pra todas as seções da página de uma vez, não
+   só a de specs, porque o vão passa a expor o escuro do próprio <main>.
+   ⚠️ Achado (não corrigido aqui, fora de escopo): o <body> global não tem
+   fundo escuro — qualquer página cujo reveal desloque uma seção full-bleed
+   pode mostrar o mesmo vão branco. Fix de raiz seria um fundo escuro global
+   no body, mas mexe em todas as páginas — não tocado sem pedido. */
+.equipamento_pdp{
+  background-color: var(--background_escuro);
+}
+
+/* ---- Breadcrumb ---- */
+.equipamento_breadcrumb{
+  color: rgba(255,255,255,0.45);
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+}
+
+/* ---- Hero do produto (split galeria | info) ---- */
+.hero_produto{
+  background-color: var(--background_escuro);
+  padding: 14vh 6vw 8vh;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.hero_produto_corpo{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.hero_produto_galeria{
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.hero_produto_thumbs{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 0 0 76px;
+}
+.thumb_produto{
+  /* Reset da regra global button{width:14vw;height:7.3vh;clip-path:...} —
+     pensada pro Hero da Home, não deve vazar pra botões de UI desta página. */
+  margin: 0;
+  clip-path: none;
+  width: 76px;
+  height: 76px;
+  padding: 0;
+  border: 2px solid transparent;
+  background-color: var(--background_claro);
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.thumb_produto img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.thumb_produto_ativo{
+  border-color: var(--laranja);
+}
+@media (hover: hover) and (pointer: fine){
+  .thumb_produto:not(.thumb_produto_ativo):hover{ border-color: rgba(255,80,0,0.5); }
+}
+.hero_produto_packshot{
+  flex: 1;
+  background-color: var(--background_claro);
+  aspect-ratio: 4 / 5;
+  padding: 32px;
+}
+.hero_produto_packshot img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+@media (hover: hover) and (pointer: fine){
+  .hero_produto_packshot:hover img{ transform: scale(1.04); }
+}
+.hero_produto_info{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.hero_produto_titulo{
+  font-family: var(--fonte-titulo);
+  color: #e9e9e9;
+  line-height: 1.05;
+  font-size: clamp(2rem, 2.4vw + 1.2rem, 3.2rem);
+}
+.produto_rating{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.produto_estrelas{
+  display: flex;
+  gap: 2px;
+}
+.produto_estrela{
+  color: var(--laranja);
+  display: inline-flex;
+}
+.produto_estrela svg{
+  width: 16px;
+  height: 16px;
+}
+.produto_rating_texto{
+  font-family: var(--fonte-rotulo);
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.65);
+}
+.produto_preco{
+  font-family: var(--fonte-titulo);
+  color: var(--branco);
+  font-size: 2rem;
+  margin: 2px 0;
+}
+.produto_descricao{
+  color: rgba(255,255,255,0.75);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 46ch;
+}
+.produto_opcao_bloco{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+.produto_opcao_label{
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+}
+.produto_swatches{
+  display: flex;
+  gap: 10px;
+}
+.produto_swatch{
+  margin: 0;
+  clip-path: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 2px solid rgba(255,255,255,0.25);
+  cursor: pointer;
+}
+.produto_swatch_ativo{
+  border-color: var(--laranja);
+}
+@media (hover: hover) and (pointer: fine){
+  .produto_swatch:not(.produto_swatch_ativo):hover{ border-color: rgba(255,255,255,0.5); }
+}
+.produto_chips_tamanho{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.produto_chip_tamanho{
+  margin: 0;
+  clip-path: none;
+  height: auto;
+  width: auto;
+  min-width: 44px;
+  padding: 0.5rem 0.4rem;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: transparent;
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-size: 0.85rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.produto_chip_tamanho_ativo{
+  border-color: var(--laranja);
+  color: var(--laranja);
+}
+@media (hover: hover) and (pointer: fine){
+  .produto_chip_tamanho:not(.produto_chip_tamanho_ativo):hover{ border-color: var(--laranja); color: var(--laranja); }
+}
+.produto_garantia{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+.icone_garantia{
+  color: var(--laranja);
+  flex-shrink: 0;
+}
+.icone_garantia svg{
+  width: 28px;
+  height: 28px;
+}
+.produto_garantia_texto{
+  display: flex;
+  flex-direction: column;
+  font-family: var(--fonte-rotulo);
+  color: rgba(255,255,255,0.85);
+}
+.produto_garantia_texto strong{
+  font-size: 0.9rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.produto_garantia_texto span{
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+}
+
+/* ---- Faixa de 4 specs ---- */
+.faixa_specs_secao{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background-color: var(--background_cinza);
+  padding: 6vh 6vw;
+}
+.spec_item{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 0 16px;
+}
+.spec_item:not(:last-child){
+  border-right: 1px solid rgba(255,255,255,0.12);
+}
+.spec_numero{
+  font-family: var(--fonte-titulo);
+  color: var(--laranja);
+  font-size: clamp(1.6rem, 1.4vw + 1rem, 2.4rem);
+}
+.spec_label{
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.8);
+}
+
+/* ---- Engineered Features ---- */
+.engineered_features_secao{
+  background-color: var(--background_escuro);
+  padding: 8vh 6vw;
+  display: flex;
+  flex-direction: column;
+  gap: 6vh;
+}
+.engineered_features_topo{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+.engineered_features_titulo_bloco h2{
+  font-family: var(--fonte-titulo);
+  color: var(--branco);
+  font-size: clamp(1.8rem, 1.6vw + 1.2rem, 2.6rem);
+  line-height: 1.15;
+  margin-top: 8px;
+}
+.engineered_features_paragrafo{
+  color: rgba(255,255,255,0.75);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-top: 8px;
+}
+.engineered_features_grid{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+.feature_pdp_card{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 24px;
+}
+.feature_pdp_card:not(:last-child){
+  border-right: 1px solid rgba(255,255,255,0.12);
+}
+.feature_pdp_icone{
+  color: var(--laranja);
+}
+.feature_pdp_icone svg{
+  width: 32px;
+  height: 32px;
+}
+.feature_pdp_card h3{
+  font-family: var(--fonte-rotulo);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 0.95rem;
+  color: var(--branco);
+}
+.feature_pdp_card p{
+  color: rgba(255,255,255,0.7);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ---- Banner "TESTADO MINAS GERAIS" (full-bleed) ---- */
+.banner_testado_secao{
+  position: relative;
+  /* z-index:0 (nunca -1) — mesmo cuidado do fix de clique do Hero da Home
+     (ver CHANGELOG): a seção não pode "afundar" atrás do <main>. Aqui não
+     há link/botão, mas o padrão evita o mesmo bug latente se algo
+     clicável entrar depois. Ainda cria o contexto de empilhamento local
+     que .banner_testado_bg precisa. */
+  z-index: 0;
+  overflow: hidden;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  padding: 0 6vw;
+}
+.banner_testado_bg{
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('../../padrao/assets/images/testado-minas.jpg');
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+.banner_testado_secao::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.15) 80%, transparent 100%);
+  pointer-events: none;
+}
+.banner_testado_conteudo{
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.banner_testado_titulo{
+  font-family: var(--fonte-titulo);
+  color: var(--branco);
+  line-height: 1.05;
+  font-size: clamp(2.2rem, 2.4vw + 1.2rem, 3.4rem);
+}
+.banner_testado_texto{
+  color: rgba(255,255,255,0.85);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 52ch;
+}
+
+/* ---- DIFERENCIAIS / ESSENCIAIS — tabela de especificações ---- */
+.especificacoes_secao{
+  background-color: var(--background_escuro);
+  padding: 8vh 6vw;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+.especificacoes_texto h2{
+  font-family: var(--fonte-titulo);
+  color: var(--branco);
+  font-size: clamp(1.8rem, 1.6vw + 1.2rem, 2.6rem);
+  line-height: 1.1;
+  margin: 0;
+}
+.especificacoes_paragrafo{
+  margin-top: 12px;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 42ch;
+}
+.tabela_especificacoes{
+  display: flex;
+  flex-direction: column;
+}
+.linha_especificacao{
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.label_especificacao{
+  font-family: var(--fonte-rotulo);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.55);
+}
+.valor_especificacao{
+  font-family: var(--fonte-corpo);
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.9);
+  text-align: right;
+}
+
+/* ---- "SINTA COM OS OLHOS / DESTAQUES" — carrossel com setas funcionais ----
+   Setas FUNCIONAIS (decisão do Opus, backlog produto.md — única exceção do
+   projeto às setas decorativas da Home) + arraste no toque, via
+   useCarrosselComSetas (equipamento/useCarrosselComSetas.js). Mesmo cuidado
+   de gesto do fix de arraste mobile da Home (ver CHANGELOG):
+   user-select/touch-callout/user-drag bloqueados pra não competir com o
+   drag do Framer. */
+.destaques_pdp_secao{
+  background-color: var(--background_cinza);
+  padding: 8vh 0;
+}
+.destaques_pdp_cabecalho{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 0 6vw;
+  margin-bottom: 5vh;
+}
+.destaques_pdp_cabecalho h2{
+  font-family: var(--fonte-titulo);
+  color: var(--branco);
+  font-size: clamp(1.8rem, 1.6vw + 1.2rem, 2.4rem);
+}
+/* Setas nos 2 EXTREMOS do carrossel (fix 2026-07-14, pedido do dono — antes
+   ficavam juntas, centralizadas no cabeçalho). `.destaques_pdp_carrossel_wrap`
+   é o contexto de posicionamento (`position:relative`) que envolve o
+   container do trilho + as 2 setas (agora soltas, não mais agrupadas num
+   wrapper próprio). Cada seta é absoluta, uma em `left`, outra em `right`,
+   verticalmente centrada, DENTRO do respiro de `margin:0 6vw` do
+   `.trilho_destaques_pdp_container` — não "passam" do início/fim do
+   carrossel: ficam centralizadas nesse mesmo respiro de 6vw, sem sobrepor
+   nenhum card. Escondidas fora do desktop, mesmo critério de sempre. */
+.destaques_pdp_carrossel_wrap{
+  position: relative;
+}
+.destaques_pdp_carrossel_wrap .seta_carrossel_pdp{
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+@media (pointer: fine) and (min-width: 1281px){
+  .destaques_pdp_carrossel_wrap .seta_carrossel_pdp{
+    display: flex;
+  }
+}
+.seta_carrossel_pdp_esquerda{
+  left: calc(3vw - 20px);
+}
+.seta_carrossel_pdp_direita{
+  right: calc(3vw - 20px);
+}
+.seta_carrossel_pdp{
+  margin: 0;
+  clip-path: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: var(--branco);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine){
+  .seta_carrossel_pdp:hover{ border-color: var(--laranja); color: var(--laranja); }
+}
+.trilho_destaques_pdp_container{
+  /* margin (não padding), fix 2026-07-14 (2ª conferência do dono) — em
+     container com overflow:hidden, padding não insere margem do lado que
+     transborda: os cards sangravam até a borda da tela (corte rente). Com
+     margin, o container fica estreitado 6vw de cada lado e o clip acontece
+     com margem simétrica — mesmo comportamento que o `.trilho_combine`
+     (COMBINE) já tinha, via padding da SEÇÃO em vez do container. */
+  overflow: hidden;
+  margin: 0 6vw;
+}
+.trilho_destaques_pdp{
+  display: flex;
+  gap: 24px;
+  touch-action: pan-y;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.trilho_destaques_pdp img{
+  -webkit-user-drag: none;
+  user-select: none;
+}
+.card_destaque_pdp{
+  flex: 0 0 320px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.card_destaque_pdp .zoom_imagem img{
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.card_destaque_pdp_kicker{
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+.card_destaque_pdp_legenda{
+  color: rgba(255,255,255,0.85);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+@media (hover: hover) and (pointer: fine){
+  .card_destaque_pdp:hover .zoom_imagem img{ transform: scale(1.05); }
+}
+
+/* ---- "23 RESPOSTAS" — avaliações ---- */
+.avaliacoes_secao{
+  background-color: var(--background_escuro);
+  padding: 8vh 6vw;
+}
+.avaliacoes_titulo_bloco{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  margin-bottom: 6vh;
+}
+.avaliacoes_titulo_bloco h2{
+  font-family: var(--fonte-titulo);
+  color: var(--branco);
+  font-size: clamp(1.8rem, 1.6vw + 1.2rem, 2.4rem);
+}
+.avaliacoes_grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.card_avaliacao{
+  background-color: var(--background_cinza);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.avaliacao_estrelas{
+  display: flex;
+  gap: 2px;
+}
+.avaliacao_texto{
+  color: rgba(255,255,255,0.85);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.avaliacao_nome{
+  font-family: var(--fonte-rotulo);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--branco);
+}
+.avaliacao_local{
+  font-family: var(--fonte-rotulo);
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: -10px;
+}
+
+/* ---- "COMBINE SEU SETUP" — cross-sell (carrossel com setas funcionais) ----
+   ⚠️ Achado (decisão de design, resolvendo uma contradição da própria
+   instrução): equipamento-pagina-produto.md pede "packshot em fundo claro"
+   pro card, citando o .card_produto_plp — mas essa classe já foi corrigida
+   pro ESCURO (2026-07-13, feedback do dono: card claro "vira figurinha" no
+   dark, ver comentário em .card_produto_plp acima). A mesma instrução
+   também chama o packshot do HeroProduto (`.hero_produto_packshot`) de "o
+   único bloco claro da página" — as duas frases não podem ser verdade ao
+   mesmo tempo. Priorizei a decisão explícita ("único bloco claro") sobre a
+   descrição solta (que parece ter herdado o texto do levantamento ORIGINAL
+   da PLP, de antes da correção pro escuro): `.card_combine` segue o padrão
+   ATUAL e corrigido do `.card_produto_plp` (fundo --background_cinza,
+   integrado ao dark). Reportar ao Opus/dono — reverter é trivial se a
+   intenção era mesmo um card claro aqui. */
+.combine_setup_secao{
+  background-color: var(--background_escuro);
+  padding: 8vh 6vw;
+}
+.combine_setup_cabecalho{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 5vh;
+}
+.combine_setup_titulo_bloco h2{
+  font-family: var(--fonte-titulo);
+  color: var(--branco);
+  font-size: clamp(1.8rem, 1.6vw + 1.2rem, 2.4rem);
+  margin-top: 4px;
+}
+.combine_setup_setas{
+  /* Escondidas fora do desktop (fix 2026-07-14) — mesmo critério das setas
+     do DESTAQUES acima (aqui as 2 setas continuam agrupadas no
+     topo-direita, layout não alterado pelo pedido de reposicionamento do
+     DESTAQUES). */
+  display: none;
+  gap: 10px;
+}
+@media (pointer: fine) and (min-width: 1281px){
+  .combine_setup_setas{
+    display: flex;
+  }
+}
+.trilho_combine_container{
+  overflow: hidden;
+}
+.trilho_combine{
+  display: flex;
+  gap: 24px;
+  touch-action: pan-y;
+  will-change: transform;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.trilho_combine img{
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+/* Cursor de arraste (fix 2026-07-14) — só quando o drag está de fato
+   habilitado (`arrastavel`, ver useCarrosselComSetas.js). No desktop
+   (setas apenas, sem drag) o cursor fica o padrão — "grab" ali seria uma
+   promessa falsa de arraste que não existe. Classe compartilhada pelos 2
+   trilhos (CarrosselDetalhes/CombineSetup). */
+.trilho_pdp_arrastavel{
+  cursor: grab;
+}
+.trilho_pdp_arrastavel:active{
+  cursor: grabbing;
+}
+.card_combine{
+  flex: 0 0 260px;
+  width: 260px;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 14px;
+  background-color: var(--background_cinza);
+  text-decoration: none;
+  color: inherit;
+  /* Drag nativo do link desabilitado (fix 2026-07-14, 2ª conferência do
+     dono) — <a> é arrastável nativamente (drag-and-drop de link), e esse
+     gesto sequestrava o drag do Framer no toque, travando o arraste do
+     COMBINE (DESTAQUES usa <div>, não tem esse problema). `draggable={false}`
+     no JSX cobre a maioria dos navegadores; isso aqui é reforço CSS, mesmo
+     espírito do -webkit-user-drag:none já aplicado nas <img>. */
+  -webkit-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card_combine_imagem img{
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.card_combine_nome{
+  margin: 14px 14px 4px;
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+.card_combine_preco{
+  margin: 0 14px;
+  color: rgba(255,255,255,0.85);
+  font-family: var(--fonte-titulo);
+  font-size: 1.05rem;
+}
+@media (hover: hover) and (pointer: fine){
+  .card_combine:hover .zoom_imagem img{ transform: scale(1.05); }
+  .card_combine:hover{
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference){
+  .card_combine:hover{ transform: translateY(-6px); }
+}
+
+/* ---- Responsividade PDP (self-contained, 1280 / 768 / 480) ---- */
+@media (max-width: 1280px){
+  .hero_produto{ padding: 12vh 5vw 6vh; }
+  .engineered_features_topo,
+  .especificacoes_secao{ grid-template-columns: 1fr; gap: 28px; }
+  .faixa_specs_secao{ grid-template-columns: repeat(2, 1fr); row-gap: 32px; }
+  .spec_item:not(:last-child){ border-right: none; }
+  .engineered_features_grid{ grid-template-columns: repeat(2, 1fr); row-gap: 28px; }
+  .feature_pdp_card:not(:last-child){ border-right: none; padding-right: 0; }
+  .avaliacoes_grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px){
+  .hero_produto_corpo{ grid-template-columns: 1fr; gap: 32px; }
+  .hero_produto_galeria{ flex-direction: column; }
+  .hero_produto_thumbs{ flex-direction: row; flex: none; overflow-x: auto; }
+  .thumb_produto{ flex: 0 0 64px; width: 64px; height: 64px; }
+  .faixa_specs_secao{ grid-template-columns: repeat(2, 1fr); }
+  .avaliacoes_grid{ grid-template-columns: 1fr; }
+  .combine_setup_cabecalho{ flex-direction: column; align-items: flex-start; }
+  .card_destaque_pdp{ flex: 0 0 78vw; width: 78vw; }
+  .card_combine{ flex: 0 0 62vw; width: 62vw; }
+}
+@media (max-width: 480px){
+  .produto_descricao{ max-width: none; }
+  .card_destaque_pdp{ flex: 0 0 82vw; width: 82vw; }
+  .card_combine{ flex: 0 0 72vw; width: 72vw; }
+}
+
+/* FIM PÁGINA EQUIPAMENTO (PDP) */
+/* ==================================================================== */

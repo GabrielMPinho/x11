@@ -1,0 +1,726 @@
+/* ==================================================================== */
+/* HERO */
+
+#escrito{
+  /* border: 2px solid red; */
+  height: auto;
+  width: 40vw;
+  position: relative;
+  top: 39vh;
+  left: 6vw;
+}
+.hero{
+  position: relative;
+  /* FIX 2026-07-13 (diagnóstico do Opus via Playwright): era z-index:-1 —
+     como .hero não tinha um ancestral que isolasse esse contexto, o hero
+     INTEIRO (inclusive os botões) afundava atrás do próprio <main>, que
+     capturava os cliques (document.elementFromPoint no botão retornava
+     MAIN). Passou despercebido até agora porque os botões eram decorativos
+     (sem onClick) — ninguém notaria a interceptação. `z-index:0` (em vez de
+     `-1`) AINDA cria o contexto de empilhamento local que `.hero_bg`
+     precisa (position:relative + z-index não-auto, qualquer valor, já
+     basta) — só deixa de ser NEGATIVO, então `.hero` não "escapa" pra trás
+     do próprio pai. Internamente nada muda: `.hero_bg` (z-index:-1) continua
+     atrás de #escrito/#botoes (z-index:auto), exatamente como antes —
+     repouso visual idêntico. */
+  z-index: 0;
+  overflow: hidden;
+  min-height: 88vh;
+  /* Fase 3: o background-image foi para a camada .hero_bg (mesmo asset,
+     mesmo size/position) para permitir o parallax em transform. Resultado
+     visual em repouso é idêntico; overflow:hidden contém o leve
+     deslocamento do parallax dentro dos limites da seção. */
+}
+.p_laranja{
+  color: var(--laranja);
+  font-family: var(--fonte-rotulo);
+  font-size: 1.3rem;
+}
+#p_branco{
+  color: var(--branco);
+  font-size: 1.3rem;
+  position: relative;
+  top: 1vh;
+}
+.hero > #escrito > h1{
+  color: #ffffff;
+  font-family: var(--fonte-titulo);
+  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
+}
+#botoes{
+  /* border: 2px solid red; */
+  height: auto;
+  width: 30vw;
+  position: relative;
+  top: 42vh;
+  left: 5.5vw;
+  
+  
+}
+button{
+  margin: 8px;
+  height: 7.3vh;
+  width: 14vw;
+  border: none;
+  outline: none;
+  font-size: small;
+  clip-path: polygon(0 0, 100% 0, 100% 70%, 92% 100%, 0 100%);
+}
+#botao_masculino{
+  background-color: var(--laranja);
+  color: var(--branco);
+  
+}
+#botao_feminino{
+  background-color: var(--branco);
+  color: var(--laranja);
+}
+/* FIM HERO */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* FAVORITOS */
+  /* ESCRITO */
+.favoritos{
+  min-height: 88vh;
+  background-color: var(--background_escuro);
+}
+.titulo{
+  /* border: 1px solid blue; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: 7vh;
+}
+.escrito_fav{
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+
+}
+.titulo > .escrito_fav > h2{
+  color: #ffffff;
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem);
+}
+  /* IMAGENS */
+
+#imagens {
+  padding-top: 11vh;
+  display: flex;
+  /* gap: 2vw; */
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  position: relative;
+  left: 6.6vw;
+  /* Card virou <a> (2026-07-13, clicável — ver Favoritos.jsx) — reset do
+     estilo nativo de âncora; nome/desc já têm `color` próprio, isso é só
+     precaução pra nada herdar azul/sublinhado do <a>. Sem anel/borda no
+     hover (2026-07-13, fica só em Categorias Populares) — só
+     elevação+sombra, ver bloco de hover compartilhado. */
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nome{
+  padding-top: 1vh;
+  color: var(--laranja);
+  font-family: var(--fonte-rotulo);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 1.3rem;
+  letter-spacing: 0.05em;
+}
+.desc{
+  color: var(--branco);
+  font-size: small;
+  padding-top: .5vh;
+  font-weight: 200;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.card .cta_comprar{
+  /* Era `.card a` (a própria CTA era o link) — virou <span> visual desde
+     que o card inteiro passou a ser o <a> (2026-07-13). Sublinhado
+     preparado via `text-decoration-color:transparent→laranja` no hover
+     (ver bloco de hover compartilhado) — anima liso, sem trocar
+     `text-decoration-line` (não-animável). */
+  margin-top: auto;
+  padding-top: 1vh;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  color: var(--laranja);
+  font-family: var(--fonte-rotulo);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 1.3rem;
+  padding-bottom: 8vh;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), text-decoration-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card img {
+  width: 26vw;
+  height: 95vh;
+  object-fit: cover;
+}
+/* FIM FAVORITO */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* LANÇAMENTO DESCONTO*/
+.lancamento_desconto{
+  min-height: 88vh;
+  height: 88vh;
+  background-color: var(--background_claro);
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+}
+#container_escrito{
+  grid-column: span 4 / span 4;
+  grid-row: span 5 / span 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+#texto{
+  /* border: 1px solid red; */
+  display: flex;
+  justify-content: center;
+  align-items:flex-start;
+  flex-direction: column;
+  height: auto;
+  width: 96.5vh;
+  position: relative;
+  left: 0.5vw;
+  top: 1vh;
+
+}
+#texto .p_laranja{
+  font-size: 1.3rem;
+}
+.p_preto{
+  color: black;
+  font-size: 1.3rem;
+
+}
+#titulo_principal{
+  font-family: var(--fonte-titulo);
+  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
+  padding-bottom: 2vh;
+}
+
+#texto button{
+  margin-top: 4vh;
+  position: relative;
+  right: 0.5vw;
+  background-color: var(--laranja);
+  color: var(--branco);
+  font-size: 1rem;
+}
+
+#container_imagem{
+  grid-column: span 3 / span 3;
+  grid-row: span 5 / span 5;
+  grid-column-start: 5;
+  min-height: 0;
+  overflow: hidden;
+
+}
+#imagem_lancamento{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* FIM LANÇAMENTO DESCONTO*/
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* CATEGORIAS */
+
+.categorias{
+  background-color: var(--background_escuro);
+  min-height: 75vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.escrito_cat{
+  /* border: 1px solid red; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; 
+}
+.titulo > .escrito_cat > h2{
+  color: #ffffff;
+  font-family: var(--fonte-titulo);
+  font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem);
+}
+#conteiner_categorias{
+  /* border: 1px solid white; */
+  width: 85vw;
+  height: 50vh;
+  position: relative;
+  top: 10.4vh;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  padding: 32px;
+}
+.card_categoria {
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 130px;
+  text-decoration: none;
+  color: #fff;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.icone_seta {
+  color: var(--branco);
+  font-size: 1.8rem;
+  position: relative;
+  bottom: 1.5vh;
+}
+
+.card_categoria p {
+  font-family: var(--fonte-rotulo);
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+/* FIM CATEGORIAS */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* LANÇAMENTO ESPECIAL */
+
+.lancamento_especial{
+  min-height: 75vh;
+  height: 80vh;
+  background-image: url("../../padrao/assets/images/cat-aventura.jpg");
+  background-size: cover;
+  object-position: center; 
+  display: flex;
+  align-items: center;
+}
+.lancamento_especial{
+  position: relative;
+}
+
+.lancamento_especial::after{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+#container_texto{
+  /* border: 1px solid red; */
+  height: auto;
+  width: 70.5vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  left: 7vw;
+  gap: 10px;
+  z-index: 1;
+  top: 3vh;
+}
+
+
+#container_texto h1, p, button{
+  color: var(--branco);
+}
+#container_texto h1{
+  font-family: var(--fonte-titulo);
+  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
+}
+
+#container_texto button{
+  background-color: var(--laranja);
+  position: relative;
+  right: 1vw;
+  font-size: 1rem;
+  margin-top: 30px; /* ajusta o valor pra descer mais ou menos */
+
+
+
+}
+/* FIM LANÇAMENTO ESPECIAL */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* TERRITÓRIO */
+
+.territorio{
+  background-color: var(--background_escuro);
+  min-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#container_cards{
+  /* border: 1px solid red; */
+  height: auto;
+  width: 90vw;
+  margin-top: 11vh;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 7vh;
+}
+.card_territorio {
+    display: flex;
+    flex-direction: column;
+    /* Sem anel/borda no hover (fica só em Categorias Populares) — só
+       elevação+sombra. */
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.imagem_territorio {
+    width: 100%;
+    height: 76vh;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+.card_territorio h3 {
+    color: var(--branco);
+    font-family: var(--fonte-titulo);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+/* FIM TERRITÓRIO */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* DESTAQUES */
+
+.destaques{
+  min-height: 75vh;
+  /* height: 75vh; */
+  background-color: var(--background_cinza);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* gap: 60px; */
+}
+
+#conteudo_destaques{
+  /* border: 1px solid rebeccapurple; */
+  width: 90vw;
+  height: 65vh;
+  display: flex;
+  flex-direction: column;
+}
+#escrito_destaques{
+  width: 100%;
+  height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2vh;
+  margin-top: 1.5vh;
+  /* background-color:  red; */
+}
+#escrito_destaques h3{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin: 0;
+}
+#setas_destaques{
+  display: flex;
+  gap: 10px;
+}
+#produtos_destaques{
+  width: 100%;
+  height: 50vh;
+  /* background-color: rgb(0, 255, 34); */
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+.card_produto{
+  display: flex;
+  flex-direction: column;
+  /* Sem anel/borda no hover (fica só em Categorias Populares) — só
+     elevação+sombra. */
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.imagem_produto_destaque{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background-color: #e8e8e8;
+  margin-bottom: 3vh;
+}
+
+.titulo_produto_destaque{
+  color: var(--branco);
+  font-family: var(--fonte-rotulo);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 1vh;
+}
+
+.preco_produto_destaque{
+  color: #999;
+  font-family: var(--fonte-titulo);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Fase 4 — Destaques vira Horizontal Scroll Carousel, SÓ ativo (via JS,
+   Destaques.jsx) com ponteiro fino em telas >1280px. EXCEÇÃO PONTUAL E
+   APROVADA à regra de ouro (só esta seção muda no desktop >1280px) — ver
+   docs/agentes/sonnet/contexto/convencoes.md. Reutiliza .card_produto/
+   .zoom_imagem/.imagem_produto_destaque/.titulo_produto_destaque/
+   .preco_produto_destaque (mesmo visual/hover de sempre); classes novas só
+   pro layout do trilho/pin, sem tocar nas regras acima. */
+.destaques.destaques_carrossel{
+  position: relative;
+  /* Altura real vem de `style` inline (CarrosselDestaques.jsx), proporcional
+     ao deslocamento medido do trilho (~1.2–1.5×) — ajuste 2026-07-10, a
+     razão fixa de 300vh (~4× o deslocamento) fazia o scroll "travado/duro"
+     (rolava muito, o trilho andava pouco). `min-height` aqui é só o piso
+     antes da medição rodar (1º render, deslocamento=0). */
+  min-height: 100vh;
+  display: block;
+}
+.destaques_pin{
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+.cabecalho_carrossel_destaques{
+  padding: 0 4vw;
+  margin-bottom: 4vh;
+}
+.cabecalho_carrossel_destaques h3{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin: 0;
+}
+.trilho_carrossel{
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  /* padding-left = respiro do 1º card (o scrollWidth CONTA esse lado).
+     A folga de "meio card" no FIM não vive aqui — uma 1ª tentativa com
+     `padding-right:170px` não funcionou: em container flex, `scrollWidth`
+     não inclui o end-padding quando o conteúdo transborda (quirk do
+     navegador), então o padding não entrava na conta do deslocamento. A
+     folga final agora é somada direto em JS — ver FOLGA_FIM em
+     CarrosselDestaques.jsx. */
+  padding-left: 4vw;
+  will-change: transform;
+}
+.card_carrossel{
+  flex: 0 0 340px;
+  width: 340px;
+}
+
+/* Modo "arrastavel" (2026-07-10) — touch/tablet/ponteiro grosso, sem
+   reduced-motion. Substitui o antigo fallback de swipe nativo (que na
+   prática não funcionava no mobile — o Lenis intercepta o gesto horizontal
+   de containers aninhados sem `data-lenis-prevent`, ver Fase 5). Layout
+   simples (sem 300vh/pin/sticky), unconditional — vale em qualquer largura,
+   já que este componente só monta em contextos não-hijack (mesmo um
+   ponteiro grosso numa janela larga cai aqui). Reutiliza .card_produto/
+   .zoom_imagem/.imagem_produto_destaque/.titulo_produto_destaque/
+   .preco_produto_destaque (mesmo hover-zoom de sempre). */
+.destaques.destaques_arrastavel{
+  display: block;
+  min-height: 0;
+  padding: 64px 0;
+}
+.trilho_arrastavel_container{
+  overflow: hidden;
+  padding: 0 4vw;
+}
+.trilho_arrastavel{
+  display: flex;
+  gap: 16px;
+  cursor: grab;
+  /* Deixa o navegador mandar o gesto vertical pro scroll da página e só o
+     horizontal pro drag — sem isso, arrastar na diagonal ou tentar rolar a
+     página por cima do trilho fica ambíguo/travado. */
+  touch-action: pan-y;
+  will-change: transform;
+  /* Bloqueia seleção de texto e o menu nativo de long-press ao começar o
+     arraste em cima de .titulo_produto_destaque/.preco_produto_destaque —
+     sem isso, o gesto nativo do navegador competia com o drag do Framer no
+     meio do arraste (sensação de "travado"). */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.trilho_arrastavel:active{
+  cursor: grabbing;
+}
+.trilho_arrastavel img{
+  /* Impede o "fantasma" nativo de arrastar imagem, que também competia com
+     o drag do Framer. Escopado aqui (não em .imagem_produto_destaque) pra
+     não afetar os modos hijack/estatico, que reaproveitam essa classe. */
+  -webkit-user-drag: none;
+  user-select: none;
+}
+.card_arrastavel{
+  flex: 0 0 38vw;
+  width: 38vw;
+}
+
+/* FIM DESTAQUES */
+/* ==================================================================== */
+
+
+/* ==================================================================== */
+/* HISTORIAS */
+.historias{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 88vh;
+  background-color: var(--background_escuro);
+
+}
+#container_historias{
+  height: auto;
+  width: 90vw;
+  margin-top: 11vh;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  /* margin-bottom: 7vh; */
+}
+.card_historia{
+  display: flex;
+  flex-direction: column;
+  /* Sem anel/borda no hover (fica só em Categorias Populares) — só
+     elevação+sombra. */
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card_historia h3, .card_historia p{
+  color: var(--branco);
+}
+.card_historia p{
+  font-size: 0.9rem;
+  margin-bottom: 1.7vh;
+}
+.card_historia h3{
+  margin-bottom: 1vh;
+  font-family: var(--fonte-titulo);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.card_historia a{
+  /* "LEIA MAIS" continua decorativo (sem página de blog ainda, dono define
+     depois) — só ganhou o mesmo sublinhado animado do .cta_comprar, pra
+     coerência visual do hover em toda a Home. */
+  color: var(--laranja);
+  font-family: var(--fonte-rotulo);
+  font-size: 1.3rem;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 4px;
+  letter-spacing: 0.19rem;
+  margin-top: auto;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), text-decoration-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card_historia img{
+  width: 29vw;
+  height: 40vh;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background-color: #e8e8e8;
+  margin-bottom: 3vh;
+}
+/* FIM HISTORIAS */
+/* ==================================================================== */
+/* ==================================================================== */
+/* BANNER */
+
+.banner{
+  min-height: 55vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background_cinza);
+  border-top: 1px solid rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+}
+#texto_banner{
+  /* border: 1px solid red; */
+  height: 30vh;
+  width: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+.banner h1{
+  color: var(--branco);
+  font-family: var(--fonte-titulo);
+  text-align: center;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+
+  font-size: clamp(2.2rem, 6vw + 1.16rem, 5rem);
+}
+.palavra_banner{
+  display: inline-block;
+}
+/* FIM BANNER */
+/* ==================================================================== */

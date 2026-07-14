@@ -1,0 +1,78 @@
+/* ==================================================================== */
+/* FOOTER */
+
+.footer{
+  background-color: var(--background_escuro);
+  padding-top: 60px;
+}
+
+#conteudo_footer{
+  width: 90vw;
+  margin: 0 auto;
+  height: 55vh;
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+  gap: 6vw;
+  padding-bottom: 60px;
+}
+
+.coluna_footer{
+  display: flex;
+  flex-direction: column;
+}
+
+.coluna_footer p{
+  font-family: var(--fonte-rotulo);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  margin: 0 0 20px 0;
+}
+
+.coluna_footer a{
+  color: var(--branco);
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.coluna_footer a:hover{
+  color: var(--laranja);
+}
+
+#rodape_footer{
+  width: 100%;
+  height: 18vh;
+  margin: 0 auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  padding: 25px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--background_cinza);
+}
+
+#rodape_footer p{
+  color: var(--branco);
+  font-size: 13px;
+  margin: 4.4vw;
+
+}
+
+#logo_footer{
+  width: 25vw;
+  height: 13vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#fim_footer{
+  width: 100%;
+  height: 20vh;
+}
+
+
+/* FIM FOOTER */
+/* ==================================================================== */

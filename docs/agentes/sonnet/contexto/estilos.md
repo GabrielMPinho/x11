@@ -1,9 +1,53 @@
 # Estilos (CSS)
 
-O CSS vive em **`src/padrao/estilos/`** (padronização): **`tokens.css`** (cores
-`:root` + fonte base) é importado no topo de **`base.css`**, que tem o reset, o
-CSS do Lenis e **todas as regras** — organizado por seção com comentários
-`/* HEADER */`, `/* HERO */`, etc. `base.css` é o arquivo linkado no `index.html`.
+## Arquitetura do CSS — manifesto + parciais (split PASSE 1, 2026-07-14)
+`base.css` **deixou de ser um arquivo monolítico** (chegou a 2988 linhas —
+motivo do split, pedido do dono: "não estou gostando de ter um arquivo css
+enorme"). Hoje `base.css` é só um **manifesto de `@import`**, na MESMA ordem
+da cascata de antes (não reordenar — a ordem importa pra especificidade
+igual vencer por posição). Continua sendo o arquivo linkado no
+`index.html` (isso não mudou). Plano completo:
+`docs/agentes/opus/backlog/refatoracao-css.md`; execução:
+`docs/agentes/alterações/CHANGELOG.md` (2026-07-14 11:59, com a prova de
+equivalência byte a byte do CSS compilado).
+
+**Fundação compartilhada** (`src/padrao/estilos/`): `tokens.css` (cores
+`:root` + fonte base) → `reset.css` (reset `*{}` + `body{background}` +
+bloco Lenis) → `header.css` (header completo **+** minimalista, os 2 juntos
+agora) → `footer.css` → `botao.css` (botão cortado) → `animacoes.css`
+(zoom/moldura, elevação hover, `.hero_bg` parallax — "resto da Fase 3") →
+`responsividade.css` (mobile GLOBAL de Home+Institucional+Produtos, ainda
+não distribuído por página — ver "passe 2" abaixo).
+
+**CSS por página** (dentro da própria pasta da página, ao lado do `.jsx`):
+`src/paginas/home/home.css`, `src/paginas/institucional/institucional.css`,
+`src/paginas/produtos/produtos.css`, `src/paginas/equipamento/
+equipamento.css` (esta já nasceu com o mobile **co-locado** no próprio
+arquivo — não depende de `responsividade.css`).
+
+**Ordem exata do manifesto (`base.css`):** `tokens → reset → header → home
+→ footer → botao → animacoes → institucional → produtos →
+responsividade → equipamento`. Ao criar/editar CSS de uma página existente,
+edite o arquivo `<pagina>.css` dela, não `base.css`. Ao criar página nova,
+siga o padrão: CSS próprio em `src/paginas/<pagina>/<pagina>.css` + um novo
+`@import` no manifesto, na posição correspondente (mobile pode nascer já
+co-locado no próprio arquivo, como a Equipamento — não precisa entrar em
+`responsividade.css`).
+
+**⚠️ Cuidado ao mexer em `url(...)` nas páginas:** CSS de página agora mora
+em `src/paginas/<pagina>/`, não mais em `src/padrao/estilos/` — caminhos
+relativos de asset mudam! Pra chegar em `src/padrao/assets/images/`, o
+caminho é **`../../padrao/assets/images/...`** (2 níveis acima + `padrao/`),
+não mais `../assets/images/...` (que só funcionava quando o CSS morava em
+`src/padrao/estilos/`). Achado real durante a prova de equivalência do
+split — 5 regras quebraram silenciosamente por isso (ver CHANGELOG).
+
+**Pendente — "passe 2" (instrução própria futura, ainda não feita):**
+distribuir o mobile de Home/Institucional/Produtos (hoje 1 bloco só em
+`responsividade.css`) pra dentro do CSS de cada página, co-locando
+desktop+mobile como a Equipamento já faz. Mais delicado (a ordem dentro de
+`@media` de mesma especificidade importa) — fazer só depois do passe 1
+validado pelo dono.
 
 ## Reset e fontes
 - Reset global: `* { margin:0; padding:0; box-sizing:border-box; }`

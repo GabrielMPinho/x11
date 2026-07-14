@@ -1,0 +1,111 @@
+/* ==================================================================== */
+/* FASE 3 — ANIMAÇÕES: elementos/estilos novos (valem em toda largura) */
+/* Só opacity/transform são animados (ver src/lib/motion.js, src/lib/
+   Revela.jsx e os componentes); as regras abaixo são estruturais
+   (position/overflow/display) e usam seletores NOVOS — não mudam o valor
+   de nenhuma regra existente, exceto onde comentado. */
+
+
+/* Moldura com overflow:hidden pro zoom da imagem no hover não vazar do card
+   (Favoritos, Território, Histórias, Destaques). Hover em CSS puro (não
+   Framer) — ver regras por seção mais abaixo. `display:block` + `line-
+   height:0` na imagem fecham o espaço fantasma que `<img>` (inline por
+   padrão) deixa embaixo dentro de um contêiner de bloco — sem isso, cada
+   card ficava ~4px mais alto que o original (achado na conferência visual). */
+.zoom_imagem{
+  display: block;
+  overflow: hidden;
+  line-height: 0;
+}
+.zoom_imagem img{
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.icone_seta{
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Hover só em dispositivos com ponteiro de verdade (evita "hover preso"
+   depois de tocar em telas sensíveis ao toque). Zoom na imagem + CTA/seta
+   deslizando, disparados pelo hover do CARD inteiro (não só da imagem/CTA).
+   Reforçado 2026-07-13 (Home: mais interatividade nos cards) — sombra sutil
+   coerente em Favoritos/Categorias/Território/Histórias/Destaques, e
+   sublinhado animado nos CTAs de texto. Anel/borda laranja no hover fica
+   **só em Categorias Populares** (pedido do dono) — os outros 4 ganham
+   elevação/sombra/zoom, sem borda. Só propriedades que NÃO causam reflow
+   (transform/box-shadow/cor) — a ELEVAÇÃO (translateY, é transform) fica
+   numa query separada abaixo, com guarda extra de prefers-reduced-motion
+   (pedido explícito da instrução; o zoom/slide que já existiam antes desta
+   rodada continuam como estavam, sem essa guarda extra). */
+@media (hover: hover) and (pointer: fine){
+  .card:hover .zoom_imagem img,
+  .card_territorio:hover .zoom_imagem img,
+  .card_historia:hover .zoom_imagem img,
+  .card_produto:hover .zoom_imagem img{
+    transform: scale(1.05);
+  }
+  .card:hover .cta_comprar,
+  .card_historia:hover a{
+    transform: translateX(6px);
+    text-decoration-color: var(--laranja);
+  }
+  .card_categoria:hover .icone_seta{
+    transform: translateX(6px);
+  }
+  /* Anel/borda no hover — só Categorias Populares (2026-07-13, pedido do
+     dono: "isso deve ter apenas nos CATEGORIAS POPULARES"). Os outros 4
+     (Favoritos/Território/Histórias/Destaques) NÃO ganham outline-color
+     aqui — o `outline:1px solid transparent` que ainda têm na regra base
+     fica sempre transparente pra eles (só a transição/elevação/sombra
+     valem). */
+  .card_categoria:hover{
+    border-color: var(--laranja);
+  }
+  .card:hover,
+  .card_categoria:hover,
+  .card_territorio:hover,
+  .card_historia:hover,
+  .card_produto:hover{
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  }
+}
+/* Elevação (translateY) isolada — só com prefers-reduced-motion:no-preference
+   (a instrução pede explicitamente pra não elevar/transformar quando o
+   usuário pediu menos movimento; o resto do hover acima — zoom, sombra,
+   sublinhado — não é "movimento" no mesmo sentido e continua igual
+   independente dessa preferência, como já era antes desta rodada).
+   `!important` (2026-07-13, achado ao investigar "só a imagem reage ao
+   hover"): estes cards são `RevelaComProgresso` (motion.div) — o reveal por
+   scroll aplica `y` via `style` inline (Framer Motion escreve
+   `element.style.transform` direto no DOM pra performance), e um `style`
+   inline SEMPRE vence uma regra `:hover` de stylesheet externo, mesmo já
+   "assentado" em `y:0`. Sem `!important` aqui, a elevação nunca aparecia —
+   só o zoom da imagem (elemento à parte, sem esse conflito) reagia de
+   verdade, dando a impressão de "só a imagem é interativa". Seguro porque
+   o Framer só reescreve esse inline style quando `scrollYProgress` muda
+   (scroll), não em resposta a `:hover` — enquanto o mouse está parado sobre
+   o card, nada compete com a regra `!important`. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference){
+  .card:hover,
+  .card_categoria:hover,
+  .card_territorio:hover,
+  .card_historia:hover,
+  .card_produto:hover{
+    transform: translateY(-6px) !important;
+  }
+}
+
+/* Camada de fundo do Hero (parallax) — assume o background-image que antes
+   estava direto em `.hero`, agora numa camada própria atrás do conteúdo
+   pra poder se mover em `transform` independente do scroll da página. */
+.hero_bg{
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: url('../assets/images/hero-home.jpg');
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+/* FIM FASE 3 — ANIMAÇÕES (base) */
+/* ==================================================================== */

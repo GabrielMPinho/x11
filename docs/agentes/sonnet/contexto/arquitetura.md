@@ -17,14 +17,22 @@ x11/
 │   │   ├── componentes/        # Header.jsx, Footer.jsx, BotaoCortado.jsx
 │   │   ├── lib/                # Revela.jsx, useProgressoSecao.js, useEstiloRevela.js, motion.js
 │   │   ├── dados/              # navegacao.js, footer.js (dados compartilhados)
-│   │   ├── estilos/
+│   │   ├── estilos/            # CSS split em manifesto + parciais (PASSE 1, 2026-07-14)
 │   │   │   ├── tokens.css      # CORES (:root) + tipografia base (fonte)
-│   │   │   └── base.css        # @import tokens + reset + Lenis + TODAS as regras
+│   │   │   ├── base.css        # MANIFESTO — só @import, na ordem da cascata antiga (não reordenar)
+│   │   │   ├── reset.css       # reset `*{}` + `body{background}` + bloco Lenis
+│   │   │   ├── header.css      # header completo + minimalista (os 2 juntos agora)
+│   │   │   ├── footer.css
+│   │   │   ├── botao.css       # botão cortado com preenchimento
+│   │   │   ├── animacoes.css   # zoom/moldura, elevação hover, .hero_bg parallax
+│   │   │   └── responsividade.css  # mobile GLOBAL de Home+Institucional+Produtos
+│   │   │                       #   (ainda não distribuído por página — "passe 2" pendente)
 │   │   └── assets/images/      # todas as imagens (.jpg, .png, .svg)
 │   │
-│   └── paginas/                # uma pasta por PÁGINA
+│   └── paginas/                # uma pasta por PÁGINA — CSS próprio ao lado do .jsx
 │       ├── home/               # a landing atual (única implementada)
 │       │   ├── Home.jsx        # <main> com as 9 seções
+│       │   ├── home.css        # HERO..BANNER (desktop; mobile ainda em responsividade.css)
 │       │   ├── *.jsx           # seções: Hero_Home, Favoritos, Lancamento_desconto,
 │       │   │                   #   Categorias, Lancamento_especial, Territorio,
 │       │   │                   #   Destaques, CarrosselDestaques, CarrosselArrastavel,
@@ -32,6 +40,7 @@ x11/
 │       │   └── dados/          # favoritos, categorias, territorio, historias, destaques
 │       ├── equipamento/        # detalhe do produto (PDP) — COMPLETA (2026-07-14)
 │       │   ├── Equipamento.jsx # <main> com os 8 sub-componentes (ver componentes.md)
+│       │   ├── equipamento.css # desktop + mobile JÁ co-locados (única página assim hoje)
 │       │   ├── *.jsx           # HeroProduto, FaixaSpecs, EngineeredFeatures,
 │       │   │                   #   BannerTestado, TabelaEspecificacoes,
 │       │   │                   #   CarrosselDetalhes, Avaliacoes, CombineSetup
@@ -39,7 +48,9 @@ x11/
 │       │   ├── useCarrosselComSetas.js   # hook do carrossel com setas funcionais
 │       │   └── dados/produto.js
 │       ├── institucional/      # institucional — COMPLETA (2026-07-13, ver componentes.md)
+│       │   └── institucional.css   # desktop; mobile ainda em responsividade.css
 │       ├── produtos/           # PLP (listagem), reutilizada por homem/mulher — COMPLETA (2026-07-13)
+│       │   └── produtos.css        # desktop; mobile ainda em responsividade.css
 │       ├── homem/  mulher/     # só renderizam <Produtos genero="..."/> (2 linhas cada)
 │       ├── guia-de-equipamento/  onde-encontrar/
 │       │                       # páginas da navegação — ainda scaffolds (stub)
