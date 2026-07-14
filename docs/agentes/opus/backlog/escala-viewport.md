@@ -51,10 +51,15 @@ Uma custom property = **"1px do desenho de 1440"**:
 `aspect-ratio` · `vh` em faixa de tela → **fica**.
 
 ## Ordem de execução (1 instrução por vez)
-1. **⏳ ATIVA — Fundação + chrome + Home** (`escala-desktop-1024-1440.md`):
-   `--u` nos tokens · `header.css`/`footer.css`/`botao.css`/`animacoes.css` ·
-   `home.css` · recuo do breakpoint da Home (1280→1023) · gate do carrossel de
-   Destaques (>1280 → ≥1024).
+1. ✅ **CONCLUÍDA e commitada** (`fd458ce "Viewport Laptop"`) — Fundação + chrome
+   + Home: `--u` nos tokens (com o override `≤1023 → 1px`, que é o que mantém o
+   mobile intacto) · `header/footer/botao/animacoes` · `home.css` · recuo do
+   breakpoint da Home (1280→1023) · gate do carrossel de Destaques (≥1024).
+   > ⚠️ **Deixou 2 regressões/defeitos**, achados pelo dono na validação em
+   > laptop e diagnosticados pelo Opus — o **botão VER FEMININO do hero sumindo**
+   > em janela baixa e o **ritmo vertical de Histórias**. Ambos têm a MESMA raiz:
+   > layout preso à **altura da janela** (`vh`), que esta passada não cobriu no
+   > hero nem no ritmo das seções. Correção em [`mobile.md`](./mobile.md).
 2. ⬜ **Institucional** — converter `institucional.css` + tirar suas regras do
    bloco ≤1280.
 3. ⬜ **Produtos (PLP)** — idem `produtos.css`.

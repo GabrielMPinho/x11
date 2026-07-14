@@ -148,6 +148,26 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   **fallback SPA** (sem ele, `/institucional` e as outras rotas dariam 404 em
   produção). Detalhes no CHANGELOG. **Fora essas exceções, a regra segue valendo.**
 
+- **Validação em laptop + rodada de MOBILE (2026-07-14):** depois da escala de
+  desktop (`fd458ce`), o dono validou no laptop e pediu:
+  - **Corrigir** o **botão VER FEMININO** do hero da Home, que **sumiu** (o Opus
+    mediu: o hero é posicionado por `vh`, então em janela de 768px de altura o 2º
+    botão é cortado pelo `overflow:hidden` — em 1440×900 sobravam só 2px).
+  - **Corrigir** a seção **Histórias, sem espaçamento embaixo** no 1440 e no
+    laptop (`margin-bottom` comentado + `margin-top:11vh`). ⚠️ **Muda o 1440 —
+    autorizado**, foi o dono que apontou.
+  - **Mobile — animações:** o dono disse "faltando animações em todas as
+    páginas". O Opus mediu: elas **rodam**, mas **fora da tela** — o reveal segue
+    o progresso da **seção**, e no mobile as seções ficam 2–5× mais altas que a
+    viewport. Decisão: no mobile o reveal passa a seguir o **próprio elemento**.
+  - **Mobile — PLP (Homem/Mulher): 2 colunas** de produtos (hoje 1).
+  - **Mobile — carrosséis: SEM setas**, com **avanço automático**, **ainda
+    arrastáveis**. Desenho do autoplay definido pelo Opus (contínuo/lento, ~1 card
+    a cada 3,5s, loop sem emenda, pausa no toque e retoma em ~1,5s, sem autoplay
+    em `reduced-motion`). Vale para os 3 carrosséis; **desktop inalterado**.
+  - Backlog: `opus/backlog/mobile.md` · Instrução:
+    `sonnet/fazer/correcoes-hero-historias-e-mobile.md`.
+
 ## Ordem das fases (executada)
 As **fases 1–7 estão concluídas e commitadas** (Fundação/data-driven,
 Responsividade+mobile, Animações, Carrossel de Destaques, Lenis, Refinos e a
