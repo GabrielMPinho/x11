@@ -30,9 +30,19 @@ x11/
 │       │   │                   #   Destaques, CarrosselDestaques, CarrosselArrastavel,
 │       │   │                   #   Historias, Banner
 │       │   └── dados/          # favoritos, categorias, territorio, historias, destaques
-│       ├── equipamento/        # detalhe do produto (ao clicar num produto) — scaffold
-│       ├── homem/  mulher/  guia-de-equipamento/  onde-encontrar/  institucional/
-│       │                       # páginas da navegação — scaffolds (stub por enquanto)
+│       ├── equipamento/        # detalhe do produto (PDP) — COMPLETA (2026-07-14)
+│       │   ├── Equipamento.jsx # <main> com os 8 sub-componentes (ver componentes.md)
+│       │   ├── *.jsx           # HeroProduto, FaixaSpecs, EngineeredFeatures,
+│       │   │                   #   BannerTestado, TabelaEspecificacoes,
+│       │   │                   #   CarrosselDetalhes, Avaliacoes, CombineSetup
+│       │   ├── IconesEquipamento.jsx     # ícones SVG próprios da página
+│       │   ├── useCarrosselComSetas.js   # hook do carrossel com setas funcionais
+│       │   └── dados/produto.js
+│       ├── institucional/      # institucional — COMPLETA (2026-07-13, ver componentes.md)
+│       ├── produtos/           # PLP (listagem), reutilizada por homem/mulher — COMPLETA (2026-07-13)
+│       ├── homem/  mulher/     # só renderizam <Produtos genero="..."/> (2 linhas cada)
+│       ├── guia-de-equipamento/  onde-encontrar/
+│       │                       # páginas da navegação — ainda scaffolds (stub)
 │
 ├── docs/agentes/               # documentação dos agentes
 ├── package.json

@@ -37,17 +37,24 @@ Header com `<Link>`/`useNavigate`; toggle removido. `vite build`/`lint` ok.
   resetar a cada troca de rota (scroll ao topo na navegação). Preservar o visual
   da Home 100%.
 
-## 1. Página de EQUIPAMENTO (detalhe do produto) ⬜ pendente — **prioridade**
-"Quando clica em um produto." É a página mais concreta e a que o dono destacou.
-- **Escopo a definir (dono):** o que a página mostra? (galeria de imagens do
-  produto, nome, preço, descrição, tamanhos, tabela de medidas, CTA de compra/
-  onde encontrar, produtos relacionados…). É vitrine (sem carrinho) ou vai ter
-  ação de compra?
-- **Dados:** de onde vêm os produtos? (hoje `home/dados/destaques.js` tem alguns
-  com imagem/título/preço). Precisa de um modelo de "produto" e uma fonte
-  (arquivo de dados agora; API/CMS depois?).
-- **Reaproveitar** do `padrao/`: Header, Footer, tokens, `BotaoCortado`, o
-  hover-zoom de imagem, o reveal. Estética de moto mantida.
+## 1. Página de EQUIPAMENTO / PRODUTO (detalhe) ✅ CONCLUÍDA (2026-07-14) — 2 rodadas de correção
+Fechada após conferência do Opus (build/lint verdes + 5 correções confirmadas no
+código) e validação visual do dono a cada rodada. Sub-componentes em
+`src/paginas/equipamento/`. Pendências de asset/conteúdo (packshots reais,
+valores da tabela) seguem em [`produto.md`](./produto.md), não bloqueiam.
+"Quando clica em um produto." A **última página** do site. Levantamento visual
+(PDF conferido em imagem, não só `.txt`) em [`produto.md`](./produto.md).
+- **Escopo decidido (Opus, 2026-07-14):** vitrine (**sem carrinho/CTA de
+  compra**). Hero split (galeria de thumbnails + packshot em fundo claro | info:
+  título/rating/preço/descrição/COR/TAMANHO/garantia) → faixa de 4 specs →
+  ENGINEERED FEATURES (4) → banner "TESTADO MINAS GERAIS" → tabela DIFERENCIAIS/
+  ESSENCIAIS → carrossel DESTAQUES → 23 RESPOSTAS (reviews) → COMBINE SEU SETUP
+  (cross-sell) → Footer. Produto unificado como **JAQUETA EXPEDITION**.
+- **Dados:** modelo de produto data-driven em `src/paginas/equipamento/dados/`
+  (arquivo por ora; API/CMS depois). Packshots reais o dono fornece depois.
+- **Reaproveita** do `padrao/`: Header, Footer, tokens, `BotaoCortado`, o
+  hover-zoom `.zoom_imagem`, o reveal, o padrão de card da PLP e o mecanismo de
+  carrossel de Destaques. Estética de moto mantida.
 
 ## Homem / Mulher (PRODUTOS — listagem) ⏳ ATIVA — `sonnet/fazer/produtos-listagem.md`
 Página de listagem (PLP) reutilizável (`src/paginas/produtos/`), **iguais
@@ -76,6 +83,10 @@ definidos pelo dono** — hoje só há o stub.
 3. Demais páginas da navegação, conforme o dono priorizar e fornecer conteúdo.
 
 ## Débito técnico anotado (não bloqueia)
+- **CSS único gigante** (`base.css`, 2211 linhas) — o dono não gosta (2026-07-14).
+  Plano de split por página (CSS puro, refatoração mecânica pixel-idêntica) em
+  [`refatoracao-css.md`](./refatoracao-css.md). ✅ Aprovado — **executar logo
+  após a página Produto** (dono, 2026-07-14).
 - `npm run build` falha no `tsc -b` (projeto é `.jsx`, sem inputs `.ts`) — usar
   `npx vite build`. Corrigir o `tsconfig`/script um dia (ex.: `allowJs` ou tirar
   o `tsc -b`).

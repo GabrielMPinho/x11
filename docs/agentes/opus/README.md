@@ -31,6 +31,15 @@ vive em **`../sonnet/contexto/`** (mesma fonte de verdade do executor). Ordem:
 > Só abra o código-fonte se precisar de um detalhe que a doc não cobre — e, se
 > abrir, **atualize a doc** para o próximo Opus não repetir a leitura.
 
+### ⭐ Regra do dono: conferir o PDF de layout VISUALMENTE (não só o `.txt`)
+Ao planejar uma página a partir de um PDF de layout, **SEMPRE renderizar o PDF em
+imagem e olhar** — nunca planejar só pelo texto extraído. O `.txt` perde posição,
+hierarquia, splits de coluna e todo elemento sem texto (rating por estrelas,
+swatches, setas de carrossel, galerias). O leitor nativo do Claude não renderiza
+aqui (falta `pdftoppm`); use **Docker rootless + poppler** para gerar PNG e leia
+os PNGs — passo-a-passo completo em `docs/layout/README.md` (seção "CONFERIR O
+PDF VISUALMENTE"). Apague os PNGs depois.
+
 ## Como conferir (visual)
 Rodar/servir e validar por **screenshot nos 5 viewports (390/768/1024/1280/
 1440)** via Docker rootless + Playwright (servir dentro do container); **apagar
@@ -58,6 +67,19 @@ os prints depois**. `npx vite build` e `npm run lint` devem passar. O
 - **Regra de design:** só o **desktop full (> 1024px)** precisa ficar intacto;
   nos demais viewports há **liberdade total**, preservando estética/conteúdo e
   priorizando UI/UX agradável.
+
+## Formato padrão: TABELA DE DIAGNÓSTICO (dono, 2026-07-14)
+Ao diagnosticar problema(s) — em conferência ou correção — **sempre** apresentar
+uma **tabela de diagnóstico** numerada com as colunas:
+
+`| # | Problema | Causa raiz | Correção |`
+
+- **Ao falar com o dono:** a tabela concisa basta (uma linha por problema).
+- **Na instrução pro Sonnet (`sonnet/fazer/`):** a tabela vai **no topo, como
+  índice**; **abaixo dela, detalhar a correção AO MÁXIMO** — arquivo exato,
+  seletor/propriedade exata, valor-alvo, o antes→depois pretendido, o porquê e a
+  verificação. Continua valendo a regra de **não escrever código** (diretiva
+  precisa, sem blocos prontos pra colar — ver abaixo).
 
 ## Suas responsabilidades
 1. **Planejar** cada fase e escrever **uma única instrução** clara e

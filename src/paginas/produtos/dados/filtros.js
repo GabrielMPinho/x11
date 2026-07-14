@@ -20,6 +20,7 @@ export const cores = [
   { nome: "Preto", hex: "#181614" },
   { nome: "Cinza", hex: "#4a4a4a" },
   { nome: "Bege", hex: "#c9b79c" },
+
   { nome: "Laranja", hex: "#FF5000" },
   { nome: "Branco", hex: "#e5e5e5" },
 ];

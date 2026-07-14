@@ -34,9 +34,46 @@ arquivos). Consequências práticas:
   asset final. Heros/banners precisam das imagens em **alta resolução** (dos
   assets em `src/padrao/assets/images/` ou fornecidas pelo dono).
 
-## Como extrair conteúdo (poppler NÃO está instalado; usar Docker rootless)
-O servidor não tem `poppler-utils` e não há `sudo`. Extraímos via **Docker
-rootless** (disponível, sem sudo):
+## ⭐ CONFERIR O PDF **VISUALMENTE** (regra do dono, obrigatória)
+**Sempre conferir o PDF de layout VISUALMENTE — não só o `.txt`.** O texto
+extraído perde tudo que importa de layout: posição, hierarquia, elementos sem
+texto (estrelas de rating, swatches, setas de carrossel), splits de coluna,
+imagens. (Ex.: a conferência visual da `produto.pdf` revelou o rating
+"4.9 · 312 avaliações", a galeria de thumbnails, os 2 carrosséis e a ausência de
+CTA de compra — nada disso aparecia no `produto.txt`.)
+
+O leitor de PDF nativo do Claude precisa de `pdftoppm` (poppler), que **não**
+está instalado (sem sudo) → ele sozinho **não** renderiza. Solução: renderizar o
+PDF em **PNG via Docker rootless** (poppler) e então **ler os PNGs** com o leitor
+de imagem nativo. Fluxo:
+
+```bash
+cd docs/layout
+SHOTS="$SCRATCHPAD/produto-pdf"; mkdir -p "$SHOTS"   # pasta temporária (apagar depois)
+
+# Nº de páginas / dimensões (páginas destes PDFs são 1 página LONGA e estreita):
+docker run --rm -v "$PWD":/data -w /data minidocks/poppler \
+  pdfinfo produto.pdf | grep -iE '^Pages|Page size'
+
+# Render em PNG (visão geral, 150 dpi):
+docker run --rm -v "$PWD":/data -v "$SHOTS":/out -w /data minidocks/poppler \
+  pdftoppm -png -r 150 produto.pdf /out/produto      # → /out/produto-1.png
+
+# Página muito alta? Renderize em alta (600 dpi) e FATIE em tiras verticais
+# legíveis com o recorte do pdftoppm (-x -y -W -H, em pixels no -r dado):
+for i in 0 1 2 3 4 5; do Y=$(( i * 950 )); \
+  docker run --rm -v "$PWD":/data -v "$SHOTS":/out -w /data minidocks/poppler \
+    pdftoppm -png -r 600 -x 0 -y $Y -W 1200 -H 1050 produto.pdf /out/strip_$i; done
+# → leia /out/strip_*.png com o Read (imagem) para ler os detalhes.
+```
+
+Depois **apague os PNGs** (economia de espaço — mesma regra dos prints de
+viewport). O PNG que o dono às vezes envia é um atalho, **não** substitui esta
+conferência.
+
+## Extrair TEXTO e listar imagens (Docker rootless)
+Para o conteúdo real (o `.txt` é a fonte dos textos; o corpo no PNG às vezes fica
+pequeno):
 
 ```bash
 cd docs/layout
@@ -48,9 +85,6 @@ docker run --rm -v "$PWD":/data -w /data minidocks/poppler \
 docker run --rm -v "$PWD":/data -w /data minidocks/poppler \
   pdfimages -list institucional.pdf
 ```
-
-> O leitor de PDF nativo do Claude também precisa de poppler (`pdftoppm`), então
-> **não** renderiza aqui. Para ver o visual, use o **PNG** que o dono envia.
 
 ## Levantamentos por página
 - **Institucional:** `docs/agentes/opus/backlog/institucional.md` (estrutura das

@@ -7,6 +7,17 @@ CSS do Lenis e **todas as regras** — organizado por seção com comentários
 
 ## Reset e fontes
 - Reset global: `* { margin:0; padding:0; box-sizing:border-box; }`
+- **`body{background-color:var(--background_escuro)}`** (2026-07-14, fix de
+  RAIZ) — logo após o reset, fora de qualquer `@media`. Sem isso, qualquer
+  reveal que desloca uma seção/bloco via `transform` (`Revela`/
+  `RevelaComProgresso`) abre um vão que expõe o branco padrão do navegador
+  durante o scroll ("faixa branca" entrando/saindo) — achado na PDP
+  (`FaixaSpecs`) e no Footer (que fica no shell `App.jsx`, fora do `<main>`
+  de qualquer página, então nenhum fundo de página o cobria). **Zero
+  mudança visual em desktop >1280px** — toda seção de toda página já cobre
+  o body no repouso; só os vãos de reveal passam a mostrar escuro em vez de
+  branco. Fundos de página/seção individuais (ex.: `.equipamento_pdp`)
+  continuam podendo existir — redundantes com o body, mas inofensivos.
 
 ### Tipografia (migração global, 2026-07-13)
 Identidade nova de **3 fontes** (Google Fonts, confirmadas por `pdffonts` nos
@@ -518,6 +529,15 @@ ligado a scroll nenhum:
   tem `data-lenis-prevent` (o Lenis não rouba o gesto) e
   `.trilho_arrastavel` tem **`touch-action:pan-y`** — o navegador manda o
   gesto horizontal pro drag e o vertical pro scroll normal da página.
+- **Sem competir com gestos nativos (fix 2026-07-14):** dono relatou arraste
+  "travado" no mobile. Causa: começar o drag em cima de texto
+  (`.titulo_produto_destaque`/`.preco_produto_destaque`) podia disparar
+  seleção nativa/long-press, e em cima da `<img>` o "fantasma" nativo de
+  arrastar imagem — competindo com o `drag="x"` do Framer no meio do gesto.
+  Fix: `.trilho_arrastavel{user-select:none;-webkit-user-select:none;
+  -webkit-touch-callout:none}` + `.trilho_arrastavel img{-webkit-user-drag:
+  none;user-select:none}` (escopado ali, não em `.imagem_produto_destaque`,
+  pra não afetar `hijack`/`estatico`).
 - Reaproveita `.card_produto`/`.zoom_imagem`/`.imagem_produto_destaque`/
   `.titulo_produto_destaque`/`.preco_produto_destaque` (mesmo hover-zoom).
   `.card_arrastavel{width:38vw}` (base, cobre tablet/ponteiro grosso largo)

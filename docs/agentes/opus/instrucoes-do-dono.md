@@ -102,6 +102,20 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   escolhe 1, que vira o **padrão reutilizável** das imagens. Instrução:
   `sonnet/fazer/favoritos-tratamento-imagens.md`.
 
+- **Conferir o PDF VISUALMENTE, sempre (2026-07-14):** ao planejar uma página a
+  partir de um PDF de layout, o Opus deve **renderizar o PDF em imagem e olhar** —
+  não basta o `.txt` extraído. Registrado como regra fixa em `opus/README.md` e o
+  método (Docker rootless + poppler `pdftoppm` → PNG → ler) em
+  `docs/layout/README.md`.
+- **Página PRODUTO / Equipamento (2026-07-14):** o dono mandou fazer a **última
+  página** — o detalhe do produto (`/equipamento`). Filtros da PLP **ficam como
+  estão** (visuais, sem lógica — "não tem problema serem visuais"). Instrução
+  ativa: `sonnet/fazer/equipamento-pagina-produto.md`; levantamento visual em
+  `opus/backlog/produto.md`. Decisões de design do Opus (dono pode vetar):
+  produto unificado como **JAQUETA EXPEDITION** (layout mistura jaqueta/calça);
+  **sem CTA de compra** (vitrine); **setas dos carrosséis funcionais** nesta
+  página; **galeria com troca de imagem** no clique do thumbnail.
+
 ## Ordem das fases (executada)
 As **fases 1–7 estão concluídas e commitadas** (Fundação/data-driven,
 Responsividade+mobile, Animações, Carrossel de Destaques, Lenis, Refinos e a

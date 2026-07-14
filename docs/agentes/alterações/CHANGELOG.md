@@ -5,6 +5,282 @@
 
 ---
 
+## 2026-07-14 11:29 — PDP: setas do DESTAQUES nos 2 extremos do carrossel
+
+**O que foi feito e por quê** (pedido direto do dono: "as setas do carrossel
+DESTAQUES uma em cada extremo, não passando do início e final do
+carrossel" — antes as 2 setas ficavam juntas, centralizadas no cabeçalho,
+acima do trilho):
+
+- **`CarrosselDetalhes.jsx`:** as setas saíram do `.destaques_pdp_cabecalho`
+  e viraram irmãs do `.trilho_destaques_pdp_container`, dentro de um novo
+  wrapper `.destaques_pdp_carrossel_wrap` (`← trilho →`).
+- **CSS:** `.destaques_pdp_carrossel_wrap{position:relative}` vira o
+  contexto; cada seta (`.seta_carrossel_pdp_esquerda`/`_direita`) é
+  `position:absolute`, verticalmente centrada (`top:50%;translateY(-50%)`),
+  posicionada em `calc(3vw - 20px)` a partir de cada lado — centralizada
+  DENTRO do respiro de `margin:0 6vw` que o container do trilho já tinha
+  (fix da 2ª rodada), então as setas ficam contidas nesse respiro, sem
+  sobrepor nenhum card e sem passar do início/fim do carrossel.
+- Removida a antiga `.destaques_pdp_setas` (wrapper que agrupava as 2 setas
+  juntas) — não existe mais no JSX do DESTAQUES.
+- **`CombineSetup` não foi tocado** — o pedido era só do DESTAQUES; lá as
+  setas continuam agrupadas no topo-direita.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos.
+
+**Não commitado.** Resumo acima; aguardando conferência visual.
+
+---
+
+## 2026-07-14 11:21 — PDP (Equipamento): 5 correções da 2ª conferência do dono
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/equipamento-correcoes-2.md`, diagnóstico do Opus
+lendo o código + os prints do dono, após reconferir desktop e mobile):
+
+| # | Problema | Causa raiz | Correção |
+|---|---|---|---|
+| 1 | DESTAQUES "cortado na metade" (cards rente à borda direita) | `.trilho_destaques_pdp_container` usava `padding:0 6vw` num container `overflow:hidden` — padding não insere margem do lado que transborda | `padding` → **`margin: 0 6vw`** (mesmo comportamento que o COMBINE, que já ficava certo via padding da seção) |
+| 2 | Setas com movimento "seco" nos 2 carrosséis | `mover()` em `useCarrosselComSetas.js` usava mola rígida `{stiffness:300,damping:32}` | Trocado por **tween** com a curva `EASE` do projeto (`@/padrao/lib/motion`) e `duration:0.6` — linguagem de movimento já usada no resto do site |
+| 3 | Footer "cortando" (faixa clara) no mobile | **Mesma raiz da "faixa branca" da 1ª rodada:** `<body>` sem `background` — o Footer fica no shell (`App.jsx`), fora do `<main>` de qualquer página, então nenhum fundo de página o cobria; o reveal do `#rodape_footer` (`Revela distancia={64}`) expunha o branco do navegador | **Fix de RAIZ:** `body{background-color:var(--background_escuro)}` no reset, topo de `base.css` (fora de `@media`) — resolve o footer **e qualquer outro vão de reveal em qualquer página**, não só a PDP. Zero mudança visual em desktop >1280px (toda seção já cobre o body no repouso). O `background` do `.equipamento_pdp` (1ª rodada) fica redundante mas inofensivo, não removido |
+| 4 | Setas visíveis no mobile (redundantes com o arraste) | Sem critério de visibilidade — setas sempre mostradas | `.destaques_pdp_setas`/`.combine_setup_setas`: `display:none` por padrão, `display:flex` só em `@media (pointer:fine) and (min-width:1281px)` — mesmo critério do `arrastavel` no hook. Desktop = só setas; toque = só arraste, nunca coexistem |
+| 5 | COMBINE não arrasta no mobile | Cards são `<a>` (links), arrastáveis nativamente pelo navegador — o drag nativo de link sequestrava o gesto do Framer (DESTAQUES usa `<div>`, sem esse problema) | `draggable={false}` no `<a class="card_combine">` + reforço CSS `-webkit-user-drag:none;user-drag:none;user-select:none` (mesmo espírito do fix já aplicado nas `<img>`) |
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos. Checagem
+no código: inset do DESTAQUES simétrico (margin, não padding); `mover()`
+com tween EASE 0.6s; `body` com fundo escuro no reset (fora de `@media`);
+setas escondidas fora do critério desktop; `.card_combine` com drag nativo
+desabilitado (atributo + CSS); nenhum outro seletor de página tocado além
+do `body` (mudança intencionalmente global, pedida na instrução). **Não
+tirei prints nem testei comportamento** (arraste mobile, setas só desktop,
+footer, suavidade) — isso é do Opus/dono.
+
+**Não commitado.** Resumo acima; aguardando reconferência do Opus.
+
+---
+
+## 2026-07-14 11:08 — PDP (Equipamento): 4 correções da 1ª conferência do dono
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/equipamento-correcoes-1.md`, diagnóstico do Opus
+lendo o código + os prints do dono):
+
+1. **Faixa branca entrando/saindo no scroll** — `<main class="equipamento_pdp">`
+   não tinha fundo, então o vão aberto pelo reveal de `FaixaSpecs` (`Revela`
+   desloca a SEÇÃO INTEIRA via `translateY`) expunha o branco padrão do
+   navegador. Fix: `.equipamento_pdp{background-color:var(--background_escuro)}`
+   — resolve pra todas as seções da página de uma vez, não só a de specs.
+   ⚠️ **Achado, não corrigido** (fora de escopo): o `<body>` global não tem
+   fundo escuro — qualquer página cujo reveal desloque uma seção full-bleed
+   pode mostrar o mesmo vão. Fix de raiz seria um fundo escuro global no
+   `body`, mas mexeria em todas as páginas — não tocado sem pedido.
+2. **Carrosséis com drag sempre ligado (mesmo no desktop)** — o dono quer
+   arraste só no toque; no desktop, só setas. `useCarrosselComSetas.js`
+   ganhou `arrastavel` (mesmo critério de `matchMedia` do `useModoCarrossel`
+   de `Destaques.jsx`/Home: `(pointer:fine) and (min-width:1281px)` →
+   desktop = sem arraste). `CarrosselDetalhes`/`CombineSetup` passam
+   `drag={arrastavel ? "x" : false}` (o `x` continua animado pelas setas
+   nos dois modos, sem mudança). CSS: `cursor:grab`/`grabbing` saiu dos
+   seletores base do trilho e virou a classe `.trilho_pdp_arrastavel`,
+   aplicada só quando `arrastavel` — no desktop o cursor fica o padrão.
+3. **Mouse sobre o carrossel trava a rolagem da página** — os containers
+   usavam `data-lenis-prevent` (bloqueia roda E toque). Trocado por
+   **`data-lenis-prevent-touch`** nos dois (`.trilho_destaques_pdp_container`
+   e `.trilho_combine_container`) — Lenis só é bloqueado no toque (pro
+   arraste mobile não brigar com o scroll), a roda do mouse no desktop volta
+   a rolar a página normalmente. O seletor CSS pra esse atributo já existia
+   (bloco do Lenis colado em `base.css`).
+4. **Carrosséis "estáticos" (setas/arraste sem curso)** — só 4 itens em cada
+   um, com cards largos o bastante pra não transbordar em telas largas
+   (`maxArrasto≈0`). Foram pra **8 itens** cada:
+   - `destaquesMacro`: 8 legendas de detalhe distintas e plausíveis, ciclando
+     os mesmos 3 packshots (`index%3`, nunca `conjunto1_fav.jpg`).
+   - `comboSetup`: 8 produtos, priorizando fotos reais (`combine-boot`,
+     `luva_fav`, `jaqueta_fav`, `conjunto2_fav`) sobre os 2 SVGs de linha
+     (capacete, "climate" — sem foto própria). `TRAVEL 3`/`VELER`/`IRON 3`
+     reaproveitam nomes já usados na PLP (mesmo catálogo). Preços variam
+     (não mais todos R$599).
+   - ⚠️ **Achado novo, ao tentar diversificar as botas:** `product-boot.jpg`
+     é **byte a byte idêntico** a `combine-boot.jpg` (mesmo MD5) — outro bug
+     de asset duplicado, mesma família do já documentado
+     `conjunto1_fav.jpg`==`colecao-hero.jpg`. Por isso `product-boot.jpg`
+     **não foi usado** (mostraria a mesma bota 3x sob nomes diferentes) —
+     `combine-boot`/`jaqueta_fav` repetem 1x cada nos 8 slots do combo em vez
+     disso (só 4 fotos são de fato distintas hoje).
+
+**Não é bug (mantido de propósito):** os cards do COMBINE SEU SETUP em fundo
+escuro (`--background_cinza`) — decisão consciente da entrada anterior,
+coerente com a correção do dono no `.card_produto_plp`. Dono não reclamou,
+não mexi.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos.
+Checagem no código: `.equipamento_pdp` com fundo escuro; `drag` condicional
+via `arrastavel`; `data-lenis-prevent-touch` nos 2 containers;
+`destaquesMacro`/`comboSetup` com 8 itens cada; nenhum seletor de outra
+página tocado. **Não tirei prints nem testei comportamento** (scroll, setas,
+arraste no mobile) — isso é do Opus/dono.
+
+**Não commitado.** Resumo acima; aguardando reconferência do Opus.
+
+---
+
+## 2026-07-14 10:48 — PLP: card de produto navega até a página de Equipamento (PDP)
+
+**O que foi feito e por quê** (pedido direto do dono: "como entro nessa
+página? Faça com que ao clicar na jaqueta eu vá para a página" — a PDP
+(`/equipamento`) já existia desde a entrada anterior, mas só o card de
+Favoritos, na Home, navegava até ela; a grade de produtos (`/homem`,
+`/mulher`) ainda não — pendência já registrada em `contexto/componentes.md`):
+
+- **`GradeProdutos.jsx`:** card inteiro (`.card_produto_plp`) virou clicável
+  → `/equipamento`, mesmo padrão de Favoritos/CombineSetup: `RevelaComProgresso
+  as="a"` com `href` real + `onClick`/`preventDefault` + `useNavigate` (navega
+  via SPA, sem reload de página).
+- **`.card_produto_plp`** (`base.css`) ganhou `text-decoration:none` +
+  `color:inherit` — reset do estilo nativo de âncora (mesma precaução que o
+  `.card` da Home recebeu quando virou clicável em 2026-07-13); nome/tag/preço
+  já tinham `color` próprio, então nada muda visualmente. Hover (elevação +
+  sombra + zoom) inalterado.
+- **Como entrar na página hoje:** direto pela URL (`/equipamento`), pelo card
+  de Favoritos (Home) ou agora também por qualquer card da grade de produtos
+  (`/homem`, `/mulher`).
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos. Checagem
+no código: só `GradeProdutos.jsx` e o seletor `.card_produto_plp` tocados,
+nenhum outro card/página alterado.
+
+**Não commitado.** Resumo acima; aguardando sinal verde do dono.
+
+---
+
+## 2026-07-14 10:43 — Página Equipamento (PDP, detalhe do produto) completa
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/equipamento-pagina-produto.md`, levantamento em
+`docs/agentes/opus/backlog/produto.md`): o scaffold `src/paginas/equipamento/
+Equipamento.jsx` (só `<h1>Equipamento</h1>`) virou a página de detalhe do
+produto completa — destino dos cards de Favoritos (Home) e da grade da PLP,
+rota `/equipamento` já existente. Mesma liberdade de layout da
+Institucional/PLP (sem a trava "desktop >1280px pixel-idêntico").
+
+- **8 sub-componentes novos** em `src/paginas/equipamento/` (+ breadcrumb
+  embutido no Hero): `HeroProduto` (galeria com 4 thumbnails + packshot em
+  fundo claro — único bloco claro da página — troca de imagem/cor/tamanho
+  via `useState` local, sem CTA de compra), `FaixaSpecs` (4 números,
+  `Revela` em bloco), `EngineeredFeatures` (split título/parágrafo + 4
+  features, mesmo mecanismo de `QuemSomos1`), `BannerTestado` (full-bleed
+  com `testado-minas.jpg`, mesma técnica em camadas do
+  `.hero_institucional`/`.missao_secao`), `TabelaEspecificacoes` (split
+  DIFERENCIAIS/ESSENCIAIS + tabela de 9 linhas, typos do PDF corrigidos:
+  MENBRANA→MEMBRANA, ASJUTES→AJUSTES), `CarrosselDetalhes` ("SINTA COM OS
+  OLHOS"), `Avaliacoes` ("23 RESPOSTAS", 3 reviews plausíveis, sem lorem
+  ipsum), `CombineSetup` ("COMBINE SEU SETUP", cross-sell).
+- **Identidade do produto unificada como JAQUETA EXPEDITION** (decisão do
+  Opus, backlog produto.md) — o PDF mesclava jaqueta/calça; onde o texto
+  original dizia "calça"/"Dune Pro" ficou "jaqueta"/"Expedition".
+- **Setas de carrossel FUNCIONAIS** (exceção pontual ao padrão decorativo da
+  Home, decisão do Opus) em `CarrosselDetalhes` e `CombineSetup`, via hook
+  novo `useCarrosselComSetas.js`: mede o deslocamento real
+  (`scrollWidth-clientWidth`) e anima um único `motionValue x` tanto no
+  clique das setas quanto no drag do usuário (Framer Motion), nunca
+  dessincronizados. Drag mobile reaproveita o fix de gesto da Home
+  (`touch-action:pan-y`, `data-lenis-prevent`, `user-select`/
+  `-webkit-user-drag:none` — ver entrada 2026-07-14 10:23 acima).
+  ⚠️ **Diferente de `Destaques` (Home), estes 2 carrosséis NÃO têm um modo
+  "estático" separado pra `prefers-reduced-motion`** — rodam sempre como
+  drag+setas. A instrução pedia deliberadamente "mais simples que o hijack",
+  sem mencionar um 3º modo; documentando como limitação conhecida pro
+  Opus/dono avaliar se vale a pena replicar o padrão de 3 modos aqui depois.
+- **`IconesEquipamento.jsx`** — 6 SVGs inline próprios da página (escudo,
+  gota, vento, termômetro, medalha, estrela) — não importa os ícones da
+  Institucional, pra manter a página autocontida.
+- **Dados** em `src/paginas/equipamento/dados/produto.js` — produto,
+  galeria (3 packshots disponíveis ciclados em 4 slots, `conjunto1_fav.jpg`
+  excluído por ser duplicata de `colecao-hero.jpg`, bug já documentado),
+  specs, features, tabela, destaques macro, avaliações, combo setup
+  (`combine-boot.jpg`, `luva_fav.jpg`, `placeholder-capacete.svg`,
+  `placeholder-acessorio.svg`).
+- **CSS** em bloco novo no fim de `base.css` (`/* ===== PÁGINA EQUIPAMENTO
+  (PDP) ===== */`), seletores 100% próprios, breakpoints self-contained
+  1280/768/480, reset de `button{}` global em todos os botões novos
+  (thumbnails, swatches, chips de tamanho, setas de carrossel).
+- **⚠️ Achado/decisão reportada:** a instrução descreve os cards de
+  `CombineSetup` como "no padrão visual do `.card_produto_plp` (packshot em
+  fundo claro...)", mas isso contradiz a própria instrução chamar o
+  packshot do Hero de "o único bloco claro da página" — e o
+  `.card_produto_plp` real já foi corrigido pro escuro (2026-07-13, ver
+  entrada correspondente). Priorizei a decisão explícita ("único bloco
+  claro") e o padrão JÁ corrigido: `.card_combine` ficou escuro
+  (`--background_cinza`), igual ao `.card_produto_plp` atual. Reverter é
+  trivial se a intenção do dono era mesmo um card claro aqui.
+- **Pendências herdadas do backlog** (não resolvidas, fora do escopo
+  decidir sozinho): confirmar a identidade "JAQUETA EXPEDITION", decidir se
+  mantém "sem CTA de compra", packshots reais (galeria, 4 detalhes de
+  DESTAQUES, 4 do combo) e capacete real, valores reais da tabela de
+  especificações. Ver `docs/agentes/opus/backlog/produto.md`.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ (também rodado
+escopado só em `src/paginas/equipamento/`) sem avisos. Checagem no código:
+100% data-driven (só textos únicos/estáticos no JSX, como o resto do
+projeto permite), todas as imagens via `import`, os 3 breakpoints
+presentes, nenhum seletor de Home/PLP/Institucional tocado (conferido por
+grep classe a classe contra o CSS pré-existente), reveal com 1 `motion` por
+unidade nas seções com `Revela`/`RevelaComProgresso` (os carrosséis de
+drag, como o `CarrosselArrastavel` da Home, não usam esse mecanismo — são
+interativos, não scroll-linked). **Não tirei prints nem testei
+interação/clique** — a conferência visual nos 5 viewports e o teste dos 2
+carrosséis com setas são do Opus (e do dono).
+
+**Não commitado.** Resumo acima; aguardando conferência do Opus e sinal
+verde do dono.
+
+---
+
+## 2026-07-14 10:23 — Fix: arraste "travado" no carrossel mobile de Destaques (mais vendidos)
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/destaques-mobile-arraste-suave.md` — diagnóstico do
+Opus por leitura de código, a partir do relato do dono: "a rolagem dos
+produtos mais vendidos no mobile está muito travada"):
+
+- **Causa raiz:** a seção `Destaques`, no modo `arrastavel`
+  (`CarrosselArrastavel.jsx`, ativo em touch/tablet/ponteiro grosso), usa
+  drag de verdade via Framer Motion (`drag="x"`). O trilho
+  (`.trilho_arrastavel`) já tinha `touch-action:pan-y`/`will-change:transform`
+  corretos, mas **faltava bloquear os gestos nativos do navegador que
+  competem com o drag do Framer**: começar o arraste em cima de texto
+  (`.titulo_produto_destaque`/`.preco_produto_destaque`) podia disparar
+  seleção de texto/menu de long-press, e em cima da `<img>` podia disparar o
+  "fantasma" nativo de arrastar imagem — qualquer um desses interrompe o
+  gesto do Framer no meio do arraste, produzindo a sensação de "trava, solta,
+  trava de novo".
+- **`.trilho_arrastavel`** ganhou `user-select:none` +
+  `-webkit-user-select:none` + `-webkit-touch-callout:none`.
+- **Nova regra `.trilho_arrastavel img`** com `-webkit-user-drag:none` +
+  `user-select:none` — escopada ali (não em `.imagem_produto_destaque`
+  direto) porque essa classe é reaproveitada pelos modos `hijack` (desktop) e
+  `estatico` (reduced-motion), que não devem ser tocados.
+- **Descartadas outras causas** (checado no código): Lenis já é
+  `syncTouch:false` com `data-lenis-prevent` no container (não é ele);
+  imagens são SVG placeholder leve (não é peso de asset); `dragElastic`/
+  `dragMomentum` seguem nos defaults do Framer — não foram alterados (fora do
+  escopo desta instrução; se o dono ainda achar o arraste "pesado" depois
+  deste fix, é um ajuste separado a discutir com o Opus).
+- **Sem mudança visual** — as propriedades novas são só de comportamento de
+  gesto, não afetam layout/cor/transform. `hijack` e `estatico` inalterados.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos. Checagem
+no código: as 2 regras novas existem, escopadas em `.trilho_arrastavel`/
+`.trilho_arrastavel img`; `.imagem_produto_destaque` não foi tocada; nenhum
+outro seletor do arquivo mudou. **Não testei a sensação de toque num
+dispositivo real** — isso não é validável por build/lint/print; fica pro
+dono confirmar no celular dele.
+
+**Não commitado.** O dono testa no celular e dá o sinal verde.
+
+---
+
 ## 2026-07-13 13:58 — Fix: clique dos botões do Hero bloqueado pelo `<main>` (z-index)
 
 **O que foi feito e por quê** (instrução

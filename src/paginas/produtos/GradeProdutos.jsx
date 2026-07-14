@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { produtos } from "@/paginas/produtos/dados/produtos";
 import { RevelaComProgresso } from "@/padrao/lib/Revela";
 import { useProgressoSecao } from "@/padrao/lib/useProgressoSecao";
@@ -13,9 +14,14 @@ function formatarPreco(valor){
 // (`--background_claro`) — único bloco de fundo claro da página, fiel ao PDF
 // (packshot precisa de contraste). Mesmo padrão de reveal por card
 // (`atrasoCard`/`LARGURA_ENTRADA_CARD`) de Favoritos/Categorias/Território.
+// Card inteiro clicável → /equipamento (2026-07-14, pedido do dono — a PDP
+// já existia mas nenhum card da PLP navegava até ela ainda; Favoritos, na
+// Home, já fazia isso). Mesmo padrão de Favoritos: `as="a"` + `href` real +
+// onClick/preventDefault navega via SPA (evita reload de página).
 export default function GradeProdutos(){
     const ref = useRef(null);
     const progresso = useProgressoSecao(ref);
+    const navegar = useNavigate();
 
     return (
         <div className="grade_produtos_container" ref={ref}>
@@ -28,7 +34,9 @@ export default function GradeProdutos(){
             <div className="grade_produtos">
                 {produtos.map((produto, index) => (
                     <RevelaComProgresso
-                        as="div"
+                        as="a"
+                        href="/equipamento"
+                        onClick={(evento) => { evento.preventDefault(); navegar("/equipamento"); }}
                         className="card_produto_plp"
                         key={index}
                         progresso={progresso}

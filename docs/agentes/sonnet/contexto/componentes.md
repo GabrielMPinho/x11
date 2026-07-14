@@ -131,6 +131,81 @@ repetir a mesma foto do `HeroColecao` dentro da própria grade. Ver
 CHANGELOG (2026-07-13 12:30) para o racional completo.
 
 **Pendências herdadas do backlog:** 12 packshots reais (hoje 3 placeholders
-alternados); filtros funcionais numa fase futura, ou seguem visuais?; clique
-no card → página de produto (detalhe) — ainda não existe. Ver
-`docs/agentes/opus/backlog/produtos.md`.
+alternados); filtros funcionais numa fase futura, ou seguem visuais? Clique
+no card → página de produto (detalhe): **resolvido (2026-07-14)** — o card
+inteiro de `GradeProdutos` navega pra `/equipamento` (mesmo padrão de
+Favoritos/CombineSetup), ver CHANGELOG. Ver `docs/agentes/opus/backlog/produtos.md`.
+
+## Página Equipamento (PDP — detalhe do produto) — COMPLETA (2026-07-14)
+`Equipamento.jsx` é `<main className="equipamento_pdp">` compondo 8
+sub-componentes, na ordem, em `src/paginas/equipamento/`. Acessível em
+**`/equipamento`** — destino dos cards de Favoritos (Home; PLP ainda não
+liga, ver pendência acima). Mesma liberdade de layout da Institucional/PLP
+(sem a trava "desktop >1280px pixel-idêntico"). Dados em
+`src/paginas/equipamento/dados/produto.js`; ícones próprios em
+`IconesEquipamento.jsx` (não reaproveita os da Institucional, pra manter a
+página autocontida). Identidade do produto unificada como **JAQUETA
+EXPEDITION** (decisão do Opus — o PDF original mesclava jaqueta/calça; ver
+`docs/agentes/opus/backlog/produto.md`). **Sem CTA de compra** (vitrine,
+decisão do Opus); COR/TAMANHO são seletores decorativos (estado visual
+local, sem lógica de e-commerce).
+
+| Componente | Classe raiz | Dados | Fundo | Descrição |
+|---|---|---|---|---|
+| `HeroProduto` | `.hero_produto` | `dados/produto.js` (`produto`, `galeriaProduto`) | `--background_escuro` | Breadcrumb + split galeria/info, entrada em stagger no load (`heroStagger`/`heroItem`, **não** full-bleed/scroll). Galeria: 4 thumbnails (`useState` local troca o packshot principal) + packshot grande em **`--background_claro`** — **o único bloco claro da página**. Info: kicker → título 2 linhas → rating (5 estrelas + "4.9 · 312 avaliações") → preço grande (`R$ 1.099`, sem centavos) → descrição → COR (3 swatches, 1º selecionado) → TAMANHO (6 chips) → GARANTIA (ícone medalha + texto). |
+| `FaixaSpecs` | `.faixa_specs_secao` | `dados/produto.js` (`specsFaixa`) | `--background_cinza` | 4 números com divisórias verticais (`600D`/`CE 2`/`20K`/`4`). Reveal em **bloco** (`Revela`, não por item). |
+| `EngineeredFeatures` | `.engineered_features_secao` | `dados/produto.js` (`featuresProduto`) | `--background_escuro` | Split topo (kicker+título / parágrafo) + 4 features com divisórias, mesmo mecanismo de reveal coreografado de `QuemSomos1` (Institucional) — classes próprias (`feature_pdp_*`), não reaproveita as da Institucional. |
+| `BannerTestado` | `.banner_testado_secao` | — (estático, texto no JSX) | foto `testado-minas.jpg` (mesmo asset do Hero da Institucional — arquivo reaproveitado, não seletor) | Full-bleed, técnica em camadas idêntica a `.hero_institucional`/`.missao_secao` (bg via CSS + overlay `::after` + conteúdo por cima). `z-index:0` (nunca `-1`, mesmo cuidado do fix de clique do Hero da Home). |
+| `TabelaEspecificacoes` | `.especificacoes_secao` | `dados/produto.js` (`especificacoesTabela`) | `--background_escuro` | Split: kicker + "DIFERENCIAIS"/"ESSENCIAIS" empilhados + parágrafo (esquerda) · tabela label/valor com linha divisória, 9 linhas (direita). Typos do PDF corrigidos: MENBRANA→MEMBRANA, ASJUTES→AJUSTES (conteúdo novo). Valores são placeholder repetido — dono fornece os reais depois. |
+| `CarrosselDetalhes` | `.destaques_pdp_secao` | `dados/produto.js` (`destaquesMacro`, 8 itens) | `--background_cinza` | "SINTA COM OS OLHOS / DESTAQUES" — 8 cards de imagem macro (ciclando os 3 packshots disponíveis, 8 legendas distintas). **Setas ← → FUNCIONAIS** (exceção ao padrão decorativo da Home), **uma em cada extremo do carrossel** (fix 2026-07-14 — `position:absolute` dentro de `.destaques_pdp_carrossel_wrap`, centralizadas no respiro de `margin:0 6vw` do trilho, sem sobrepor cards; **diferente do CombineSetup**, que mantém as 2 setas agrupadas no topo-direita); **arraste SÓ no toque/tablet** (no desktop o trilho anda só pelas setas, sem drag de mouse), via hook `useCarrosselComSetas.js`. |
+| `Avaliacoes` | `.avaliacoes_secao` | `dados/produto.js` (`avaliacoes`) | `--background_escuro` | "23 RESPOSTAS" — 3 cards de review (5 estrelas + texto plausível, sem lorem ipsum + linha divisória + nome + localização). Reveal por card. |
+| `CombineSetup` | `.combine_setup_secao` | `dados/produto.js` (`comboSetup`, 8 itens) | `--background_escuro` | "COMBINE SEU SETUP" — cross-sell, mesmo mecanismo de setas+arraste (desktop/mobile) de `CarrosselDetalhes`. 8 cards navegam pra `/equipamento` (mesma vitrine, padrão de clique de Favoritos/PLP). **Cards em fundo escuro** (`--background_cinza`, igual ao `.card_produto_plp` atual) — ver achado/decisão no CHANGELOG (2026-07-14): a instrução pedia "fundo claro" citando um padrão da PLP que já foi corrigido pro escuro; resolvi a contradição priorizando "único bloco claro = Hero" + o padrão já corrigido. Dono conferiu e não pediu mudança. |
+
+**Mecanismo de carrossel com setas (`useCarrosselComSetas.js`):** hook
+próprio da página (não vive em `padrao/`, só usado aqui) — mede o
+deslocamento real (`scrollWidth - clientWidth`) e anima um único
+`motionValue x` tanto no clique das setas quanto no drag do usuário, nunca
+dessincronizados. Setas usam **tween com `EASE` do projeto (`duration:0.6`)**
+(fix 2026-07-14, 2ª rodada — era mola rígida `{stiffness:300,damping:32}`,
+"seca"; tween é a linguagem de movimento do resto do site).
+
+**Desktop = só setas, mobile = só arraste (fix 2026-07-14, coerência entre
+1ª e 2ª rodada):** hook expõe `arrastavel` (mesmo critério de `matchMedia`
+do `useModoCarrossel` de `Destaques.jsx`/Home — `(pointer:fine) and
+(min-width:1281px)` → desktop sem arraste) — no desktop o trilho só se move
+pelas setas (`drag={false}`, cursor padrão), sem drag de mouse; no
+toque/tablet, arraste normal (`drag="x"`, cursor `grab`/`grabbing` via
+classe `.trilho_pdp_arrastavel`). **As próprias setas** (`.destaques_pdp_setas`/
+`.combine_setup_setas`) ficam **escondidas fora do desktop** (`display:none`,
+só `flex` em `(pointer:fine) and (min-width:1281px)`, 2ª rodada) — setas e
+arraste nunca coexistem na tela. Containers usam **`data-lenis-prevent-touch`**
+(não `-prevent` puro) — Lenis só é bloqueado no toque, a roda do mouse no
+desktop rola a página normalmente por cima do carrossel.
+
+**`.card_combine` (COMBINE) é `<a>`, arrastável nativamente pelo navegador**
+(fix 2026-07-14, 2ª rodada) — esse drag nativo de link sequestrava o gesto
+do Framer no toque, travando o arraste (`CarrosselDetalhes` usa `<div>`,
+sem esse problema). Fix: `draggable={false}` no JSX + reforço CSS
+(`-webkit-user-drag:none;user-drag:none;user-select:none`).
+
+**Inset do DESTAQUES é `margin` no container, não `padding`** (fix
+2026-07-14, 2ª rodada) — em container com `overflow:hidden`, `padding` não
+insere margem do lado que transborda (cards sangravam até a borda da
+tela); `margin:0 6vw` estreita o container e o clip fica simétrico dos 2
+lados, igual ao `.trilho_combine` (que já ficava certo via padding da
+seção).
+
+**Diferente de `Destaques` (Home), não tem um modo "estático" separado pra
+`prefers-reduced-motion`** — limitação conhecida, documentada no CHANGELOG,
+pendente de avaliação do Opus/dono.
+
+**⚠️ Outro bug de asset duplicado (achado 2026-07-14):** `product-boot.jpg`
+é byte a byte idêntico a `combine-boot.jpg` (mesmo MD5) — mesma família do
+já documentado `conjunto1_fav.jpg`==`colecao-hero.jpg`. `product-boot.jpg`
+não é usado em lugar nenhum do projeto por enquanto (evitar até esclarecer
+com o dono se é intencional ou duplicata de upload).
+
+**Pendências herdadas do backlog:** confirmar identidade "JAQUETA
+EXPEDITION"; decidir se mantém "sem CTA de compra"; packshots reais
+(galeria, 4 detalhes de DESTAQUES, 4 do combo) e capacete real; valores
+reais da tabela de especificações. Ver `docs/agentes/opus/backlog/produto.md`.
