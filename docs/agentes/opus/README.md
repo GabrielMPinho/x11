@@ -14,6 +14,9 @@ economia de tokens.
   equipamento + páginas da navegação), com as decisões abertas do dono.
 - `backlog/institucional.md` — levantamento da **página institucional**
   (estrutura, textos reais, assets) — em execução, começando pelo Hero.
+- `backlog/escala-viewport.md` — **frente ATIVA:** a escala proporcional do
+  desktop (**1024 = o 1440 encolhido**), o diagnóstico medido e a ordem de
+  execução por página.
 
 ## Contexto técnico do projeto (LEIA ANTES DE PLANEJAR — não releia o código)
 Para planejar sem perder tempo relendo `src/`, o contexto técnico do projeto
@@ -64,9 +67,13 @@ os prints depois**. `npx vite build` e `npm run lint` devem passar. O
   (CHANGELOG, planejamento, instruções-do-dono, contexto/*).
 - **Sempre entregar ao dono um "prompt de arranque" curto** (2–4 linhas) para
   ele colar no Sonnet e iniciar o trabalho — ver seção abaixo.
-- **Regra de design:** só o **desktop full (> 1024px)** precisa ficar intacto;
-  nos demais viewports há **liberdade total**, preservando estética/conteúdo e
-  priorizando UI/UX agradável.
+- **⭐ Regra de design (REDEFINIDA pelo dono em 2026-07-14):** a **régua do
+  desktop é 1440px**. O **1024 tem que ser o 1440 encolhido** (0,7111×) — mesmo
+  modelo, mesmas grades, só com as devidas proporções. Fronteira: **desktop
+  ≥ 1024px** (escala contínua 1024→1440) · **responsivo ≤ 1023px** (liberdade,
+  preservando estética/conteúdo). Acima de 1440 nada muda. As proporções são
+  travadas na **largura** (`aspect-ratio`), não na altura da janela. Ver
+  `instrucoes-do-dono.md` e `backlog/escala-viewport.md`.
 
 ## Formato padrão: TABELA DE DIAGNÓSTICO (dono, 2026-07-14)
 Ao diagnosticar problema(s) — em conferência ou correção — **sempre** apresentar
@@ -129,7 +136,10 @@ Opus confere (build/lint/visual)
               pede sinal verde do dono para commit
 ```
 
-## Regra de ouro que rege tudo
-**Nunca alterar o visual atual em desktop.** Toda mudança (responsividade,
-animação, refatoração) preserva 100% da aparência em telas grandes. Ver
-`docs/agentes/sonnet/contexto/convencoes.md`.
+## Regra de ouro que rege tudo (atualizada 2026-07-14)
+**O desktop de referência é o 1440 × 900 — e ele não muda.** Toda mudança
+(responsividade, animação, refatoração) preserva 100% da aparência **em 1440 e
+acima**. O que mudou: a faixa **1024 → 1440** deixou de ser "design responsivo" e
+passou a ser o **mesmo desktop, escalado proporcionalmente**; e as proporções
+passam a ser travadas na **largura**, não na altura da janela (exceção
+autorizada pelo dono). Ver `docs/agentes/sonnet/contexto/convencoes.md`.

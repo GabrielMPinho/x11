@@ -3,18 +3,38 @@
 Regras que **o agente executor** deve seguir ao atuar neste projeto.
 
 ## Regras de ouro (inegociáveis)
-1. **NÃO alterar o visual atual em desktop (> 1280px).** Qualquer refatoração,
-   responsividade ou animação deve manter a aparência pixel-idêntica em telas
-   grandes (**> 1280px** — fronteira atualizada de 1024→1280 pelo dono). Se
-   estiver em dúvida se algo muda o visual, não faça — pergunte.
+1. **A régua do desktop é 1440px, escalado proporcionalmente até 1024px
+   (dono, 2026-07-14 — "Escala proporcional do desktop 1024→1440").**
+   Substitui a regra antiga de "acima de 1280 intocado, sem detalhe abaixo":
+   - **≥1440px:** pixel-idêntico a hoje, travado (era a regra antiga,
+     continua valendo aqui).
+   - **1024px → 1440px:** NÃO é mais o design responsivo — é **o mesmo
+     desenho do 1440, escalado proporcionalmente** (via `--u`, ver
+     `estilos.md`). Home e chrome (header/footer) já convertidos; se estiver
+     em dúvida se algo é "faixa de tela" (fica em `vh`) ou "caixa de
+     conteúdo" (vira `aspect-ratio`/`calc(N*var(--u))`), não invente — ver a
+     lei de conversão em `estilos.md` ou pergunte.
+   - **≤1023px:** o design responsivo de sempre, sem nenhuma mudança visual.
+   - **Institucional/Produtos/Equipamento AINDA NÃO foram convertidas** —
+     seguem no modelo antigo (tablet a partir de ≤1280px) até cada uma
+     ganhar sua própria instrução de escala. Não é bug, é consequência
+     intencional documentada.
+   - **Proporções travadas na LARGURA, não na altura (decisão do dono):**
+     caixas de conteúdo que usavam `vh` (card de Favoritos, imagem de
+     Território, etc.) viraram `aspect-ratio` derivado da largura — exceção
+     explícita e autorizada à ideia de "nunca mudar nada", só pra essas
+     caixas especificamente (efeito colateral aceito: numa janela mais alta
+     que 900px, essas imagens não esticam mais).
    - **Única exceção documentada (dono, 2026-07-10):** a seção **Destaques
      ("OS MAIS VENDIDOS")** PODE mudar no desktop, pois vira um **horizontal
-     scroll carousel** (ver Fase 4 no planejamento). Todas as **demais** seções
-     seguem pixel-idênticas > 1280px.
+     scroll carousel** (ver Fase 4 no planejamento) — hoje ativo a partir de
+     **1024px** (recuado de 1281px junto com a escala). Todas as **demais**
+     seções seguem fiéis ao desenho do 1440 (agora escalado, não mais
+     "trocando de layout").
    - **Exceção tipográfica (dono, 2026-07-13):** a **fonte** do site inteiro
      mudou para o sistema de 3 fontes (**Chakra Petch** / **IBM Plex Sans
      Condensed** / **Open Sans Condensed**) — isso altera a tipografia da Home
-     no desktop > 1280px, **autorizado**. O **layout/estrutura** segue
+     no desktop, **autorizado**. O **layout/estrutura** segue
      preservado; **só a fonte** muda. Ver `padrao-api.md` (tipografia).
 2. **Data-driven sempre.** Conteúdo repetido vive em `dados/` da página
    (`src/paginas/<pagina>/dados/`) ou em `src/padrao/dados/` se for compartilhado,

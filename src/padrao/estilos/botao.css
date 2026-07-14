@@ -15,6 +15,7 @@
 .texto_botao{
   position: relative;
   font-family: var(--fonte-rotulo);
-  font-size: 1.3rem;
+  /* 1.3rem = 20,8px (N). Escala do desktop (2026-07-14), piso de 12px. */
+  font-size: max(12px, calc(20.8 * var(--u)));
   z-index: 1;
 }

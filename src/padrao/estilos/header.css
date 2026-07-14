@@ -2,7 +2,10 @@
 /* HEADER */
 header{
   background-color: black;
-  height: 12vh;
+  /* Escala do desktop (2026-07-14, 1024→1440) — é caixa (chrome), não
+     faixa de tela: N=108 (12vh de 900px, o render de referência 1440×900).
+     Ver --u em tokens.css. */
+  height: calc(108 * var(--u));
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -12,13 +15,14 @@ header > nav{
   display: flex;
   align-items: center;
   margin-left: 10vw;
-  gap: 6rem;
+  gap: calc(96 * var(--u));
 }
 header > nav > a{
   color: #afb3ae;
   font-family: var(--fonte-rotulo);
   text-decoration: none;
-  font-size: medium;
+  /* "medium" = 16px (N). Piso de 12px (escala 2026-07-14). */
+  font-size: max(12px, calc(16 * var(--u)));
 }
 /* Descendente (não mais filho direto) desde 2026-07-10: o logo virou
    clicável ("voltar ao topo"), envolvido num <button class="logo_home_
@@ -28,8 +32,11 @@ header > nav > a{
 header img{
   position: relative;
   height: auto;
-  width: auto;
-  top: 2.9vh;
+  /* Era `width:auto` (tamanho natural fixo, 308px, em qualquer viewport).
+     Escala do desktop (2026-07-14): N=308 — 308px @1440 (idêntico a hoje),
+     219px @1024. */
+  width: calc(308 * var(--u));
+  top: calc(26 * var(--u));
   left: 4vw;
   z-index: 1;
 }
@@ -77,7 +84,9 @@ header img{
   left: 0;
   right: 0;
   z-index: 40;
-  height: 60px;
+  /* Escala do desktop (2026-07-14): N=60 — 60px @1440 (idêntico a hoje),
+     ~43px @1024. */
+  height: calc(60 * var(--u));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -99,21 +108,23 @@ header img{
    tamanho mantido). */
 .header_minimalista img{
   position: relative;
-  width: 170px;
+  /* Escala do desktop (2026-07-14): N=170/4. */
+  width: calc(170 * var(--u));
   height: auto;
-  top: 4px;
+  top: calc(4 * var(--u));
   z-index: 1;
 }
 .header_minimalista nav{
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: calc(24 * var(--u));
 }
 .header_minimalista nav a{
   color: #afb3ae;
   font-family: var(--fonte-rotulo);
   text-decoration: none;
-  font-size: 0.8rem;
+  /* 0.8rem = 12,8px (N). Piso de 12px. */
+  font-size: max(12px, calc(12.8 * var(--u)));
 }
 .header_minimalista nav a:hover{
   color: var(--laranja);

@@ -36,10 +36,22 @@
 
 
 /* ==================================================================== */
-/* ---- TABLET + base do novo design (<= 1280px) ---- */
-@media (max-width: 1280px){
-  body{ overflow-x: hidden; }
-
+/* ---- DESKTOP RESPONSIVO — HOME + CHROME (<= 1023px) ----
+   Recuado de 1280→1023px (2026-07-14, "Escala proporcional do desktop
+   1024→1440"): o desktop de referência agora é 1440, escalado (via --u,
+   ver tokens.css) até 1024px — o design responsivo abaixo só entra a
+   partir de 1023px pra baixo. Contém TUDO que é da Home (seções, cabeçalho
+   padrão, CTAs) + o chrome compartilhado (header/footer) que ainda usa o
+   layout de tablet aqui. Institucional e Produtos (abaixo, ainda em
+   @media max-width:1280px) NÃO foram convertidos nesta rodada — seguem
+   entrando em modo tablet 1 breakpoint mais cedo (1024–1280px) que a Home;
+   é uma CONSEQUÊNCIA INTENCIONAL (aprovada), não um bug: cada página ganha
+   sua própria instrução de escala depois. Conteúdo desta faixa idêntico ao
+   antigo bloco ≤1280px — só o número do breakpoint mudou (mais os 6
+   `clamp()` de fonte, recriados no fim, que senão quebrariam o mobile já
+   que a versão desktop virou `max(12px, calc(N * var(--u)))`, que em
+   ≤1023 (--u neutra) não encolhe mais nos celulares pequenos). */
+@media (max-width: 1023px){
   /* HEADER — nav horizontal ainda ativa (hambúrguer só <=768px), bem mais
      enxuta; LARGURA do logo restrita de forma explícita (não só a altura —
      a imagem original é 308×130px; height:36px sozinho não impedia o
@@ -82,39 +94,6 @@
   }
   #escrito{ position: static; top: auto; left: auto; width: 100%; }
   #botoes{ position: static; top: auto; left: auto; width: auto; }
-
-  /* ---- INSTITUCIONAL — HERO: centralizado, mesmo em tablet ---- */
-  .hero_institucional{ min-height: 82vh; }
-  .hero_institucional_escrito{ max-width: 520px; padding: 0 20px; }
-
-  /* ---- INSTITUCIONAL — QUEM SOMOS #1: título/texto empilham, features 2 col ---- */
-  .quemsomos1_secao{ padding: 8vh 20px; }
-  .quemsomos1_topo{ grid-template-columns: 1fr; gap: 32px; margin-bottom: 6vh; }
-  .quemsomos1_features{ grid-template-columns: repeat(2, 1fr); gap: 24px; }
-
-  /* ---- INSTITUCIONAL — QUEM SOMOS #2/#3 (split): paddings de tablet ---- */
-  .quemsomos_split{ padding: 8vh 20px; gap: 32px; }
-  .quemsomos_split_imagem img{ height: 56vh; }
-
-  /* ---- INSTITUCIONAL — TIMELINE: 2 colunas ---- */
-  .timeline_secao{ padding: 8vh 20px; }
-  .timeline_grid{ grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
-
-  /* ---- INSTITUCIONAL — MISSÃO: padding de tablet ---- */
-  .missao_secao{ padding: 7vh 20px; }
-
-  /* ---- INSTITUCIONAL — NOSSOS VALORES: padding de tablet ---- */
-  .valores_secao{ padding: 8vh 20px; }
-  .valores_grid{ gap: 32px 24px; }
-
-  /* ---- PRODUTOS — PLP: grade 2 col, sidebar mais estreita, paddings de tablet ---- */
-  .colecao_hero{ min-height: 38vh; padding: 0 20px; }
-  .barra_categorias{ padding: 20px; }
-  /* grid-template-columns não repetido — já é 200px 1fr no base (compactado
-     2026-07-13), essa faixa só ajusta gap/padding. */
-  .produtos_corpo{ gap: 32px; padding: 6vh 20px; }
-  .grade_produtos{ grid-template-columns: repeat(2, 1fr); }
-  .bloco_editorial{ padding: 32px; }
 
   /* CTAs de Lançamento desconto/especial: largura por conteúdo, texto inteiro */
   #texto button,
@@ -191,9 +170,68 @@
 
   /* Logo do rodapé (308×130px natural) estourava a lateral em 769–1280px:
      só era restringido dentro do bloco ≤768px. Estende a mesma restrição
-     de largura pra toda a faixa ≤1280px (correção Fase 3). */
+     de largura pra toda a faixa ≤1023px (correção Fase 3, breakpoint
+     recuado 2026-07-14). */
   #logo_footer{ width: 140px; height: auto; }
   #logo_footer img{ max-width: 100%; height: auto; }
+
+  /* ---- FONTES FLUIDAS — recriação dos 6 clamp() (2026-07-14) ----
+     A versão desktop (home.css) virou `max(12px, calc(N * var(--u)))`,
+     que em ≤1023 (--u neutra, ver tokens.css) devolve N px FIXO — sem
+     isso, os títulos parariam de encolher nos celulares pequenos. Aqui
+     restauramos a fórmula `clamp()` ORIGINAL (idêntica à de antes do
+     split de escala), então o mobile fica byte a byte igual ao de hoje. */
+  .hero > #escrito > h1{ font-size: clamp(2rem, 5vw + 0.8rem, 4rem); }
+  #titulo_principal{ font-size: clamp(2rem, 5vw + 0.8rem, 4rem); }
+  #container_texto h1{ font-size: clamp(2rem, 5vw + 0.8rem, 4rem); }
+  .titulo > .escrito_fav > h2{ font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem); }
+  .titulo > .escrito_cat > h2{ font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem); }
+  .banner h1{ font-size: clamp(2.2rem, 6vw + 1.16rem, 5rem); }
+}
+
+
+/* ==================================================================== */
+/* ---- TABLET — INSTITUCIONAL + PRODUTOS (<= 1280px) ----
+   Só o que ainda NÃO foi convertido pra escala do desktop (2026-07-14) —
+   cada uma ganha sua própria instrução de escala depois. `body{overflow-x:
+   hidden}` mora aqui (inofensivo, vale pra todos os viewports ≤1280,
+   incluindo ≤1023 — os dois blocos são cumulativos, não mutuamente
+   exclusivos). */
+@media (max-width: 1280px){
+  body{ overflow-x: hidden; }
+
+  /* ---- INSTITUCIONAL — HERO: centralizado, mesmo em tablet ---- */
+  .hero_institucional{ min-height: 82vh; }
+  .hero_institucional_escrito{ max-width: 520px; padding: 0 20px; }
+
+  /* ---- INSTITUCIONAL — QUEM SOMOS #1: título/texto empilham, features 2 col ---- */
+  .quemsomos1_secao{ padding: 8vh 20px; }
+  .quemsomos1_topo{ grid-template-columns: 1fr; gap: 32px; margin-bottom: 6vh; }
+  .quemsomos1_features{ grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+  /* ---- INSTITUCIONAL — QUEM SOMOS #2/#3 (split): paddings de tablet ---- */
+  .quemsomos_split{ padding: 8vh 20px; gap: 32px; }
+  .quemsomos_split_imagem img{ height: 56vh; }
+
+  /* ---- INSTITUCIONAL — TIMELINE: 2 colunas ---- */
+  .timeline_secao{ padding: 8vh 20px; }
+  .timeline_grid{ grid-template-columns: repeat(2, 1fr); gap: 32px 24px; }
+
+  /* ---- INSTITUCIONAL — MISSÃO: padding de tablet ---- */
+  .missao_secao{ padding: 7vh 20px; }
+
+  /* ---- INSTITUCIONAL — NOSSOS VALORES: padding de tablet ---- */
+  .valores_secao{ padding: 8vh 20px; }
+  .valores_grid{ gap: 32px 24px; }
+
+  /* ---- PRODUTOS — PLP: grade 2 col, sidebar mais estreita, paddings de tablet ---- */
+  .colecao_hero{ min-height: 38vh; padding: 0 20px; }
+  .barra_categorias{ padding: 20px; }
+  /* grid-template-columns não repetido — já é 200px 1fr no base (compactado
+     2026-07-13), essa faixa só ajusta gap/padding. */
+  .produtos_corpo{ gap: 32px; padding: 6vh 20px; }
+  .grade_produtos{ grid-template-columns: repeat(2, 1fr); }
+  .bloco_editorial{ padding: 32px; }
 }
 
 

@@ -116,6 +116,38 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   **sem CTA de compra** (vitrine); **setas dos carrosséis funcionais** nesta
   página; **galeria com troca de imagem** no clique do thumbnail.
 
+- **⭐ A RÉGUA DO DESKTOP PASSA A SER 1440px (2026-07-14)** — o dono: *"o padrão
+  de desktop deve ser o que está em **1440px**. O **1024px** deve ser **esse mesmo
+  modelo, porém com as devidas proporções**."* Isso **redefine a regra de ouro**:
+  - **Referência = 1440 × 900.** O 1024 tem que ser o **1440 encolhido** (0,7111×) —
+    mesmas grades, mesmo desenho, só menor. Nada de "outro layout" em 1024.
+  - **Fronteira nova:** **desktop ≥ 1024px** (escalando de 1024 a 1440) ·
+    **responsivo ≤ 1023px** (o design atual, intocado por ora). Antes a fronteira
+    era >1280px.
+  - **Acima de 1440px:** nada muda.
+  - **Proporções travadas na LARGURA** (decisão do dono nesta rodada): hoje as
+    caixas são dimensionadas em `vh`, então o "desktop do 1440" **muda conforme a
+    altura da janela** (o card de Favoritos tem 855px numa janela 1440×900 e
+    1026px numa 1440×1080 — medido). As caixas de conteúdo passam a derivar a
+    altura da largura (`aspect-ratio`). **Exceção autorizada à regra de ouro:**
+    em janelas mais altas que 900px o desktop deixa de esticar as imagens.
+  - **Texto com piso de legibilidade** (decisão do dono): o layout escala fiel
+    (0,7111×), mas a fonte **não desce de 12px** — senão a nav cairia de 16px pra
+    11,4px. O piso só morde as fontes pequenas; os títulos escalam fiéis.
+  - **Outros viewports:** o dono disse ter **mais ajustes** para os demais
+    viewports — este (1024) é "o principal por enquanto".
+  - Instrução ativa: `sonnet/fazer/escala-desktop-1024-1440.md` (fundação `--u` +
+    chrome compartilhado + Home). Institucional/Produtos/Equipamento vêm depois,
+    uma instrução por página.
+
+- **Deploy na Vercel (2026-07-14):** o dono tentou publicar e o build quebrou
+  (`TS18003` — o script `npm run build` rodava `tsc -b` num projeto sem nenhum
+  arquivo `.ts`). Disse **"pode arrumar isso você mesmo"** → **exceção pontual**
+  à regra "o Opus não edita código" (a 2ª; a 1ª foi a reestruturação
+  multi-página). O Opus corrigiu o script e criou o `vercel.json` com o
+  **fallback SPA** (sem ele, `/institucional` e as outras rotas dariam 404 em
+  produção). Detalhes no CHANGELOG. **Fora essas exceções, a regra segue valendo.**
+
 ## Ordem das fases (executada)
 As **fases 1–7 estão concluídas e commitadas** (Fundação/data-driven,
 Responsividade+mobile, Animações, Carrossel de Destaques, Lenis, Refinos e a

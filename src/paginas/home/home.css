@@ -34,18 +34,22 @@
 .p_laranja{
   color: var(--laranja);
   font-family: var(--fonte-rotulo);
-  font-size: 1.3rem;
+  /* Escala do desktop (2026-07-14): 1.3rem = 20,8px (N), piso 12px. */
+  font-size: max(12px, calc(20.8 * var(--u)));
 }
 #p_branco{
   color: var(--branco);
-  font-size: 1.3rem;
+  font-size: max(12px, calc(20.8 * var(--u)));
   position: relative;
   top: 1vh;
 }
 .hero > #escrito > h1{
   color: #ffffff;
   font-family: var(--fonte-titulo);
-  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
+  /* Escala do desktop (2026-07-14): era clamp(2rem,5vw+0.8rem,4rem) — N=64
+     (o máximo do clamp). O clamp original é recriado no bloco
+     @media(max-width:1023px) de responsividade.css, senão o mobile quebra. */
+  font-size: max(12px, calc(64 * var(--u)));
 }
 #botoes{
   /* border: 2px solid red; */
@@ -58,7 +62,12 @@
   
 }
 button{
-  margin: 8px;
+  /* Escala do desktop (2026-07-14): N=8 (margin). height/width ficam como
+     estão — o item 6 do diagnóstico (botão do hero quebrando a palavra)
+     se resolve sozinho quando o resto (fonte em .texto_botao, width já em
+     vw) escala junto; font-size:small é herdado/inerte aqui (o texto
+     visível vem de .texto_botao, com font-size próprio). */
+  margin: calc(8 * var(--u));
   height: 7.3vh;
   width: 14vw;
   border: none;
@@ -106,7 +115,9 @@ button{
 .titulo > .escrito_fav > h2{
   color: #ffffff;
   font-family: var(--fonte-titulo);
-  font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem);
+  /* Escala do desktop (2026-07-14): era clamp(1.6rem,3vw+0.68rem,2.6rem) —
+     N=41.6. Clamp original recriado em responsividade.css (≤1023). */
+  font-size: max(12px, calc(41.6 * var(--u)));
 }
   /* IMAGENS */
 
@@ -137,7 +148,8 @@ button{
   font-family: var(--fonte-rotulo);
   font-weight: 600;
   text-transform: uppercase;
-  font-size: 1.3rem;
+  /* Escala do desktop (2026-07-14): N=20.8 (1.3rem). */
+  font-size: max(12px, calc(20.8 * var(--u)));
   letter-spacing: 0.05em;
 }
 .desc{
@@ -145,7 +157,8 @@ button{
   font-size: small;
   padding-top: .5vh;
   font-weight: 200;
-  font-size: 0.9rem;
+  /* Escala do desktop (2026-07-14): N=14.4 (0.9rem) → piso 12px @1024. */
+  font-size: max(12px, calc(14.4 * var(--u)));
   line-height: 1.4;
 }
 .card .cta_comprar{
@@ -158,19 +171,25 @@ button{
   padding-top: 1vh;
   text-decoration-line: underline;
   text-decoration-color: transparent;
-  text-underline-offset: 4px;
+  /* Escala do desktop (2026-07-14): N=4. */
+  text-underline-offset: calc(4 * var(--u));
   color: var(--laranja);
   font-family: var(--fonte-rotulo);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 1.3rem;
+  /* Escala do desktop (2026-07-14): N=20.8 (1.3rem) → 14,8px @1024. */
+  font-size: max(12px, calc(20.8 * var(--u)));
   padding-bottom: 8vh;
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), text-decoration-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card img {
   width: 26vw;
-  height: 95vh;
+  /* Escala do desktop (2026-07-14, decisão #1 — proporções travadas na
+     LARGURA) — era `height:95vh` (mudava com a ALTURA da janela, ex.:
+     855px numa 1440×900 e 1026px numa 1440×1080). Medido no render
+     1440×900: 26vw=374px, 95vh=855px → aspect-ratio 374/855. */
+  aspect-ratio: 374 / 855;
   object-fit: cover;
 }
 /* FIM FAVORITO */
@@ -203,23 +222,29 @@ button{
   align-items:flex-start;
   flex-direction: column;
   height: auto;
-  width: 96.5vh;
+  /* Era `width:96.5vh` — bug (largura definida pela ALTURA da janela);
+     hoje calha de dar 823px, que é exatamente a coluna (4/7 de 1440).
+     `100%` dá o mesmo em 1440 e acompanha a coluna em qualquer largura
+     (fix 2026-07-14, pedido explícito da instrução). */
+  width: 100%;
   position: relative;
   left: 0.5vw;
   top: 1vh;
 
 }
 #texto .p_laranja{
-  font-size: 1.3rem;
+  font-size: max(12px, calc(20.8 * var(--u)));
 }
 .p_preto{
   color: black;
-  font-size: 1.3rem;
+  font-size: max(12px, calc(20.8 * var(--u)));
 
 }
 #titulo_principal{
   font-family: var(--fonte-titulo);
-  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
+  /* Escala do desktop (2026-07-14): era clamp(2rem,5vw+0.8rem,4rem) —
+     N=64. Clamp original recriado em responsividade.css (≤1023). */
+  font-size: max(12px, calc(64 * var(--u)));
   padding-bottom: 2vh;
 }
 
@@ -229,7 +254,7 @@ button{
   right: 0.5vw;
   background-color: var(--laranja);
   color: var(--branco);
-  font-size: 1rem;
+  font-size: max(12px, calc(16 * var(--u)));
 }
 
 #container_imagem{
@@ -270,27 +295,34 @@ button{
 .titulo > .escrito_cat > h2{
   color: #ffffff;
   font-family: var(--fonte-titulo);
-  font-size: clamp(1.6rem, 3vw + 0.68rem, 2.6rem);
+  /* Escala do desktop (2026-07-14): era clamp(1.6rem,3vw+0.68rem,2.6rem) —
+     N=41.6. Clamp original recriado em responsividade.css (≤1023). */
+  font-size: max(12px, calc(41.6 * var(--u)));
 }
 #conteiner_categorias{
   /* border: 1px solid white; */
   width: 85vw;
-  height: 50vh;
+  /* Era `height:50vh` — removido (2026-07-14): os cards já escalam
+     (.card_categoria abaixo), a altura fixa em vh briga com eles; altura
+     agora vem do CONTEÚDO (2 linhas de .card_categoria). */
   position: relative;
   top: 10.4vh;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
-  padding: 32px;
+  /* Escala do desktop (2026-07-14): N=12 (gap) / N=32 (padding). */
+  gap: calc(12 * var(--u));
+  padding: calc(32 * var(--u));
 }
 .card_categoria {
   background-color: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  padding: 20px;
+  /* Escala do desktop (2026-07-14): N=1 (border) / N=20 (padding) / N=130
+     (height). */
+  border: calc(1 * var(--u)) solid #2a2a2a;
+  padding: calc(20 * var(--u));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 130px;
+  height: calc(130 * var(--u));
   text-decoration: none;
   color: #fff;
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -298,7 +330,8 @@ button{
 
 .icone_seta {
   color: var(--branco);
-  font-size: 1.8rem;
+  /* Escala do desktop (2026-07-14): N=28.8 (1.8rem). */
+  font-size: max(12px, calc(28.8 * var(--u)));
   position: relative;
   bottom: 1.5vh;
 }
@@ -306,7 +339,8 @@ button{
 .card_categoria p {
   font-family: var(--fonte-rotulo);
   font-weight: 700;
-  font-size: 1.3rem;
+  /* Escala do desktop (2026-07-14): N=20.8 (1.3rem). */
+  font-size: max(12px, calc(20.8 * var(--u)));
   text-transform: uppercase;
   line-height: 1.3;
 }
@@ -345,7 +379,9 @@ button{
 #container_texto{
   /* border: 1px solid red; */
   height: auto;
-  width: 70.5vh;
+  /* Era `width:70.5vh` — mesma patologia do #texto (largura em vh).
+     Escala do desktop (2026-07-14): N=635 (70.5vh de 900px). */
+  width: calc(635 * var(--u));
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -354,7 +390,7 @@ button{
   overflow: hidden;
   position: relative;
   left: 7vw;
-  gap: 10px;
+  gap: calc(10 * var(--u));
   z-index: 1;
   top: 3vh;
 }
@@ -365,15 +401,17 @@ button{
 }
 #container_texto h1{
   font-family: var(--fonte-titulo);
-  font-size: clamp(2rem, 5vw + 0.8rem, 4rem);
+  /* Escala do desktop (2026-07-14): era clamp(2rem,5vw+0.8rem,4rem) —
+     N=64. Clamp original recriado em responsividade.css (≤1023). */
+  font-size: max(12px, calc(64 * var(--u)));
 }
 
 #container_texto button{
   background-color: var(--laranja);
   position: relative;
   right: 1vw;
-  font-size: 1rem;
-  margin-top: 30px; /* ajusta o valor pra descer mais ou menos */
+  font-size: max(12px, calc(16 * var(--u)));
+  margin-top: calc(30 * var(--u)); /* ajusta o valor pra descer mais ou menos */
 
 
 
@@ -400,7 +438,8 @@ button{
   margin-top: 11vh;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  /* Escala do desktop (2026-07-14): N=20 (gap). */
+  gap: calc(20 * var(--u));
   margin-bottom: 7vh;
 }
 .card_territorio {
@@ -413,16 +452,22 @@ button{
 
 .imagem_territorio {
     width: 100%;
-    height: 76vh;
+    /* Escala do desktop (2026-07-14, decisão #1) — era `height:76vh`
+       (mudava com a altura da janela). Medido no render 1440×900:
+       largura efetiva da coluna (grid de 4, 90vw, gap 20px) = 309px,
+       76vh = 684px → aspect-ratio 309/684. */
+    aspect-ratio: 309 / 684;
     object-fit: cover;
-    margin-bottom: 15px;
+    margin-bottom: calc(15 * var(--u));
 }
 .card_territorio h3 {
     color: var(--branco);
     font-family: var(--fonte-titulo);
-    font-size: 26px;
+    /* Escala do desktop (2026-07-14): N=26 (h3 de card) / N=1
+       (letter-spacing). */
+    font-size: max(12px, calc(26 * var(--u)));
     font-weight: 800;
-    letter-spacing: 1px;
+    letter-spacing: calc(1 * var(--u));
     margin: 0;
 }
 
@@ -446,39 +491,44 @@ button{
 #conteudo_destaques{
   /* border: 1px solid rebeccapurple; */
   width: 90vw;
-  height: 65vh;
+  /* Era `height:65vh` — removido (2026-07-14): altura vem do conteúdo
+     (cabeçalho + grade), como #conteiner_categorias acima. */
   display: flex;
   flex-direction: column;
 }
 #escrito_destaques{
   width: 100%;
-  height: 10vh;
+  /* Era `height:10vh` — removido (altura pelo conteúdo). Margens
+     escaladas (2026-07-14): N=18 (2vh de 900px) / N=13.5 (1.5vh). */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2vh;
-  margin-top: 1.5vh;
+  margin-bottom: calc(18 * var(--u));
+  margin-top: calc(13.5 * var(--u));
   /* background-color:  red; */
 }
 #escrito_destaques h3{
   color: var(--branco);
   font-family: var(--fonte-titulo);
-  font-size: 26px;
+  /* Escala do desktop (2026-07-14): N=26 (h3 de card) / N=1
+     (letter-spacing). */
+  font-size: max(12px, calc(26 * var(--u)));
   font-weight: 800;
-  letter-spacing: 1px;
+  letter-spacing: calc(1 * var(--u));
   margin: 0;
 }
 #setas_destaques{
   display: flex;
-  gap: 10px;
+  gap: calc(10 * var(--u));
 }
 #produtos_destaques{
   width: 100%;
-  height: 50vh;
+  /* Era `height:50vh` — removido (altura pelo conteúdo; as imagens já são
+     aspect-ratio:1/1). */
   /* background-color: rgb(0, 255, 34); */
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 20px;
+  gap: calc(20 * var(--u));
 }
 .card_produto{
   display: flex;
@@ -498,16 +548,19 @@ button{
 .titulo_produto_destaque{
   color: var(--branco);
   font-family: var(--fonte-rotulo);
-  font-size: 1.3rem;
+  /* Escala do desktop (2026-07-14): N=20.8 (1.3rem) / N=0.5
+     (letter-spacing). */
+  font-size: max(12px, calc(20.8 * var(--u)));
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: calc(0.5 * var(--u));
   margin-bottom: 1vh;
 }
 
 .preco_produto_destaque{
   color: #999;
   font-family: var(--fonte-titulo);
-  font-size: 13px;
+  /* Escala do desktop (2026-07-14): N=13. */
+  font-size: max(12px, calc(13 * var(--u)));
   margin: 0;
 }
 
@@ -544,15 +597,18 @@ button{
 .cabecalho_carrossel_destaques h3{
   color: var(--branco);
   font-family: var(--fonte-titulo);
-  font-size: 26px;
+  /* Escala do desktop (2026-07-14): N=26 (h3 de card) / N=1
+     (letter-spacing). */
+  font-size: max(12px, calc(26 * var(--u)));
   font-weight: 800;
-  letter-spacing: 1px;
+  letter-spacing: calc(1 * var(--u));
   margin: 0;
 }
 .trilho_carrossel{
   display: flex;
   align-items: flex-start;
-  gap: 32px;
+  /* Escala do desktop (2026-07-14): N=32. */
+  gap: calc(32 * var(--u));
   /* padding-left = respiro do 1º card (o scrollWidth CONTA esse lado).
      A folga de "meio card" no FIM não vive aqui — uma 1ª tentativa com
      `padding-right:170px` não funcionou: em container flex, `scrollWidth`
@@ -564,8 +620,11 @@ button{
   will-change: transform;
 }
 .card_carrossel{
-  flex: 0 0 340px;
-  width: 340px;
+  /* Escala do desktop (2026-07-14): N=340. FOLGA_FIM (CarrosselDestaques.jsx)
+     passa a derivar da largura REAL medida do card em runtime (metade
+     dela), não mais um px fixo — ver o componente. */
+  flex: 0 0 calc(340 * var(--u));
+  width: calc(340 * var(--u));
 }
 
 /* Modo "arrastavel" (2026-07-10) — touch/tablet/ponteiro grosso, sem
@@ -580,7 +639,8 @@ button{
 .destaques.destaques_arrastavel{
   display: block;
   min-height: 0;
-  padding: 64px 0;
+  /* Escala do desktop (2026-07-14): N=64. */
+  padding: calc(64 * var(--u)) 0;
 }
 .trilho_arrastavel_container{
   overflow: hidden;
@@ -588,7 +648,8 @@ button{
 }
 .trilho_arrastavel{
   display: flex;
-  gap: 16px;
+  /* Escala do desktop (2026-07-14): N=16. */
+  gap: calc(16 * var(--u));
   cursor: grab;
   /* Deixa o navegador mandar o gesto vertical pro scroll da página e só o
      horizontal pro drag — sem isso, arrastar na diagonal ou tentar rolar a
@@ -639,7 +700,8 @@ button{
   margin-top: 11vh;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  /* Escala do desktop (2026-07-14): N=20. */
+  gap: calc(20 * var(--u));
   /* margin-bottom: 7vh; */
 }
 .card_historia{
@@ -654,15 +716,18 @@ button{
   color: var(--branco);
 }
 .card_historia p{
-  font-size: 0.9rem;
+  /* Escala do desktop (2026-07-14): N=14.4 (0.9rem) → piso 12px @1024. */
+  font-size: max(12px, calc(14.4 * var(--u)));
   margin-bottom: 1.7vh;
 }
 .card_historia h3{
   margin-bottom: 1vh;
   font-family: var(--fonte-titulo);
-  font-size: 26px;
+  /* Escala do desktop (2026-07-14): N=26 (h3 de card) / N=1
+     (letter-spacing). */
+  font-size: max(12px, calc(26 * var(--u)));
   font-weight: 800;
-  letter-spacing: 1px;
+  letter-spacing: calc(1 * var(--u));
 }
 .card_historia a{
   /* "LEIA MAIS" continua decorativo (sem página de blog ainda, dono define
@@ -670,18 +735,24 @@ button{
      coerência visual do hover em toda a Home. */
   color: var(--laranja);
   font-family: var(--fonte-rotulo);
-  font-size: 1.3rem;
+  /* Escala do desktop (2026-07-14): N=20.8 (1.3rem) / N=4
+     (text-underline-offset) / N=3.04 (0.19rem, letter-spacing). */
+  font-size: max(12px, calc(20.8 * var(--u)));
   text-decoration-line: underline;
   text-decoration-color: transparent;
-  text-underline-offset: 4px;
-  letter-spacing: 0.19rem;
+  text-underline-offset: calc(4 * var(--u));
+  letter-spacing: calc(3.04 * var(--u));
   margin-top: auto;
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), text-decoration-color 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card_historia img{
   width: 29vw;
-  height: 40vh;
-  aspect-ratio: 1 / 1;
+  /* Escala do desktop (2026-07-14, decisão #1) — era `height:40vh` +
+     `aspect-ratio:1/1` (o 1/1 é LETRA MORTA: width+height explícitos já
+     anulavam — medido 418×360, não é quadrado). Medido no render
+     1440×900: 29vw=418px, 40vh=360px → aspect-ratio 418/360 (substitui os
+     dois). */
+  aspect-ratio: 418 / 360;
   object-fit: cover;
   background-color: #e8e8e8;
   margin-bottom: 3vh;
@@ -697,12 +768,13 @@ button{
   align-items: center;
   justify-content: center;
   background-color: var(--background_cinza);
-  border-top: 1px solid rgba(255, 255, 255, 0.55);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+  /* Escala do desktop (2026-07-14): N=1 (border). */
+  border-top: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.55);
+  border-bottom: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.55);
 }
 #texto_banner{
   /* border: 1px solid red; */
-  height: 30vh;
+  /* Era `height:30vh` — removido (altura pelo conteúdo, 2026-07-14). */
   width: auto;
   display: flex;
   align-items: center;
@@ -715,9 +787,12 @@ button{
   text-align: center;
   font-weight: 800;
   line-height: 1.1;
-  letter-spacing: 0.5px;
+  /* Escala do desktop (2026-07-14): N=0.5 (letter-spacing). */
+  letter-spacing: calc(0.5 * var(--u));
 
-  font-size: clamp(2.2rem, 6vw + 1.16rem, 5rem);
+  /* Era clamp(2.2rem,6vw+1.16rem,5rem) — N=80 (o máximo). Clamp original
+     recriado em responsividade.css (≤1023). */
+  font-size: max(12px, calc(80 * var(--u)));
 }
 .palavra_banner{
   display: inline-block;

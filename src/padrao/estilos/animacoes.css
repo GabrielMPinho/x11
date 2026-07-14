@@ -46,11 +46,12 @@
   }
   .card:hover .cta_comprar,
   .card_historia:hover a{
-    transform: translateX(6px);
+    /* Escala do desktop (2026-07-14): N=6 (offset de hover). */
+    transform: translateX(calc(6 * var(--u)));
     text-decoration-color: var(--laranja);
   }
   .card_categoria:hover .icone_seta{
-    transform: translateX(6px);
+    transform: translateX(calc(6 * var(--u)));
   }
   /* Anel/borda no hover — só Categorias Populares (2026-07-13, pedido do
      dono: "isso deve ter apenas nos CATEGORIAS POPULARES"). Os outros 4
@@ -66,7 +67,8 @@
   .card_territorio:hover,
   .card_historia:hover,
   .card_produto:hover{
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+    /* Escala do desktop (2026-07-14): N=12/28 (offset/blur da sombra). */
+    box-shadow: 0 calc(12 * var(--u)) calc(28 * var(--u)) rgba(0, 0, 0, 0.35);
   }
 }
 /* Elevação (translateY) isolada — só com prefers-reduced-motion:no-preference
@@ -91,7 +93,8 @@
   .card_territorio:hover,
   .card_historia:hover,
   .card_produto:hover{
-    transform: translateY(-6px) !important;
+    /* Escala do desktop (2026-07-14): N=-6 (elevação). */
+    transform: translateY(calc(-6 * var(--u))) !important;
   }
 }
 

@@ -17,10 +17,14 @@ import CarrosselArrastavel from "./CarrosselArrastavel";
 // intercepta o gesto horizontal de containers aninhados sem
 // `data-lenis-prevent`. O dono pediu um carrossel de verdade ARRASTÁVEL no
 // lugar do swipe):
-// - "hijack" — (pointer:fine) e (min-width:1281px), sem reduced-motion →
-//   CarrosselDestaques (scroll-hijack, 300vh+pin). INALTERADO.
+// - "hijack" — (pointer:fine) e (min-width:1024px), sem reduced-motion →
+//   CarrosselDestaques (scroll-hijack, 300vh+pin). Limiar recuado de
+//   1281→1024px (2026-07-14, "Escala proporcional do desktop 1024→1440"):
+//   o modelo desktop agora começa em 1024, então o carrossel (única seção
+//   que muda no desktop, exceção aprovada) passa a valer da mesma largura
+//   pra cima.
 // - "arrastavel" — qualquer outro caso não-reduced-motion (touch, tablet,
-//   ≤1280px, ponteiro grosso) → CarrosselArrastavel (drag de verdade,
+//   ≤1023px, ponteiro grosso) → CarrosselArrastavel (drag de verdade,
 //   Framer Motion, sem 300vh/pin, sem depender do scroll).
 // - "estatico" — reduced-motion → fallback acessível de sempre (grade com
 //   overflow-x:auto + scroll-snap, sem drag/inércia).
@@ -33,7 +37,7 @@ function useModoCarrossel() {
             setModo("estatico");
             return;
         }
-        const consulta = window.matchMedia("(pointer: fine) and (min-width: 1281px)");
+        const consulta = window.matchMedia("(pointer: fine) and (min-width: 1024px)");
         const atualizar = () => setModo(consulta.matches ? "hijack" : "arrastavel");
         atualizar();
         consulta.addEventListener("change", atualizar);

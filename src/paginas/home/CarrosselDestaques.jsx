@@ -17,14 +17,6 @@ const FATOR_ALTURA_PIN = 1.15;
 // fim do movimento SEMPRE coincidia com o fim do pin.
 const FIM_MOVIMENTO = 0.82;
 
-// Folga de "meio card invisível" no fim (2026-07-10 — 2ª tentativa: a 1ª,
-// via `padding-right` no `.trilho_carrossel`, não funcionou — quirk
-// conhecido de container flex, onde `scrollWidth` não inclui o
-// end-padding quando o conteúdo transborda, então o padding não entrava
-// na conta de `deslocamento`). Agora a folga é somada DIRETO no JS, sem
-// depender do `scrollWidth` refletir nada — robusto contra esse quirk.
-const FOLGA_FIM = 170;
-
 // Isolado do componente pai (Destaques.jsx) de propósito (fix 2026-07-10):
 // `useScroll({ target })` precisa que o ref já esteja anexado no PRIMEIRO
 // render do componente que o chama — se o pai renderiza primeiro com
@@ -53,16 +45,23 @@ export default function CarrosselDestaques(){
     const progressoSuave = useSpring(scrollYProgress, { stiffness: 200, damping: 26, mass: 0.3 });
 
     // Desloca o trilho até o ÚLTIMO card encostar quase na borda direita da
-    // viewport (com a folga de FOLGA_FIM sobrando) — medido de verdade (não
-    // um "%" chutado, que só bate pra uma contagem/largura específica de
-    // card). A folga é somada aqui, direto no valor medido, não no CSS.
+    // viewport (com uma folga de "meio card" sobrando) — medido de verdade
+    // (não um "%" chutado, que só bate pra uma contagem/largura específica
+    // de card). A folga é somada aqui, direto no valor medido, não no CSS.
+    // Folga = metade da largura REAL do card, medida em runtime (2026-07-14,
+    // "Escala proporcional do desktop 1024→1440") — antes era um px fixo
+    // (170 = 340÷2), mas `.card_carrossel` agora escala com a largura da
+    // janela (`calc(340 * var(--u))`); um valor fixo ficaria errado em
+    // qualquer largura abaixo de 1440. `firstElementChild?.offsetWidth`
+    // já reflete o tamanho renderizado (escalado) do card.
     const [deslocamento, setDeslocamento] = useState(0);
     useEffect(() => {
         function medir() {
             if (!trilhoRef.current) return;
             const larguraViewport = trilhoRef.current.parentElement?.clientWidth ?? window.innerWidth;
             const larguraTrilho = trilhoRef.current.scrollWidth;
-            setDeslocamento(Math.max(larguraTrilho - larguraViewport, 0) + FOLGA_FIM);
+            const larguraCard = trilhoRef.current.firstElementChild?.offsetWidth ?? 0;
+            setDeslocamento(Math.max(larguraTrilho - larguraViewport, 0) + larguraCard / 2);
         }
         medir();
         window.addEventListener("resize", medir);

@@ -87,9 +87,15 @@ definidos pelo dono** — hoje só há o stub.
   Plano de split por página (CSS puro, refatoração mecânica pixel-idêntica) em
   [`refatoracao-css.md`](./refatoracao-css.md). ✅ Aprovado — **executar logo
   após a página Produto** (dono, 2026-07-14).
-- `npm run build` falha no `tsc -b` (projeto é `.jsx`, sem inputs `.ts`) — usar
-  `npx vite build`. Corrigir o `tsconfig`/script um dia (ex.: `allowJs` ou tirar
-  o `tsc -b`).
+- ~~`npm run build` falha no `tsc -b`~~ ✅ **RESOLVIDO (2026-07-14)** — quebrou o
+  **deploy na Vercel** (TS18003). `tsc -b` removido do script; `npm run build`
+  agora é só `vite build`. Sobrou como débito **inofensivo**: os 3 `tsconfig*` e
+  as deps `typescript`/`@types/*` seguem no projeto sem uso (limpeza opcional).
+- ~~**Débito:** em produção o `BrowserRouter` precisa de *fallback SPA*~~ ✅
+  **RESOLVIDO (2026-07-14)** — `vercel.json` novo com rewrite `/(.*)` →
+  `/index.html`. Sem ele, `/institucional` e as demais rotas dariam 404 ao
+  abrir/recarregar direto. (Se um dia o site sair também num vhost próprio, o
+  mesmo fallback precisa ser configurado lá.)
 - Tokens de **espaçamento** ainda não existem (valores diretos no CSS) —
   padronizar em `tokens.css` numa passada futura, sem mudar o visual.
 

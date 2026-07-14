@@ -1,5 +1,45 @@
 # Estilos (CSS)
 
+## Escala proporcional do desktop — 1024→1440 (2026-07-14)
+**Referência do desktop agora é 1440px** (não mais "acima de 1280 = intocado
+sem mais detalhe"). Pedido do dono: "1024 deve ser o 1440 encolhido, com as
+devidas proporções" — antes, 1024 caía direto no design responsivo (OUTRO
+layout). Hoje (Home + chrome já convertidos; Institucional/Produtos/
+Equipamento ainda não, cada uma terá sua instrução):
+- **≥1440px:** idêntico a hoje, travado (regra de ouro).
+- **1024→1440px:** escala proporcional contínua (0,7111× em 1024).
+- **≤1023px:** design responsivo de sempre, sem nenhuma mudança visual —
+  breakpoint recuado de 1280→1023 (só pra Home+chrome; Institucional/
+  Produtos continuam entrando em modo tablet em ≤1280, efeito colateral
+  intencional até serem convertidas).
+
+**O mecanismo — `--u` (`tokens.css`):** `--u: min(1px, 0.069444vw)` + override
+`@media(max-width:1023px){:root{--u:1px}}`. É "1px do desenho de referência
+1440×900", com 3 regimes (ver comentário em `tokens.css` pro racional
+completo — por que precisa voltar a 1px em ≤1023, não só ficar decrescendo:
+as regras "desktop" são a base HERDADA pelo bloco responsivo, que só
+sobrescreve parte delas).
+
+**Lei de conversão (aplicar em qualquer arquivo convertido pra escala):**
+| Tinha | Vira | Nota |
+|---|---|---|
+| comprimento fixo `px`/`rem` (gap/padding/margin/width/height/border/offset) | `calc(N * var(--u))`, N = valor em px medido em 1440 | `1rem=16px` |
+| `font-size` (qualquer) | `max(12px, calc(N * var(--u)))` | piso de legibilidade — só morde abaixo de 12px |
+| `vw` | fica como está | já é proporcional |
+| `vh` numa **caixa de conteúdo** | `aspect-ratio` derivado da LARGURA, razão medida no render 1440×900 | decisão do dono: proporções travadas na largura, não na altura (evita variar com a altura da janela) |
+| `vh` numa **faixa de tela** (seção que existe pra "encher a tela") | fica como está | `.hero`, `.favoritos`, `.categorias`, etc. — 9 seções da Home |
+| `clamp()` de fonte existente | `max(12px, calc(N * var(--u)))`, N = o máximo do clamp | o clamp ORIGINAL precisa ser recriado no bloco `≤1023` (`responsividade.css`), senão o mobile para de encolher em telas pequenas |
+
+**vh de espaçamento não cobertos pela lei acima** (padding/margin/top que não
+são "altura de caixa de conteúdo" nem faixa de tela nomeada — ex.:
+`.card .cta_comprar{padding-bottom:8vh}`) foram deixados como estão na
+conversão de 2026-07-14 — a instrução não deu alvo explícito pra esses, não
+inventei. Variam com a altura da janela; ajuste futuro se o dono pedir.
+
+Ver `docs/agentes/alterações/CHANGELOG.md` (2026-07-14 13:00) pro detalhe
+completo (arquivos tocados, valores-alvo @1440/@1024) e `convencoes.md`
+(regra de ouro atualizada).
+
 ## Arquitetura do CSS — manifesto + parciais (split PASSE 1, 2026-07-14)
 `base.css` **deixou de ser um arquivo monolítico** (chegou a 2988 linhas —
 motivo do split, pedido do dono: "não estou gostando de ter um arquivo css

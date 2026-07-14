@@ -5,6 +5,152 @@
 
 ---
 
+## 2026-07-14 13:00 — Escala proporcional do desktop (1024→1440): fundação + chrome + Home
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/escala-desktop-1024-1440.md` — pedido do dono:
+"o padrão de desktop deve ser o que está em 1440px. O 1024px deve ser esse
+mesmo modelo, porém com as devidas proporções" — hoje 1024 caía no design
+responsivo da Fase 2, que é OUTRO layout, não o desktop encolhido):
+
+### O mecanismo — `--u`
+Nova custom property em `tokens.css`, `--u: min(1px, 0.069444vw)` — "1px do
+desenho de referência 1440×900" — com **3 regimes**: ≥1440px trava em 1px
+(desktop de hoje intacto); 1024→1440px varia linearmente (0,7111px→1px);
+**≤1023px volta a 1px, NEUTRA**, via `@media(max-width:1023px){:root{--u:1px}}`
+— crítico, porque as regras "desktop" também são a base HERDADA pelo bloco
+responsivo (que só sobrescreve parte delas); sem essa neutralização, todo
+valor herdado murcharia e o mobile mudaria. Toda a Home/chrome escala com
+`calc(N * var(--u))` (comprimentos) ou `max(12px, calc(N * var(--u)))`
+(fontes, piso de legibilidade).
+
+### Decisão do dono — proporções travadas na LARGURA
+Caixas de conteúdo que usavam `vh` (mudavam de tamanho conforme a ALTURA da
+janela, não só a largura — ex.: `.card img` media 855px numa janela
+1440×900 e 1026px numa 1440×1080) viraram `aspect-ratio` derivado da
+LARGURA, medido no render 1440×900: `.card img` (Favoritos) → 374/855;
+`.imagem_territorio` → 309/684; `.card_historia img` → 418/360 (e removido
+o `aspect-ratio:1/1` que já era letra morta ali, anulado por width+height
+explícitos). **Exceção que NÃO virou aspect-ratio:** as "faixas de tela"
+(`.hero`, `.favoritos`, `.categorias`, etc. — 9 seções listadas na
+instrução) continuam com `min-height`/`height` em `vh`, e os offsets
+internos do Hero (`#escrito{top:39vh}`, `#botoes{top:42vh}`) também ficam
+como estão (proporcionais à altura do próprio hero, não "caixa de
+conteúdo"). Duas larguras que estavam erradamente em `vh` (bug real, não
+proporcional): `#texto{width:96.5vh}` → `width:100%`; `#container_texto{width:
+70.5vh}` → `calc(635 * var(--u))`.
+
+### Arquivos tocados
+- **`tokens.css`** — `--u` (3 regimes).
+- **`header.css`/`footer.css`/`botao.css`/`animacoes.css`** (chrome
+  compartilhado) — lei de conversão aplicada em todos os `px`/`rem`/
+  `font-size`; `footer.css` ganhou `aspect-ratio` nas 4 caixas que usavam
+  `vh` (`#conteudo_footer`, `#rodape_footer`, `#logo_footer`,
+  `#fim_footer`), medido no render 1440×900.
+- **`home.css`** — lei de conversão em todo o arquivo (specs completas
+  acima); os 6 `clamp()` de fonte (`.hero>#escrito>h1`, `#titulo_principal`,
+  `#container_texto h1`, `.titulo>.escrito_fav>h2`, `.titulo>.escrito_cat>h2`,
+  `.banner h1`) viraram `max(12px, calc(N * var(--u)))` na versão desktop.
+- **`responsividade.css`** — o bloco único `@media(max-width:1280px)` (Home +
+  chrome + Institucional + Produtos misturados) foi dividido em dois:
+  **`@media(max-width:1023px)`** (novo — Home + chrome, breakpoint recuado
+  de 1280) e **`@media(max-width:1280px)`** (mantido — só Institucional +
+  Produtos, que não foram convertidos nesta rodada, `body{overflow-x:
+  hidden}` continua aqui). Os 6 `clamp()` originais foram **recriados** no
+  bloco novo `≤1023`, senão o mobile pararia de encolher fontes em telas
+  pequenas (a versão desktop, `max(12px,...)`, não tem a mesma curva). Os
+  blocos `≤768px` e `≤480px` ficaram **intactos** (conferido por grep, zero
+  seletor de Home/chrome cruzou pro bloco de Institucional/Produtos nem
+  vice-versa).
+- **`Destaques.jsx`** — gate do modo `hijack` (carrossel scroll-linked)
+  recuado de `(pointer:fine) and (min-width:1281px)` pra
+  `(min-width:1024px)` — mesma lógica do resto da tarefa: o desktop agora
+  começa em 1024.
+- **`CarrosselDestaques.jsx`** — `FOLGA_FIM=170` (constante fixa, "meio
+  card" de 340px) removida; a folga agora é **medida em runtime**
+  (`firstElementChild.offsetWidth / 2`), porque `.card_carrossel` passou a
+  escalar com `--u` — um valor fixo ficaria errado em qualquer largura
+  abaixo de 1440.
+
+### ⚠️ Consequência intencional (aprovada pela instrução, não corrigir)
+De 1024 a 1280px, o **chrome** (header/footer) das páginas Institucional/
+Produtos/Equipamento passa a mostrar a versão desktop ESCALADA (não mais a
+de tablet), enquanto o **corpo** dessas páginas segue no layout tablet até
+cada uma ganhar sua própria instrução de escala. `.p_laranja` (kicker
+compartilhado, fisicamente definido em `home.css` desde sempre — não é bug
+novo desta rodada) também escala e "vaza" esse efeito pras outras páginas
+no intervalo 1024–1439px, mesmo raciocínio.
+
+### Pendências/achados não resolvidos (fora do escopo desta instrução)
+- **vh de espaçamento não nomeados na instrução** (ex.:
+  `.card .cta_comprar{padding-bottom:8vh}`, `.desc{padding-top:.5vh}`,
+  `#imagens{padding-top:11vh}`) foram **mantidos como estão** — variam com
+  a ALTURA da janela, não com a escala 1024→1440 pedida, mas a instrução só
+  deu alvos explícitos pras "caixas de conteúdo" citadas na tabela; não
+  inventei conversões pra essas. Se o Opus/dono quiser eliminar essa
+  variância residual, é um ajuste pontual futuro.
+- Institucional, Produtos e Equipamento **não foram convertidos** — cada
+  uma terá sua própria instrução de escala.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅ sem avisos.
+Conferido por leitura/grep: `--u` vale 1px em ≤1023 e em ≥1440 (só varia
+entre os dois); nenhum seletor de Institucional/Produtos saiu do bloco
+`≤1280` (e vice-versa); blocos `≤768`/`≤480` intactos; nenhum `height`/
+`min-height` em `vh` sobrou numa caixa de conteúdo da Home (só as 9 faixas
+de tela + o botão do Hero, documentado). **Não tirei prints.**
+
+**Valores-alvo pro Opus conferir no navegador (1440 → 1024):**
+| Elemento | @1440 | @1024 |
+|---|---|---|
+| Logo do header (width) | 308px (igual a hoje) | ≈219px |
+| Nav do header (font-size) | 16px (igual a hoje) | 12px (piso) |
+| H2 de seção (Favoritos/Categorias) | 41,6px (igual a hoje) | ≈29,6px |
+| Card de Favoritos (`.card img`) | 374×855px (igual a hoje) | ≈266×609px (mesma proporção) |
+| Card de Categoria (height) | 130px (igual a hoje) | ≈92px |
+| Colunas de Categorias | 6 (igual a hoje) | **6** (não vira mais 3) |
+| Colunas de Território | 4 (igual a hoje) | **4** (não vira mais 2) |
+
+**Não commitado.** Resumo acima; aguardando conferência do Opus/dono nos
+viewports 1024 e 1440 (e checagem de que ≤1023/≥1440 seguem idênticos a
+antes).
+
+---
+
+## 2026-07-14 13:05 — Deploy na Vercel: build quebrado (`tsc -b`) + fallback SPA
+
+**Feito pelo OPUS a pedido explícito do dono** ("pode arrumar isso você mesmo") —
+**exceção pontual** à regra "o Opus não edita código", como já houve na
+reestruturação multi-página (`598a7ad`). Fora isso, a regra segue valendo.
+
+**O que aconteceu:** o deploy na Vercel (commit `a6fd2a7`) falhou no build:
+
+```
+error TS18003: No inputs were found in config file 'tsconfig.app.json'.
+Specified 'include' paths were '["src"]' and 'exclude' paths were '[]'.
+```
+
+| # | Problema | Causa raiz | Correção |
+|---|---|---|---|
+| 1 | `npm run build` quebra na Vercel (TS18003) | O script era `tsc -b && vite build`, mas o projeto tem **zero** arquivos `.ts`/`.tsx` (é tudo `.jsx`) — o `tsc` não encontra input e aborta. Sobra do template Vite React-**TS**. Localmente passava despercebido porque sempre rodamos `npx vite build` direto, nunca o script oficial | `package.json`: `"build": "vite build"` (removido o `tsc -b`) |
+| 2 | *(latente — quebraria logo depois)* `/institucional` e as demais rotas dariam **404** em produção | `BrowserRouter` com 7 rotas reais e **nenhum `vercel.json`**. A Vercel serve o arquivo correspondente ao path; `/institucional` não é um arquivo. Já estava anotado como débito ("o `BrowserRouter` precisa de fallback SPA em produção") | **`vercel.json` novo**: rewrite de `/(.*)` → `/index.html` |
+
+**Por que rewrite e não `HashRouter`:** o rewrite preserva as URLs limpas
+(`/institucional`, não `/#/institucional`). A Vercel só aplica `rewrites`
+**depois** de checar o filesystem, então `/assets/*` continua sendo servido como
+arquivo estático — o fallback não os captura. Conferido também que o
+`index.html` referencia os assets por caminho **absoluto** (`/assets/…`, o
+`base` padrão do Vite): sem isso, uma rota com barra quebraria os assets.
+
+**Verificação:** `npm run build` (o comando exato que a Vercel roda) ✅ —
+`✓ built in 725ms`. `npm run lint` ✅ sem avisos.
+
+**Débito remanescente (não bloqueia):** `tsconfig.app.json` / `tsconfig.json` /
+`tsconfig.node.json` e as devDependencies `typescript` + `@types/*` ficaram no
+projeto sem uso. Inofensivos (nada mais os invoca). Limpeza opcional numa passada
+futura.
+
+---
+
 ## 2026-07-14 11:59 — Split do `base.css` em fundação + CSS por página (PASSE 1)
 
 **O que foi feito e por quê** (instrução

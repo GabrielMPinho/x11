@@ -24,6 +24,36 @@
   --fonte-titulo: "Chakra Petch", sans-serif;
   --fonte-rotulo: "IBM Plex Sans Condensed", sans-serif;
   --fonte-corpo: "Open Sans Condensed", sans-serif;
+
+  /* Unidade de escala do desktop (2026-07-14, pedido do dono: "1024 deve
+     ser o 1440 encolhido, nas devidas proporções" — hoje 1024 caía no
+     design responsivo, que é OUTRO layout). 1 `--u` = 1px do desenho de
+     referência (1440×900). É a espinha de todo `calc(N * var(--u))` do
+     chrome e da Home — 3 regimes:
+     - **≥1440px:** trava em 1px — o desktop de hoje fica intacto (regra
+       de ouro preservada, nada muda acima de 1440).
+     - **1024→1440px:** varia LINEARMENTE com a largura da janela —
+       0,7111px em 1024px, 1px em 1440px. É a escala proporcional.
+     - **≤1023px (ver @media abaixo):** volta a 1px, NEUTRA. ⚠️ Crítico:
+       as regras "desktop" (aqui) são também a base HERDADA pelo bloco
+       responsivo, que só sobrescreve PARTE delas — se `--u` continuasse
+       encolhendo abaixo de 1024px seguindo a fórmula contínua, TODO valor
+       herdado murcharia e o mobile mudaria (proibido). Com `--u:1px`
+       neutro em ≤1023, `calc(N * var(--u))` sempre devolve exatamente
+       `N px` — o valor de hoje, byte a byte, mobile intacto.
+     Ancoragem: 1px em 1440px = 100÷1440 = 0,069444vw; `min(1px, …)` trava
+     o teto em 1440 pra cima (regime 1). Abaixo de 1440, o termo `vw`
+     vence o `min()` e escala linear (regime 2) — até a media query abaixo
+     forçar de volta a 1px (regime 3). */
+  --u: min(1px, 0.069444vw);
+}
+
+@media (max-width: 1023px){
+  :root{
+    /* Regime 3 — ver comentário de `--u` acima: neutraliza a escala
+       abaixo do desktop, preservando o design responsivo de hoje. */
+    --u: 1px;
+  }
 }
 
 /* Tipografia base */
