@@ -135,9 +135,7 @@ TEXTO alinhado à esquerda (2026-07-16):** era `#texto{width:100%}` —
 preenchia os 823px inteiros da coluna esquerda (4/7 de 1440), título/
 parágrafo em linhas largas. Fix: como `#container_escrito` (pai) já tem
 `justify-content:center;align-items:center`, bastou estreitar o `#texto`
-pra ele centralizar sozinho — `width:calc(420*var(--u))` (ajustado 2×: 520
-inicial, depois **420** por pedido do dono, "mais quadrado" — título quebra
-em mais linhas, bloco mais compacto); removido `left:0.5vw` do `#texto` e
+pra ele centralizar sozinho; removido `left:0.5vw` do `#texto` e
 `right:0.5vw` do `#texto button` (os dois descentralizavam o bloco/botão).
 `align-items:flex-start` do `#texto` **ficou como estava** (não é
 `center`) — importante: **`align-items` controla a posição do BLOCO** (a
@@ -159,6 +157,30 @@ imagem, grid/fundo, `#container_escrito` e todo o conteúdo de texto seguem
 intactos (ordem do dono). Mobile `≤1023px` já sobrescrevia
 `#texto{width:100%;left:0;top:0}` em `responsividade.css` — inalterado, e
 nunca teve `text-align:center` a cascatear.
+
+**⚠️ Largura do `#texto`: valor móvel, editado ao vivo pelo dono —
+NÃO confiar num número fixo aqui.** Já passou por 520 → 420 → **660**
+(o dono edita `width:calc(N*var(--u))` diretamente no arquivo, fora do
+fluxo Opus→instrução, então o valor no código sempre vence qualquer N
+citado em docs antigos). A instrução `sonnet/fazer/
+home-lancamento-bikefest-e-logo-header.md` (2026-07-16) pediu reverter pra
+`width:520` + `align-items:center` + `text-align:center` — **NÃO
+aplicado**: contradiz tanto o pedido explícito do dono (texto à esquerda,
+acima) quanto a largura que ele mesmo ajustou depois (660). Antes de
+mexer na largura ou no alinhamento deste bloco de novo, **leia o valor
+atual no código primeiro** e confirme com o dono/Opus se alguma instrução
+antiga sobre este `#texto` ainda vale — ver CHANGELOG 2026-07-16 16:00.
+
+**Header — logo cobrindo o preto (2026-07-16):** `header img` tinha
+`top:calc(26*var(--u))`, deixando **15px de preto acima** da logo em
+1440×900 — a logo (308×130 natural) é mais ALTA que o `header{height:
+calc(108*var(--u))}` (130 > 108); centralizada sozinha ela cairia em
+`top=-11` (transborda igual pros 2 lados), mas o offset de 26 empurrava
+demais pra baixo. Fix: `top: calc(11 * var(--u))` — N=11 =
+`(altura_logo−altura_header)/2 = (130−108)/2`, o deslocamento exato que
+zera o preto acima em **qualquer viewport** (logo e header escalam juntos
+com `--u`). `width:calc(308*var(--u))`/`left:4vw` (tamanho/posição
+horizontal) **inalterados**; `.header_minimalista img` não foi tocado.
 
 ## Arquitetura do CSS — manifesto + parciais (split PASSE 1, 2026-07-14)
 `base.css` **deixou de ser um arquivo monolítico** (chegou a 2988 linhas —

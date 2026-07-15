@@ -5,6 +5,53 @@
 
 ---
 
+## 2026-07-16 16:00 — Header: logo cobrindo todo o preto (item 1 da instrução pulado — ver nota)
+
+**Instrução:** `docs/agentes/sonnet/fazer/home-lancamento-bikefest-e-logo-header.md`
+(2 itens independentes).
+
+**Item 2 — feito.** `src/padrao/estilos/header.css`, `header img`: havia **15px
+de preto acima** da logo em 1440×900. Causa: `header{height:calc(108*--u)}`
+é preto com `align-items:center`; a logo (308×130 natural) é mais ALTA
+(130) que o header (108) — centralizada sozinha ela cairia em `top=-11`
+(transbordando igual pros dois lados), mas `top:calc(26*--u)` a empurrava
+pra baixo, sobrando 15px de preto acima e a logo passando 37px pro hero.
+Fix: `top: calc(26*var(--u))` → **`top: calc(11*var(--u))`** — N=11 é
+exatamente `(altura_logo − altura_header)/2 = (130−108)/2`, o deslocamento
+que zera o preto acima em **qualquer viewport** (logo e header escalam
+ambos com `--u`). `width:calc(308*var(--u))` e `left:4vw` (largura/posição
+horizontal) **inalterados** — só a posição vertical mudou. Consequência
+esperada: a logo passa a cobrir os 108px do header à esquerda e sobra
+~22px pro hero (era 37px). `.header_minimalista img` **não** foi tocado.
+
+**Item 1 — PULADO (conflito com trabalho já feito ao vivo nesta sessão).**
+A instrução pede `#texto{width:calc(520*var(--u)); align-items:center;
+text-align:center}` pro Bike Fest (`.lancamento_desconto`) — mas essa
+mesma seção já tinha sido ajustada **ao vivo, direto pelo dono**, em 3
+rodadas anteriores (ver entrada de 2026-07-16 14:00 abaixo): (1) largura
+estreitada, (2) **`text-align:center` removido a pedido explícito do
+dono** ("o título... comece no início... alinhado à esquerda da div, mas
+esta deve estar centralizada na página" — texto centralizado fazia as
+linhas mais curtas do título ficarem descentralizadas entre si), (3)
+largura ajustada de novo por pedido do dono. Ao reler o arquivo agora,
+a largura já estava em **`calc(660*var(--u))`** — diferente até do último
+valor que eu mesmo tinha deixado (420) — indicando edição manual direta
+do dono no arquivo, depois da nossa conversa. Perguntei como proceder
+(manter/aplicar a instrução/mesclar) e não obtive resposta a tempo;
+por segurança, **não sobrescrevi** o `#texto` — a instrução do item 1 está
+desatualizada (não reflete as 3 correções ao vivo já aplicadas) e
+aplicá-la ao pé da letra desfaria tanto o pedido explícito do dono (texto
+centralizado → esquerda) quanto a largura que ele próprio acabou de ajustar
+manualmente. **Pendência:** o Opus/dono precisa confirmar se o item 1
+desta instrução ainda vale, ou se está obsoleto pelas correções ao vivo.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅. Por leitura:
+`header img` com `top:calc(11*var(--u))`, `width`/`left` intactos;
+`.header_minimalista img` intacto; `.lancamento_especial` não foi tocada;
+`#texto` do Bike Fest deliberadamente não tocado nesta rodada (ver acima).
+
+---
+
 ## 2026-07-16 14:00 — LANÇAMENTO ESPECIAL "Bike Fest" (fundo branco) — bloco de texto estreito e centralizado
 
 **O que foi feito e por quê** (instrução

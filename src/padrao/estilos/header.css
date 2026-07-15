@@ -36,7 +36,19 @@ header img{
      Escala do desktop (2026-07-14): N=308 — 308px @1440 (idêntico a hoje),
      219px @1024. */
   width: calc(308 * var(--u));
-  top: calc(26 * var(--u));
+  /* Fix 2026-07-16 (pedido do dono: tirar a faixa preta acima da logo) —
+     era `top: calc(26*var(--u))`. `header{height:calc(108*var(--u))}` é
+     PRETO com `align-items:center`; a logo (308×130 natural) é mais ALTA
+     que o header (130 > 108) — centralizada sozinha ela cairia em
+     `top=-11` (transbordando pros dois lados igualmente). O `top:26`
+     empurrava ela pra baixo, sobrando **15px de preto acima**. N=11 —
+     `(altura_logo − altura_header)/2 = (130−108)/2 = 11` — é exatamente o
+     deslocamento que zera esse "acima" (leva o topo da logo a `top=0`,
+     colado no topo do header). Como logo e header escalam ambos com
+     `--u`, `calc(11*var(--u))` zera o preto acima em QUALQUER viewport,
+     não só 1440. `width`/`left` (largura e posição horizontal)
+     inalterados — só a posição vertical muda. */
+  top: calc(11 * var(--u));
   left: 4vw;
   z-index: 1;
 }
