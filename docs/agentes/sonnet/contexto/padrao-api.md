@@ -34,6 +34,27 @@ Consome `colunasFooter` (`dados/footer.js`). Usa `<Revela as="div" distancia={10
 ### Reveal por scroll (bidirecional) — 2 caminhos
 - **`Revela`** (`Revela.jsx`): unidade isolada com scroll próprio. Props: `{ as="div", className, style, distancia=108, saida=80, children }`. Cria seu `useScroll`; mapeia opacity `[0,1,1,0]` e y `[distancia,0,0,-saida]`. Use pra blocos/seções soltas (ex.: Footer). Reduced-motion → fixa visível.
 - **`RevelaComProgresso`** (`Revela.jsx`) + **`useProgressoSecao(ref)`**: pra **grids** que assentam em stagger espacial. O container chama `const progresso = useProgressoSecao(ref)` (retorna `scrollYProgress`, offset `["start end","end start"]`) e passa `progresso` + `atraso` a cada card. Props: `{ as, className, style, progresso, atraso=0, distancia=84, saida=80, larguraEntrada, children }`.
+  **Duas fontes de progresso (2026-07-15, corrigido 2026-07-16):** em
+  **≤1023px** (`useEhMobile()`, `src/padrao/lib/useEhMobile.js`),
+  `RevelaComProgresso` **ignora** o `progresso` recebido e usa o **próprio**
+  `useScroll({target: refDoElemento, offset:["start end","end start"]})` —
+  motivo: no mobile as seções empilham em 1 coluna e ficam 2–5× mais altas
+  que a viewport, então o progresso da SEÇÃO inteira já passava de
+  `ASSENTA_INICIO` antes de um card no meio/fim entrar em cena (chegava
+  opaco, sem animação visível). **`offset` corrigido na rodada 2** — a 1ª
+  tentativa usou uma janela CURTA (`["start end","start 70%"]`, só a
+  entrada) alimentando uma curva que tem **saída** (`opacity[0,1,1,0]`): o
+  progresso saturava em 1 com o elemento ainda visível, a rampa de saída
+  disparava em cena e o bloco sumia (opacity 0) estando na tela — medido:
+  42 de 47 blocos invisíveis com o centro na viewport. `["start end","end
+  start"]` é a **mesma fórmula** que `Revela`/`useProgressoSecao` usam por
+  seção — cobre a passagem INTEIRA do elemento (topo entrando pela base →
+  fundo saindo pelo topo), então a curva assenta enquanto o elemento está
+  de fato em cena. Nesse modo, `atraso` vira `0` (é um stagger espacial da
+  seção, sem sentido por elemento) e `distancia` sobe pro mínimo de **96px**
+  (era 84, "mais perceptível" — pedido do dono). **≥1024px continua
+  exatamente como antes** (progresso da seção, com `atraso`). Mesmo
+  componente pros dois casos — não duplicar.
 - **`useEstiloRevela(progresso,{atraso,distancia,saida,larguraEntrada})`**: retorna `{opacity,y}` ligados ao progresso (janela `ENTRA=0`/`ASSENTA_INICIO=0.33`/`ASSENTA_FIM=0.70`/`SAI=1`). **`atrasoCard(index,qtd)`** = stagger espacial curto (último card só ~0.09 à frente). Usados em Favoritos, Categorias, Territorio, Historias, Destaques, Lançamentos.
 - **Regra fail-safe:** cada unidade de reveal tem **1 só** elemento `motion`; imagens/textos são filhos DOM comuns (nunca `opacity:0` numa `<img>`). Só animar `transform`/`opacity`.
 

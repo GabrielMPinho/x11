@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { destaquesMacro } from "@/paginas/equipamento/dados/produto";
 import { useCarrosselComSetas } from "@/paginas/equipamento/useCarrosselComSetas";
+import { useAutoplayCarrossel } from "@/padrao/lib/useAutoplayCarrossel";
 
 // "SINTA COM OS OLHOS / DESTAQUES" — carrossel horizontal com setas
 // FUNCIONAIS (decisão do Opus, backlog produto.md), sempre disponíveis, +
@@ -23,6 +24,12 @@ import { useCarrosselComSetas } from "@/paginas/equipamento/useCarrosselComSetas
 // sobrepor os cards.
 export default function CarrosselDetalhes() {
   const { containerRef, trilhoRef, x, arrastavel, dragConstraints, avancar, voltar } = useCarrosselComSetas();
+  // Autoplay só no mobile/toque (2026-07-15, item 5): `arrastavel` já é
+  // exatamente esse critério (mesmo threshold que esconde as setas acima).
+  // Lista DUPLICADA só nesse modo — no desktop (setas, sem drag) a grade
+  // continua com os itens originais, sem repetir produto.
+  const itens = arrastavel ? [...destaquesMacro, ...destaquesMacro] : destaquesMacro;
+  const { pausar, retomar } = useAutoplayCarrossel({ x, trilhoRef, qtdItens: destaquesMacro.length, ativo: arrastavel });
 
   return (
     <section className="destaques_pdp_secao">
@@ -50,8 +57,10 @@ export default function CarrosselDetalhes() {
             dragConstraints={dragConstraints}
             dragElastic={0.12}
             dragMomentum
+            onDragStart={pausar}
+            onDragEnd={retomar}
           >
-            {destaquesMacro.map((item, index) => (
+            {itens.map((item, index) => (
               <div className="card_destaque_pdp" key={index}>
                 <div className="zoom_imagem">
                   <img src={item.imagem} alt={item.legenda} />

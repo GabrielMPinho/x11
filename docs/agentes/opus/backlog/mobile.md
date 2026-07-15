@@ -4,8 +4,13 @@
 > entregue e commitada (`fd458ce "Viewport Laptop"`), o dono validou no laptop e
 > abriu esta frente: **2 correções** + **3 pedidos de mobile**.
 >
-> Instrução ativa: `sonnet/fazer/correcoes-hero-historias-e-mobile.md`.
-> A escala de desktop tem backlog próprio em [`escala-viewport.md`](./escala-viewport.md).
+> **RODADA 2 (2026-07-15):** o Sonnet executou a instrução abaixo (não commitada)
+> e o dono validou — **4 pontos quebraram** (hero jogando os botões abaixo da
+> dobra, Histórias com título sobre os cards + espaço torto, mobile some tudo, e o
+> carrossel da Home passou a autoplay no laptop). O Opus mediu tudo no navegador e
+> reescreveu a instrução: `sonnet/fazer/correcao-hero-historias-mobile-carrossel.md`
+> (índice medido no topo dela). A escala de desktop tem backlog próprio em
+> [`escala-viewport.md`](./escala-viewport.md).
 
 ## Correções (validação do dono no laptop)
 

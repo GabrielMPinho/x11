@@ -34,7 +34,11 @@ export function useCarrosselComSetas() {
     medir();
     window.addEventListener("resize", medir);
     return () => window.removeEventListener("resize", medir);
-  }, []);
+    // Fix 2026-07-15: `arrastavel` como dependência — quando o autoplay
+    // mobile passa a duplicar a lista de itens (ver CarrosselDetalhes/
+    // CombineSetup), o `scrollWidth` do trilho muda SEM disparar um resize
+    // de janela; sem remedir aqui, `maxArrasto` ficaria com o valor antigo.
+  }, [arrastavel]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

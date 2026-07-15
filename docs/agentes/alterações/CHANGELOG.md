@@ -5,6 +5,227 @@
 
 ---
 
+## 2026-07-16 14:00 — LANÇAMENTO ESPECIAL "Bike Fest" (fundo branco) — bloco de texto estreito e centralizado
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/lancamento-bikefest-texto-centrado.md`): a seção
+`.lancamento_desconto` (kicker "LANÇAMENTO ESPECIAL", título "CONCORRA AO
+COMBRO DE PROTEÇÃO NO BIKE FEST", fundo branco, foto do estande X11 —
+**não** confundir com `.lancamento_especial`, fundo escuro/"VALOR PARA
+AVENTURA", que não foi tocada) tinha o bloco de texto **esticado**:
+`#texto{width:100%}` preenchia os 823px inteiros da coluna esquerda (4/7 de
+1440) com `align-items:flex-start`, deixando título/parágrafo em linhas
+largas alinhadas à esquerda.
+
+**Correção — só no `#texto` e no botão dele** (`src/paginas/home/home.css`):
+`#container_escrito` (pai) já tinha `justify-content:center;align-items:
+center`, então bastou `#texto` ficar mais estreito pra ele centralizar
+sozinho: `width:100%` → `width:calc(520*var(--u))` (título quebra em ~4
+linhas, bloco mais "quadrado", como a referência do dono); removido
+`left:0.5vw` (descentralizava o bloco, `top:1vh` mantido) e, no `#texto
+button`, removido `right:0.5vw` (mesmo motivo, descentralizava o botão).
+
+**Ajuste do mesmo dia (revisão do dono):** a 1ª tentativa somou
+`text-align:center` ao `align-items:flex-start` já existente — mas com
+`align-items:flex-start` a caixa do `h1` já fica ancorada à esquerda do
+`#texto` (dimensionada pela linha mais longa, ao quebrar em várias linhas);
+`text-align:center` então centralizava CADA linha mais curta **dentro**
+dessa caixa — o título não começava "no início" nas linhas curtas. Pedido
+do dono: *"o título dessa parte comece no início igual eu fiz com os
+outros elementos [...] alinhado à esquerda da div, mas esta deve estar
+centralizada na página."* Fix: **removido o `text-align:center`** — kicker/
+título/parágrafo/botão voltam a ter texto alinhado à ESQUERDA (como o
+resto do site); o **bloco** (`#texto`, mais estreito que a coluna) continua
+centralizado na página só pelo `justify-content:center` do
+`#container_escrito` (pai), não por `text-align`.
+
+**2º ajuste do mesmo dia (revisão do dono):** *"diminua o tamanho pra ficar
+mais quadrado e centralize ela"* — `width:calc(520*var(--u))` ainda não
+estava quadrado o bastante. Reduzido pra **`width:calc(420*var(--u))`**
+(título quebra em mais linhas, bloco mais compacto). A centralização não
+precisou de nenhum ajuste à parte — é o mesmo `justify-content:center` do
+`#container_escrito` (pai), que centraliza qualquer largura de `#texto`
+sozinho.
+
+**3º ajuste do mesmo dia (revisão do dono):** *"tire a margin left do
+botão dessa div"* — o `button{margin:calc(8*var(--u))}` global (Hero) dá
+8px em TODOS os lados; `#texto button{margin-top:4vh}` já sobrescrevia só
+o de cima, então o `margin-left` de 8px continuava herdado, desalinhando o
+botão do resto do bloco (agora todo com `align-items:flex-start`, rente à
+esquerda). Fix: `#texto button{margin-left:0}`.
+
+**Nada mais mudou:** imagem (`#container_imagem`/`#imagem_lancamento`),
+grid/fundo (`.lancamento_desconto`), `#container_escrito` e todo o
+**conteúdo** de texto (kicker/título/parágrafo/rótulo do botão, incluindo o
+typo "COMBRO") seguem idênticos — ordem explícita do dono. Mobile
+(`≤1023px`) já sobrescrevia `#texto{width:100%;left:0;top:0}` em
+`responsividade.css` — segue assim, intacto; texto já era alinhado à
+esquerda lá (nunca teve `text-align:center` a cascatear).
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅. Por leitura:
+`#texto` com `width:calc(420*var(--u))`, `align-items:flex-start`, sem
+`text-align`, sem `left:0.5vw`; `#texto button` sem `right:0.5vw` e sem
+`margin-left`; `.lancamento_desconto`/`#container_imagem`/
+`#container_escrito` intactos; nenhum texto de conteúdo mudou;
+`.lancamento_especial` não foi tocada.
+
+---
+
+## 2026-07-16 10:00 — RODADA 2: correção da correção (hero, Histórias, reveal mobile, reverte autoplay da Home)
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/correcao-hero-historias-mobile-carrossel.md` —
+substitui a de 2026-07-15, apagada. O dono validou a rodada anterior e
+**4 pontos quebraram**; o Opus reproduziu e mediu tudo no navegador via
+Docker+Playwright, os números abaixo são medidos, não estimados):
+
+1. **Hero (`home.css`) — conteúdo caindo abaixo da dobra em laptop.** A
+   rodada 1 trocou o `top:vh` de `#escrito`/`#botoes` por
+   `.hero{padding-top:calc(351*--u)}` **fixo** — não encolhia em janela
+   baixa, então em 1440×768/1366×768/1536×730/1600×740/1280×720 os 2
+   botões ficavam de **68 a 149px abaixo da dobra** (só 1440×900 cabia, por
+   coincidência: header 108 + hero 88vh = exatamente 100vh só nessa
+   altura). Fix: `.hero` deixou de ser `min-height:88vh` e virou
+   `height:calc(100vh - calc(108*var(--u)))` — 108 é o mesmo valor de
+   `header{height}` (`header.css`), então header+hero somam **exatamente
+   100vh em qualquer altura de janela** (792px de hero em 1440×900,
+   idêntico a antes; encolhe abaixo disso, nunca estoura). O conteúdo
+   passou a ancorar **de baixo** (`display:flex;flex-direction:column;
+   justify-content:flex-end`) com folga de baixo **fixa e pequena**
+   (`padding-bottom:calc(22*var(--u))`, o alvo medido) e folga de cima
+   **elástica** (sobra do flex, encolhe sozinha em janela baixa) — os 2
+   botões nunca mais ficam abaixo da dobra, e 1440×900 continua
+   pixel-idêntico (as margens internas entre kicker/parágrafo/botões não
+   mudaram, só o jeito de ancorar o bloco inteiro). `≤1023px` (mobile)
+   ganhou um reset (`height:auto`) pra não herdar o novo mecanismo — segue
+   com `min-height:78vh` de sempre. Confirmado por leitura: `button{height:
+   7.3vh}` (ainda em `vh`) só ENCOLHE em janela baixa, nunca cresce a ponto
+   de empurrar o kicker pra fora.
+2. **Histórias (`home.css`) — espaço torto e título sobre os cards.** A
+   rodada 1 pôs `padding-top`/`padding-bottom:calc(224*--u)` simétrico na
+   seção (que ainda tinha `justify-content:center`) e não recolocou o
+   `margin-top` do `#container_historias` — a seção inflou pra **1054px**
+   (>1 tela) **e**, sem clearance, o `.titulo{top:7vh}` (deslocamento só
+   visual, não reserva espaço) passou a **sobrepor o card do meio**. Fix:
+   removido `justify-content:center` de `.historias` (sem centralização, o
+   `top:7vh` do título — 1º filho — já produz a folga de cima de graça,
+   63px em 1440×900, igual ao `.territorio`, a seção-irmã citada pelo dono
+   como referência de ritmo 63/63); `#container_historias` ganhou
+   `margin-top:calc(99*--u)` (clearance título↔grid, mesmo valor do
+   `#container_cards` do Território) e `margin-bottom:calc(63*--u)` (folga
+   de baixo, agora simétrica). Muda o 1440 — autorizado pelo dono.
+3. **Mobile (`Revela.jsx`) — tudo sumindo depois de rolar.** A rodada 1
+   alimentou `useEstiloRevela` (curva entra→assenta→**sai**,
+   `opacity[0,1,1,0]`) com uma janela de progresso **curta**
+   (`["start end","start 70%"]`, só a entrada) — o progresso saturava em 1
+   com o elemento ainda bem visível, a rampa de saída disparava em cena e
+   o bloco sumia estando na tela (medido em 390×844: **42 de 47** blocos
+   invisíveis com o centro na viewport). Fix: janela agora cobre a
+   **passagem inteira** do elemento (`["start end","end start"]` — mesma
+   fórmula que `Revela`/`useProgressoSecao` usam por seção). `atraso=0` e
+   `distancia` mínima 96px mantidos; desktop ≥1024 inalterado (progresso da
+   seção, com `atraso`).
+4. **Carrossel da Home — revertido ao estado de antes.** A rodada 1 pôs
+   autoplay + lista duplicada no `CarrosselArrastavel.jsx` (modo
+   "arrastável" da Home) — esse modo ativa em **qualquer ponteiro
+   grosso/toque em qualquer largura** (só o modo `hijack`, ponteiro fino
+   **e** ≥1024px, escapa disso), então num laptop com tela de toque (ou
+   device-mode do DevTools) a Home passou a **andar sozinha também no
+   laptop**. O dono: *"o carrossel da home deve se manter intacto, como
+   era antes."* Fix: `CarrosselArrastavel.jsx` restaurado **byte a byte**
+   ao commit `fd458ce` (`git diff fd458ce -- ...` vazio) — sem autoplay,
+   sem lista duplicada, sem `useMotionValue`/`onDragStart`/`onDragEnd`. O
+   autoplay **permanece** nos 2 carrosséis do Equipamento
+   (`CarrosselDetalhes`/`CombineSetup` — o dono não reclamou deles); o
+   hook `useAutoplayCarrossel.js` continua no projeto, só não é mais
+   importado pela Home. **Não tocado:** a regra `#setas_destaques{display:
+   none}` em ≤1023px (`responsividade.css`, da rodada 1) — a instrução
+   desta rodada só reverteu o autoplay/movimento, não as setas ocultas no
+   mobile.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅. Por leitura:
+hero sem `padding-top` fixo, header+hero somam 792px em 1440×900, conteúdo
+ancorado por baixo; Histórias sem os `padding:224*--u`, título separado dos
+cards; `RevelaComProgresso` no mobile usa `end start` (passagem inteira),
+desktop ≥1024 inalterado; `git diff fd458ce -- CarrosselArrastavel.jsx`
+vazio. Conferência visual (viewports reais) pendente — papel do Opus/dono.
+
+---
+
+## 2026-07-15 18:00 — Correções (hero + histórias) + rodada de mobile (reveal, PLP 2 colunas, autoplay dos carrosséis)
+
+**O que foi feito e por quê** (instrução
+`docs/agentes/sonnet/fazer/correcoes-hero-historias-e-mobile.md` — vem da
+validação do dono no laptop em 2026-07-14, depois do commit `fd458ce
+"Viewport Laptop"`; itens 1–2 são correções, itens 3–5 são pedidos novos
+pro mobile):
+
+1. **Hero da Home (`home.css`) — botão VER FEMININO sumia.** Regressão do
+   refactor de escala: `#escrito`/`#botoes` eram posicionados por
+   `position:relative;top:39vh`/`top:42vh` — preso à ALTURA da janela, não
+   só à largura. Em janelas ≤~900px de altura (1440×768, 1366×768, o
+   laptop do dono) o 2º botão estourava 32px o `overflow:hidden` do
+   `.hero` e sumia (em 1440×900 sobravam só 2px, no fio). Fix: tirado do
+   posicionamento por `vh` — fluxo normal, ancorado por `padding-top`
+   do `.hero` (`calc(351 * var(--u))`) + `margin-top` de `#p_branco`/
+   `#botoes`, calibrados pra bater pixel-idêntico aos alvos medidos em
+   1440×900. `left:Nvw` virou `padding-left`. **Bônus (pedido do dono na
+   mesma rodada):** os 2 botões passaram a ficar lado a lado
+   (`#botoes{display:flex;flex-direction:row}`) no desktop/laptop — antes
+   "empilhavam" só como efeito colateral de quebra de linha. Mobile
+   ≤768px continua empilhado (regra própria, não tocada).
+2. **Histórias sem respiro embaixo (`home.css`).** `#container_historias`
+   tinha `margin-top:11vh` grande e `margin-bottom:7vh` **comentado**
+   (defeito antigo, não regressão) — medido em 1440×900: 224px de folga
+   em cima × 44px torto embaixo. Virou `padding-top`/`padding-bottom`
+   **simétricos** (`calc(224 * var(--u))` cada) na `.historias` —
+   **muda o 1440**, autorizado pelo dono. Pendente: `Favoritos`/
+   `Território` usam o mesmo padrão assimétrico de vh — não corrigidos
+   (o pedido foi só "conferir e relatar"; medição de folga renderizada é
+   conferência visual, fora do escopo do Sonnet, ver `convencoes.md`) —
+   dono decide se estende.
+3. **Mobile: animações fora de cena (`Revela.jsx` + `useEhMobile.js`,
+   novo).** `RevelaComProgresso` usava só o progresso da SEÇÃO
+   (`useProgressoSecao`) — no mobile as seções empilham e ficam 2–5× mais
+   altas que a viewport (páginas de 7.000–10.400px), então um card no
+   meio/fim já passava do ponto de assentar antes de entrar em cena
+   (medido: Produtos animava só 10 de 18 blocos em cena). Fix: em
+   **≤1023px** (`useEhMobile()`, novo helper), cada unidade usa o
+   **próprio** progresso (`useScroll` no próprio ref, offset `["start
+   end","start 70%"]` — sempre em cena), sem `atraso`, com `distancia`
+   mínima de 96px (era 84, "mais perceptível"). **≥1024px inalterado**
+   (progresso da seção, com `atraso`). Mesmo componente, sem duplicar.
+4. **PLP mobile em 1 coluna (`responsividade.css`).** Pedido do dono:
+   2 colunas em `/homem` e `/mulher` no mobile. `.grade_produtos` virou
+   `repeat(2, 1fr)` em `≤768px` **e** `≤480px`; `.card_produto_plp_*`
+   (tag/nome/preço/cores/mais) ganhou `padding`/`font-size`/`gap`
+   reduzidos pra caber em ~metade da largura sem estourar nem gerar
+   scroll horizontal.
+5. **Carrosséis no mobile — sem setas, autoplay, arraste mantido.** Pedido
+   do dono nos 3 carrosséis do site (Home/Destaques, Equipamento/Destaques,
+   Equipamento/CombineSetup): **setas ocultas** em ≤1023px (Home ganhou
+   `#setas_destaques{display:none}` em `responsividade.css` — as do
+   Equipamento já escondiam, verificado); **avanço automático contínuo**
+   (~1 card/3,5s, loop infinito sem emenda via lista duplicada + módulo da
+   largura de um conjunto) via hook novo `useAutoplayCarrossel.js`
+   (`src/padrao/lib/`); **arraste continua** — pausa no `onDragStart`,
+   retoma ~1,5s depois do `onDragEnd` de onde parou (sem saltar);
+   `prefers-reduced-motion` desliga só o autoplay. `CarrosselArrastavel.jsx`
+   (Home) ganhou `useMotionValue` explícito pro `x` (antes o drag do Framer
+   geria a posição sozinho, sem valor compartilhável com o autoplay).
+   `useCarrosselComSetas.js` (Equipamento) passou a remedir `maxArrasto`
+   quando `arrastavel` muda (a lista duplicada muda `scrollWidth` sem
+   disparar `resize`). **Desktop inalterado nos 3** (Home segue no hijack
+   ligado ao scroll; Equipamento segue só com setas, sem autoplay).
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅. Por leitura:
+hero sem nenhum `vh` posicionando `#escrito`/`#botoes`; `.grade_produtos`
+em 2 colunas em ≤768 e ≤480; nenhum dos 3 carrosséis com seta em ≤1023;
+reveal ≥1024 continua no progresso da seção. Conferência visual (viewports,
+folga renderizada das seções irmãs) pendente — papel do Opus/dono.
+
+---
+
 ## 2026-07-14 13:00 — Escala proporcional do desktop (1024→1440): fundação + chrome + Home
 
 **O que foi feito e por quê** (instrução

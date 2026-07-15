@@ -45,9 +45,11 @@ CHANGELOG, "Home: botões navegando + mais interatividade nos cards"):
 ## Elementos ainda decorativos (NÃO funcionais — por decisão do dono)
 - Setas ← → em `Destaques`: apenas visuais (hover), nunca viram controle
   manual do carrossel — **ocultas** no modo `hijack` (o trilho já se move
-  sozinho, ligado ao scroll); **mantidas** nos modos `arrastavel` e
-  `estatico` (sinalizam "isso é navegável", já que ali o trilho não se move
-  sozinho).
+  sozinho, ligado ao scroll); nos modos `arrastavel`/`estatico` seguem
+  presentes **≥1024px**, mas **ocultas em ≤1023px** desde 2026-07-15 (pedido
+  do dono) — `#setas_destaques{display:none}` em `responsividade.css`. Essa
+  regra de CSS **não foi revertida** na rodada 2 (ver seção de autoplay
+  abaixo) — só o autoplay do carrossel da Home voltou atrás.
 - Botões "COMO PARTICIPAR" (Lançamento desconto) e "LEIA MAIS" (Histórias):
   sem página de blog/promoção ainda — o dono define o destino depois.
 - Cards de `Territorio` e `Destaques`: sem destino definido, só ganharam
@@ -55,6 +57,51 @@ CHANGELOG, "Home: botões navegando + mais interatividade nos cards"):
 - Links de categoria e do footer: `href` placeholder.
 > Esses elementos recebem apenas **micro-interações de hover/animação**, nunca
 > lógica funcional (a menos que o dono peça em fase futura).
+
+## Autoplay mobile — só nos 2 carrosséis do Equipamento (2026-07-15, revertido na Home em 2026-07-16)
+Pedido original do dono: *"no mobile tire todas as setas de todos os
+carrosséis e faça eles passarem automaticamente, mas ainda podendo
+arrastar"* — aplicado nos **3 carrosséis** do site na rodada 1
+(`CarrosselArrastavel` da Home + `CarrosselDetalhes`/`CombineSetup` do
+Equipamento). **O carrossel da Home ativa em qualquer ponteiro
+grosso/toque em QUALQUER largura** (é o critério do modo `arrastavel` de
+`useModoCarrossel`/`Destaques.jsx` — só o modo `hijack`, ponteiro fino
+**e** `≥1024px`, escapa disso) — então num laptop com tela de toque (ou o
+device-mode do DevTools, que força ponteiro grosso), a Home caía no modo
+`arrastavel` e passou a **andar sozinha também no laptop**. O dono: *"o
+carrossel da home deve se manter intacto, como era antes."*
+
+**Fix (rodada 2, `correcao-hero-historias-mobile-carrossel.md` item 4):**
+`src/paginas/home/CarrosselArrastavel.jsx` foi revertido **byte a byte** ao
+estado do commit `fd458ce` — sem autoplay, sem lista duplicada, sem
+`useMotionValue`/`onDragStart`/`onDragEnd`. A Home volta a ser: **desktop
+≥1024 (ponteiro fino)** → `hijack` ligado ao scroll (`CarrosselDestaques`,
+intacto); **toque/qualquer largura** → `CarrosselArrastavel`, **arraste
+puro, sem autoplay**, como sempre foi. **O autoplay permanece só nos 2
+carrosséis do Equipamento** (`CarrosselDetalhes`/`CombineSetup`) — o dono
+não reclamou deles; se quiser autoplay na Home só no mobile real (não em
+qualquer ponteiro grosso), é pedido/rodada à parte.
+
+Mecanismo, `src/padrao/lib/useAutoplayCarrossel.js` (usado só por
+`CarrosselDetalhes`/`CombineSetup` agora — `CarrosselArrastavel` da Home
+não o importa mais, revertido):
+- Recebe `{x, trilhoRef, qtdItens, ativo}` — `x` é o **mesmo** `MotionValue`
+  que o drag já escreve e o autoplay lê/escreve, nunca dessincronizados
+  (por isso o Equipamento usa `useMotionValue` + `style={{x}}` no
+  `useCarrosselComSetas.js` — o drag do Framer não geria a posição sozinho
+  ali, precisa do valor explícito compartilhado com o autoplay).
+- **Loop sem emenda:** quem chama renderiza a lista de itens **duplicada**
+  (`[...itens, ...itens]`) quando `ativo`; o hook avança `x` em **módulo**
+  da largura de UM conjunto (`trilhoRef.scrollWidth/2`) — o "reset" nunca
+  precisa saltar, a 2ª cópia cai exatamente onde a 1ª começou.
+- **Velocidade:** ~1 card a cada 3,5s (`msPorCard`, contínuo via
+  `useAnimationFrame`, não passo a passo).
+- **Pausa/retomada:** `onDragStart={pausar}` / `onDragEnd={retomar}` no
+  `motion.div` do trilho — `retomar` espera ~1,5s e resincroniza o
+  acumulador com a posição real deixada pelo drag (nunca "pula" de volta).
+- **`prefers-reduced-motion`:** autoplay nunca roda (checado dentro do
+  próprio hook, via `useReducedMotion`) — só o arraste continua, tudo
+  visível.
 
 ## Erros de conteúdo conhecidos (NÃO corrigir sem pedir)
 Existem typos no texto original (`MOTOCILISMO` no Banner, `COMBRO` em
@@ -198,6 +245,17 @@ seção).
 **Diferente de `Destaques` (Home), não tem um modo "estático" separado pra
 `prefers-reduced-motion`** — limitação conhecida, documentada no CHANGELOG,
 pendente de avaliação do Opus/dono.
+
+**Autoplay no mobile/toque (2026-07-15):** quando `arrastavel=true`, os dois
+carrosséis duplicam a lista de itens e usam `useAutoplayCarrossel`
+(`src/padrao/lib/`, ver `componentes.md` — seção da Home — pro mecanismo
+completo: loop por módulo, ~1 card/3,5s, pausa no `onDragStart`/retoma no
+`onDragEnd`, desligado em `prefers-reduced-motion`). `arrastavel` já é
+exatamente o critério "mobile/toque" pedido pelo dono, então vira também o
+`ativo` do autoplay — sem gating extra. `useCarrosselComSetas.js` passou a
+remedir `maxArrasto` quando `arrastavel` muda (dependência nova no
+`useEffect` de medição) — a duplicação da lista muda o `scrollWidth` do
+trilho sem disparar `resize`.
 
 **⚠️ Outro bug de asset duplicado (achado 2026-07-14):** `product-boot.jpg`
 é byte a byte idêntico a `combine-boot.jpg` (mesmo MD5) — mesma família do

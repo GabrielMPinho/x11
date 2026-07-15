@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
 import { comboSetup } from "@/paginas/equipamento/dados/produto";
 import { useCarrosselComSetas } from "@/paginas/equipamento/useCarrosselComSetas";
+import { useAutoplayCarrossel } from "@/padrao/lib/useAutoplayCarrossel";
 
 function formatarPreco(valor) {
   return `R$ ${valor.toFixed(2).replace(".", ",")}`;
@@ -17,6 +18,10 @@ function formatarPreco(valor) {
 export default function CombineSetup() {
   const { containerRef, trilhoRef, x, arrastavel, dragConstraints, avancar, voltar } = useCarrosselComSetas();
   const navegar = useNavigate();
+  // Autoplay só no mobile/toque (2026-07-15, item 5) — mesmo padrão de
+  // CarrosselDetalhes: lista duplicada só quando `arrastavel`.
+  const itens = arrastavel ? [...comboSetup, ...comboSetup] : comboSetup;
+  const { pausar, retomar } = useAutoplayCarrossel({ x, trilhoRef, qtdItens: comboSetup.length, ativo: arrastavel });
 
   return (
     <section className="combine_setup_secao">
@@ -40,8 +45,10 @@ export default function CombineSetup() {
           dragConstraints={dragConstraints}
           dragElastic={0.12}
           dragMomentum
+          onDragStart={pausar}
+          onDragEnd={retomar}
         >
-          {comboSetup.map((item, index) => (
+          {itens.map((item, index) => (
             <a
               href="/equipamento"
               className="card_combine"

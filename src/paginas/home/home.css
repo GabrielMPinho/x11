@@ -5,12 +5,49 @@
   /* border: 2px solid red; */
   height: auto;
   width: 40vw;
-  position: relative;
-  top: 39vh;
-  left: 6vw;
+  padding-left: 6vw;
+  /* Fix 2026-07-15 (correções hero/histórias/mobile): era
+     `position:relative;top:39vh` — preso à ALTURA da janela. `left:6vw`
+     virou `padding-left` (mesmo deslocamento visual, sem
+     position:relative). Ancoragem vertical: ver `.hero` (RODADA 2 abaixo). */
 }
 .hero{
   position: relative;
+  /* RODADA 2 (2026-07-16, correção da correção — ver
+     correcao-hero-historias-mobile-carrossel.md item 1): a 1ª rodada trocou
+     o `top:vh` de #escrito/#botoes por `padding-top: calc(351*--u)` FIXO no
+     `.hero` — não encolhia em janela baixa, então em laptops mais baixos
+     que ~900px (medido: 1440×768, 1366×768, 1536×730, 1600×740, 1280×720)
+     o conteúdo (kicker→h1→parágrafo→2 botões) era empurrado pra ALÉM da
+     dobra (até 149px abaixo em 1536×730). Só cabia em 1440×900 (a régua),
+     por coincidência (header 108 + hero 88vh = exatamente 100vh nessa
+     altura específica).
+     Fix — 2 mudanças:
+     (A) `.hero` deixa de ser `min-height:88vh` chapado e passa a ocupar
+     EXATAMENTE "1 tela menos o header" (`calc(100vh - calc(108*var(--u)))`
+     — 108 é o MESMO valor de `header{height}`, então header+hero = 100vh
+     em QUALQUER altura de janela, não só em 900px). Em 1440×900 isso ainda
+     dá 792px de hero (108+792=900, idêntico a antes); abaixo de 900px o
+     hero ENCOLHE (nunca estoura).
+     (B) o conteúdo deixa de ser ancorado por cima (`padding-top` fixo) e
+     passa a ser ancorado por BAIXO (`justify-content:flex-end`), com uma
+     folga de baixo FIXA e pequena (`padding-bottom:calc(22*var(--u))` — o
+     alvo medido em 1440×900, último botão a 22px do fundo do hero) e uma
+     folga de cima ELÁSTICA (o espaço que sobra no flex, sem CSS próprio —
+     encolhe sozinha conforme a janela fica mais baixa). Resultado: os 2
+     botões SEMPRE ficam colados 22px acima do fundo do hero — nunca abaixo
+     da dobra, em nenhuma altura testada — e o layout em 1440×900 continua
+     pixel-idêntico (kicker y≈459, botões terminando em y≈878), porque o
+     bloco de texto (margens internas de #p_branco/#botoes, não tocadas)
+     não mudou de altura, só o jeito de ancorá-lo.
+     `≤1023px` (mobile) reseta `height:auto` de volta em `responsividade.css`
+     — este mecanismo é só para ≥1024px; o mobile usa `min-height:78vh` +
+     `justify-content:center`, já existentes, inalterados. */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: calc(100vh - calc(108 * var(--u)));
+  padding-bottom: calc(22 * var(--u));
   /* FIX 2026-07-13 (diagnóstico do Opus via Playwright): era z-index:-1 —
      como .hero não tinha um ancestral que isolasse esse contexto, o hero
      INTEIRO (inclusive os botões) afundava atrás do próprio <main>, que
@@ -25,7 +62,6 @@
      repouso visual idêntico. */
   z-index: 0;
   overflow: hidden;
-  min-height: 88vh;
   /* Fase 3: o background-image foi para a camada .hero_bg (mesmo asset,
      mesmo size/position) para permitir o parallax em transform. Resultado
      visual em repouso é idêntico; overflow:hidden contém o leve
@@ -40,8 +76,10 @@
 #p_branco{
   color: var(--branco);
   font-size: max(12px, calc(20.8 * var(--u)));
-  position: relative;
-  top: 1vh;
+  /* Fix 2026-07-15: era `position:relative;top:1vh` (mesmo padrão de vh
+     preso à altura da janela). N=9 (1vh de 900px) — vira margin-top fixo,
+     participa do fluxo (mesma folga visual de antes, sem depender de vh). */
+  margin-top: calc(9 * var(--u));
 }
 .hero > #escrito > h1{
   color: #ffffff;
@@ -54,12 +92,26 @@
 #botoes{
   /* border: 2px solid red; */
   height: auto;
-  width: 30vw;
-  position: relative;
-  top: 42vh;
-  left: 5.5vw;
-  
-  
+  width: auto;
+  padding-left: 5.5vw;
+  /* Fix 2026-07-15: era `position:relative;top:42vh;left:5.5vw` — o
+     mesmo bug do `#escrito` (preso à altura da janela). N=18 = a folga
+     interna entre `#escrito` e `#botoes` (rimo próprio, independente de
+     como `.hero` ancora o bloco inteiro — ver RODADA 2 em `.hero` acima).
+     `left:5.5vw` virou `padding-left` (mesmo deslocamento visual, sem
+     position:relative). */
+  margin-top: calc(18 * var(--u));
+  /* Pedido do dono (2026-07-15): botões lado a lado no desktop/laptop —
+     antes "empilhavam" só como efeito colateral (button é inline-block por
+     padrão; 2×14vw+margens não cabiam nos antigos 30vw de #botoes, então
+     quebravam linha). `width:auto` (acima) + `display:flex;row` tornam a
+     disposição lado a lado intencional e sem risco de overflow (a caixa
+     cresce pro conteúdo). Mobile ≤768px mantém empilhado — ver
+     responsividade.css (regra própria já existente, não tocada aqui). */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: calc(16 * var(--u));
 }
 button{
   /* Escala do desktop (2026-07-14): N=8 (margin). height/width ficam como
@@ -219,18 +271,31 @@ button{
   /* border: 1px solid red; */
   display: flex;
   justify-content: center;
-  align-items:flex-start;
+  align-items: flex-start;
   flex-direction: column;
   height: auto;
-  /* Era `width:96.5vh` — bug (largura definida pela ALTURA da janela);
-     hoje calha de dar 823px, que é exatamente a coluna (4/7 de 1440).
-     `100%` dá o mesmo em 1440 e acompanha a coluna em qualquer largura
-     (fix 2026-07-14, pedido explícito da instrução). */
-  width: 100%;
+  /* Fix 2026-07-16 (LANÇAMENTO ESPECIAL "Bike Fest", fundo branco —
+     `.lancamento_desconto`): era `width:100%`, preenchendo os 823px
+     inteiros da coluna esquerda (4/7 de 1440) — texto esticado. `#container_
+     escrito` (pai) já tem `justify-content:center;align-items:center`;
+     bastava `#texto` ficar mais estreito pra ele centralizar sozinho.
+     N=520 — mais estreito que a coluna, o título quebra em ~4 linhas
+     (bloco mais "quadrado", como a referência do dono). *(Se ficar largo/
+     estreito demais na conferência visual, é só este 1 número a afinar.)*
+     Ajuste (mesmo dia, revisão do dono): tentei `text-align:center` junto —
+     com `align-items:flex-start` a caixa do `h1` já fica ancorada à
+     esquerda do `#texto` (pelo tamanho da linha mais longa, que dita a
+     largura da caixa ao quebrar em várias linhas), mas `text-align:center`
+     centralizava CADA linha mais curta **dentro** dessa caixa — o título
+     não começava "no início" nas linhas curtas. Removido: kicker/título/
+     parágrafo/botão ficam com texto alinhado à ESQUERDA (como os outros
+     elementos do site), e o BLOCO (`#texto`, mais estreito que a coluna)
+     continua centralizado na página via o `justify-content:center` do
+     `#container_escrito` (pai) — não por `text-align`. */
+  width: calc(660 * var(--u));
   position: relative;
-  left: 0.5vw;
+  /* `left:0.5vw` removido — descentralizava o bloco; `top:1vh` mantido. */
   top: 1vh;
-
 }
 #texto .p_laranja{
   font-size: max(12px, calc(20.8 * var(--u)));
@@ -250,8 +315,17 @@ button{
 
 #texto button{
   margin-top: 4vh;
+  /* `margin-left:0` (2026-07-16, pedido do dono) — o `button{margin:calc(8*
+     var(--u))}` global dá 8px em TODOS os lados; `margin-top` acima já
+     sobrescrevia o de cima, mas o de baixo/direita/esquerda continuavam
+     herdados. Com `#texto{align-items:flex-start}` (título/parágrafo
+     começando rente à esquerda), esse `margin-left` residual desalinhava o
+     botão dos demais elementos — zerado aqui pra ele também começar no
+     mesmo ponto. */
+  margin-left: 0;
   position: relative;
-  right: 0.5vw;
+  /* `right:0.5vw` removido (2026-07-16) — descentralizava o botão dentro
+     do `#texto` agora centralizado; resto (margin/cor/fonte) inalterado. */
   background-color: var(--laranja);
   color: var(--branco);
   font-size: max(12px, calc(16 * var(--u)));
@@ -688,21 +762,40 @@ button{
 .historias{
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-direction: column;
   min-height: 88vh;
   background-color: var(--background_escuro);
-
+  /* RODADA 2 (2026-07-16, correção da correção — ver
+     correcao-hero-historias-mobile-carrossel.md item 2): a 1ª rodada pôs
+     `padding-top`/`padding-bottom: calc(224*--u)` (SIMÉTRICO) na seção,
+     mas manteve `justify-content:center` E removeu o `margin-top` que o
+     `#container_historias` tinha antes — dois problemas ao mesmo tempo:
+     (a) a seção inflou pra 1054px (>1 tela, medido); (b) sem o
+     `margin-top` de clearance, o `.titulo{top:7vh}` (é só um deslocamento
+     visual — `position:relative`, não reserva espaço no fluxo) passou a
+     **sobrepor o card do meio** — nada mais separava o título da grade.
+     Fix: **removido `justify-content:center`** — sem centralização, o
+     `top:7vh` do título (1º filho da seção) já produz sozinho a folga de
+     cima "de graça" (63px em 1440×900 — mesmo valor/mecanismo do
+     `.territorio`, citado pelo dono como a seção-irmã com ritmo correto,
+     63/63). A folga de baixo e a clearance título↔grid viram margin do
+     `#container_historias` (abaixo) — mesmo padrão do `#container_cards`
+     do Território (`margin-top:11vh` + `margin-bottom:7vh`). */
 }
 #container_historias{
   height: auto;
   width: 90vw;
-  margin-top: 11vh;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   /* Escala do desktop (2026-07-14): N=20. */
   gap: calc(20 * var(--u));
-  /* margin-bottom: 7vh; */
+  /* N=99 (11vh de 900px — mesmo valor do `#container_cards` do
+     Território): clearance entre o título (deslocado 63px por `top:7vh`,
+     sem reservar espaço) e a grade — suficiente pra nunca sobrepor. */
+  margin-top: calc(99 * var(--u));
+  /* N=63 (7vh de 900px — idem Território): folga de baixo, agora
+     simétrica à folga de cima (63px, que já vem do `top:7vh` do título). */
+  margin-bottom: calc(63 * var(--u));
 }
 .card_historia{
   display: flex;

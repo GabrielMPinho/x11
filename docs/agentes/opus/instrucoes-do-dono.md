@@ -168,6 +168,61 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   - Backlog: `opus/backlog/mobile.md` · Instrução:
     `sonnet/fazer/correcoes-hero-historias-e-mobile.md`.
 
+- **RODADA 2 de correção — validação do dono (2026-07-15):** o Sonnet executou a
+  instrução acima (ainda **não commitada**), o dono validou e **quatro pontos
+  ficaram quebrados**. O Opus reproduziu e mediu tudo no navegador:
+  - **Hero** — a troca de `top:vh` por `padding-top: calc(351*--u)` **fixo** joga
+    o parágrafo e os 2 botões **abaixo da dobra** em janela de laptop (medido: 2
+    botões 114px abaixo em 1440×768; 140px em 1600×740 — o print do dono). 1440×900
+    ainda cabe. Correção: header+hero = 1 tela; conteúdo ancorado **de baixo** com
+    folga elástica no topo.
+  - **Histórias** — `padding:224*--u` dos dois lados (seção virou 1054px) **e** a
+    remoção do `margin-top` do container fez o título (`.titulo{top:7vh}`)
+    **sobrepor os cards**. Correção: ritmo simétrico moderado (referência
+    **Território**, 63/63) + folga real título↔cards.
+  - **Mobile some tudo** — o reveal por elemento usou janela **curta**
+    (`start 70%`) numa curva que tem **saída**, então o bloco vai a opacity 0 **em
+    cena** (medido: 42/47 blocos). Correção: usar a **passagem inteira** do
+    elemento (`end start`), como o desktop faz por seção.
+  - **Carrossel da Home** — a rodada anterior pôs **autoplay** no
+    `CarrosselArrastavel` (modo toque), que ativa em ponteiro grosso em **qualquer
+    largura** → a Home passou a andar sozinha **também no laptop**. O dono: *"o
+    carrossel da home deve se manter intacto, como era antes"*. **Decisão do Opus
+    (dono pode vetar):** reverter **só** o carrossel da Home a `fd458ce` (arraste
+    puro no toque, sem autoplay); o autoplay **fica** nos 2 do Equipamento (não
+    reclamados). Se o dono quiser autoplay na Home só no mobile real, é outra
+    rodada.
+  - Instrução ativa: `sonnet/fazer/correcao-hero-historias-mobile-carrossel.md`
+    (substituiu a anterior). Backlog em `opus/backlog/mobile.md`.
+  - **Conferido pelo Opus (2026-07-16, medido + prints):** os 4 pontos passaram —
+    hero com os 2 botões acima da dobra em todos os laptops (header+hero=100vh) e
+    idêntico em 1440×900; Histórias sem sobreposição e cabendo na tela; mobile sem
+    vão preto nem overflow (banner assenta); carrossel da Home com `git diff
+    fd458ce` vazio. **Verde, aguardando o dono validar e liberar o commit.**
+
+- **LANÇAMENTO ESPECIAL "Bike Fest" — bloco de texto (2026-07-16):** ⚠️ há **DUAS
+  seções com o kicker "LANÇAMENTO ESPECIAL"** — o dono se confundiu e depois
+  esclareceu que é a de **fundo BRANCO**, título **"CONCORRA AO COMBRO DE PROTEÇÃO
+  NO BIKE FEST"**, foto do estande à direita = a seção **`.lancamento_desconto`**
+  (não a `.lancamento_especial`/"Valor para Aventura"/fundo escuro). O texto está
+  **esticado** (ocupa os 823px inteiros da coluna esquerda, alinhado à esquerda);
+  ele quer **estreito (forma quadrada) e centralizado**. Refinamento: **mexer
+  APENAS no bloco de texto** (`#texto`) — não tocar na imagem, no fundo nem no
+  conteúdo (incl. o typo "COMBRO"). Como o fundo é branco e o texto preto, **não
+  há problema de legibilidade** (o alerta de overlay que eu havia levantado era da
+  outra seção, não se aplica).
+
+- **Header — logo cobrindo o preto (2026-07-16):** o dono quer tirar a **faixa de
+  ~15px de preto acima** da logo — ela deve cobrir toda a altura preta do header,
+  **sem** mudar largura nem posição horizontal. Medido: header 108px, logo 308×130
+  empurrada por `top: calc(26*--u)` (15px de preto acima, 37px passando pro hero).
+  Correção: `header img{ top }` de `26` → **`11`** (= `(130−108)/2`, o offset que
+  leva o topo da logo ao topo do header; escala com `--u`, zera o preto em todos os
+  viewports). A logo sobe 15px (cobre os 22px do hero em vez de 37).
+
+  Os dois ajustes acima foram **juntados numa instrução só** (nenhum executado
+  ainda): `sonnet/fazer/home-lancamento-bikefest-e-logo-header.md`.
+
 ## Ordem das fases (executada)
 As **fases 1–7 estão concluídas e commitadas** (Fundação/data-driven,
 Responsividade+mobile, Animações, Carrossel de Destaques, Lenis, Refinos e a

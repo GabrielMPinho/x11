@@ -40,6 +40,126 @@ Ver `docs/agentes/alterações/CHANGELOG.md` (2026-07-14 13:00) pro detalhe
 completo (arquivos tocados, valores-alvo @1440/@1024) e `convencoes.md`
 (regra de ouro atualizada).
 
+## Correções 2026-07-15/16 (hero, Histórias, PLP mobile) — 2 rodadas
+A **rodada 1** (`docs/agentes/sonnet/fazer/correcoes-hero-historias-e-mobile.md`,
+apagada — substituída) teve **4 pontos que quebraram** na validação do dono
+(medidos pelo Opus via Playwright); a **rodada 2**
+(`docs/agentes/sonnet/fazer/correcao-hero-historias-mobile-carrossel.md`)
+corrigiu esses 4. O que está documentado abaixo já é o estado **final**
+(pós-rodada 2) — a rodada 1 não é mais o comportamento vigente pro hero,
+Histórias, reveal mobile e carrossel da Home.
+
+**Hero (`home.css`) — header+hero = 1 tela, conteúdo ancorado por BAIXO:**
+a rodada 1 tirou `#escrito`/`#botoes` do `top:vh` (bug real: preso à altura
+da janela) mas trocou por `.hero{padding-top:calc(351*--u)}` **FIXO** — não
+encolhia em janela baixa, então em laptops mais baixos que ~900px (medido:
+1440×768, 1366×768, 1536×730, 1600×740, 1280×720) os 2 botões iam **até
+149px abaixo da dobra**. Só 1440×900 cabia (coincidência: header 108 +
+hero 88vh = exatamente 100vh nessa altura). Fix da rodada 2: `.hero` deixou
+de ser `min-height:88vh` chapado e virou `height:calc(100vh - calc(108 *
+var(--u)))` — **108 é o mesmo valor de `header{height}`** (`header.css`),
+então header+hero somam exatamente **100vh em qualquer altura de janela**
+(792px de hero em 1440×900, idêntico a antes; encolhe abaixo disso, nunca
+estoura). O conteúdo passou a ancorar **de baixo**: `.hero{display:flex;
+flex-direction:column; justify-content:flex-end; padding-bottom:calc(22 *
+var(--u))}` — folga de baixo **fixa e pequena** (22px, o alvo medido) +
+folga de cima **elástica** (o sobra do flex, sem CSS próprio — encolhe
+sozinha em janela baixa). `#p_branco{margin-top:calc(9*--u)}` e
+`#botoes{margin-top:calc(18*--u)}` (ritmo interno entre os elementos)
+**não mudaram** — só o mecanismo de ancoragem do bloco inteiro mudou, por
+isso 1440×900 continua pixel-idêntico (kicker `y≈459`, botões terminando em
+`y≈878`). `left:6vw`/`left:5.5vw` continuam `padding-left`. `.hero` mantém
+`overflow:hidden` (parallax do `.hero_bg`). **`button{height:7.3vh}`
+continua em `vh`** — conferido: como é `vh` (encolhe em janela baixa, não
+cresce), nunca chega a empurrar o kicker pra fora nos casos testados.
+**Bônus (pedido do dono):** `#botoes{display:flex;flex-direction:row}` —
+os 2 botões lado a lado no desktop/laptop. Mobile ≤768px continua
+empilhado (regra própria em `responsividade.css`). **`≤1023px` reseta
+`height:auto`** em `responsividade.css` — o mecanismo novo é só pra
+≥1024px; mobile usa `min-height:78vh`+`justify-content:center` de sempre.
+
+**Histórias — ritmo do Território (63/63), sem sobrepor os cards:** a
+rodada 1 pôs `padding-top`/`padding-bottom:calc(224*--u)` **simétrico** na
+`.historias` (que ainda tinha `justify-content:center`) e não recolocou o
+`margin-top` que o `#container_historias` tinha antes — dois problemas:
+seção inflou pra **1054px** (>1 tela) **e**, sem clearance nenhuma, o
+`.titulo{top:7vh}` (deslocamento só visual, `position:relative`, não
+reserva espaço) passou a **sobrepor o card do meio**. Fix da rodada 2:
+**removido `justify-content:center`** de `.historias` — sem centralização,
+o `top:7vh` do título (1º filho) já produz sozinho a folga de cima "de
+graça" (63px em 1440×900), exatamente como em `.territorio` (a seção-irmã
+citada como referência, mesmo `.titulo` compartilhado, mesmo mecanismo).
+`#container_historias` ganhou `margin-top:calc(99*--u)` (clearance
+título↔grid, mesmo valor do `#container_cards` do Território) e
+`margin-bottom:calc(63*--u)` (folga de baixo, agora simétrica à de cima) —
+**muda o 1440** (autorizado pelo dono). **Pendente:** `Favoritos`/
+`Categorias` usam padrões de `vh` assimétricos próprios (medido pelo Opus:
+Favoritos 63/0, Categorias 63/164) — **não corrigidos** (o dono não pediu
+ainda; medição de folga renderizada é conferência visual, fora do escopo
+do Sonnet — ver `convencoes.md`).
+
+**PLP mobile (`responsividade.css`) — 2 colunas:** `.grade_produtos` em
+`≤768px` e `≤480px` virou `grid-template-columns:repeat(2, 1fr)` (era
+`1fr`), pedido do dono. `.card_produto_plp_*` (tag/nome/preço/cores/mais)
+ganhou `padding`/`font-size`/`gap` reduzidos nos dois breakpoints — o card
+foi desenhado pra 1 coluna, precisava compactar pra caber em ~metade da
+largura sem estourar nem gerar scroll horizontal. Vale pra `/homem` e
+`/mulher` (mesma página `Produtos.jsx`). **Não mexido na rodada 2.**
+
+**Reveal mobile por elemento próprio + carrosséis com autoplay:** ver
+`padrao-api.md` (fonte de progresso do `RevelaComProgresso` no mobile,
+corrigida na rodada 2) e `componentes.md` (autoplay só no Equipamento
+desde a rodada 2 — o carrossel da Home foi **revertido**, arraste puro,
+sem autoplay).
+
+## ⚠️ Pegadinha — DUAS seções "LANÇAMENTO ESPECIAL" na Home
+O **kicker de texto** ("LANÇAMENTO ESPECIAL") se repete em **2 seções
+diferentes** da Home — fácil confundir ao ler só o conteúdo, sem olhar a
+classe raiz:
+- **`.lancamento_desconto`** (componente `Lancamento_desconto.jsx`) — fundo
+  **branco** (`--background_claro`, o único bloco claro da Home), título
+  **"CONCORRA AO COMBRO DE PROTEÇÃO NO BIKE FEST"** (typo "COMBRO"
+  intencionalmente não corrigido, ver `componentes.md`), foto do **estande
+  X11 no Bike Fest** à direita. Grid split 7 colunas (`#container_escrito`
+  4/7 + `#container_imagem` 3/7).
+- **`.lancamento_especial`** (componente separado) — fundo **escuro**, foto
+  `cat-aventura.jpg` (moto na trilha) com overlay `::after`, título "VALOR
+  PARA AVENTURA". Texto sobre imagem (`#container_texto`), **não** é grid
+  split.
+Nomes de classe **quase idênticos** (`_desconto` vs `_especial`) — ao
+receber uma instrução sobre "LANÇAMENTO ESPECIAL", **confirme pelo título/
+fundo/imagem citados** qual das duas é antes de editar.
+
+**Bike Fest (`.lancamento_desconto`) — `#texto` estreito, BLOCO centralizado,
+TEXTO alinhado à esquerda (2026-07-16):** era `#texto{width:100%}` —
+preenchia os 823px inteiros da coluna esquerda (4/7 de 1440), título/
+parágrafo em linhas largas. Fix: como `#container_escrito` (pai) já tem
+`justify-content:center;align-items:center`, bastou estreitar o `#texto`
+pra ele centralizar sozinho — `width:calc(420*var(--u))` (ajustado 2×: 520
+inicial, depois **420** por pedido do dono, "mais quadrado" — título quebra
+em mais linhas, bloco mais compacto); removido `left:0.5vw` do `#texto` e
+`right:0.5vw` do `#texto button` (os dois descentralizavam o bloco/botão).
+`align-items:flex-start` do `#texto` **ficou como estava** (não é
+`center`) — importante: **`align-items` controla a posição do BLOCO** (a
+caixa do `h1`, dimensionada pela linha mais longa ao quebrar) **dentro do
+`#texto`**, e é isso que deve ficar centralizado (via largura+pai, não via
+`align-items`); ⚠️ **não confundir com `text-align`**, que centralizaria
+CADA LINHA dentro da própria caixa do elemento — foi tentado
+(`text-align:center`) e revertido no mesmo dia (pedido do dono: as linhas
+mais curtas do título ficavam centralizadas dentro da caixa em vez de
+começar todas no mesmo ponto à esquerda). Estado final: kicker/título/
+parágrafo/botão com texto alinhado à **esquerda** (como o resto do site);
+o bloco `#texto` (mais estreito que a coluna) fica centralizado **só**
+pelo `justify-content:center` do `#container_escrito` (pai). `#texto
+button` também ganhou `margin-left:0` — o `button{margin:calc(8*var(--u))}`
+global (Hero) dá 8px em todos os lados, e só o `margin-top` era
+sobrescrito; o `margin-left` residual desalinhava o botão do resto do
+bloco (agora todo rente à esquerda). **Só o `#texto`/botão mudou** —
+imagem, grid/fundo, `#container_escrito` e todo o conteúdo de texto seguem
+intactos (ordem do dono). Mobile `≤1023px` já sobrescrevia
+`#texto{width:100%;left:0;top:0}` em `responsividade.css` — inalterado, e
+nunca teve `text-align:center` a cascatear.
+
 ## Arquitetura do CSS — manifesto + parciais (split PASSE 1, 2026-07-14)
 `base.css` **deixou de ser um arquivo monolítico** (chegou a 2988 linhas —
 motivo do split, pedido do dono: "não estou gostando de ter um arquivo css

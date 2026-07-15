@@ -88,6 +88,11 @@
 
   /* ---- HERO: sai do posicionamento absoluto já no tablet ---- */
   .hero{
+    /* `height` reseta pra `auto` (RODADA 2, 2026-07-16) — a base (desktop)
+       agora fixa `height:calc(100vh - header)`; sem esse reset, o mobile
+       herdaria essa altura (maior que os `min-height:78vh` de hoje) em vez
+       de ficar do tamanho do conteúdo + `min-height` como sempre foi. */
+    height: auto;
     min-height: 78vh;
     display: flex; flex-direction: column; justify-content: center;
     padding: 96px 20px 56px;
@@ -143,6 +148,11 @@
   .destaques{ display: block; min-height: 0; padding: 64px 0; }
   #conteudo_destaques{ width: auto; height: auto; margin: 0 20px; }
   #escrito_destaques{ height: auto; margin-bottom: 28px; }
+  /* Setas sempre foram decorativas aqui (Destaques mantém drag/scroll como
+     mecanismo real, ver componentes.md) — escondidas em ≤1023px por pedido
+     do dono (2026-07-15, item 5): mesmo critério dos outros 2 carrosséis
+     (Equipamento), que já escondiam as deles. */
+  #setas_destaques{ display: none; }
   #produtos_destaques{
     grid-template-columns: none;
     grid-auto-flow: column;
@@ -313,7 +323,17 @@
   .seta_filtros_aberta{ transform: rotate(180deg); }
   .sidebar_filtros_conteudo{ display: none; margin-top: 20px; }
   .sidebar_filtros_conteudo.sidebar_filtros_aberta{ display: flex; }
-  .grade_produtos{ grid-template-columns: 1fr; gap: 20px; }
+  /* Pedido do dono (2026-07-15): 2 colunas no mobile (era 1fr) — card
+     compactado (padding/font-size/gap) pra caber em ~metade da largura sem
+     estourar nem gerar scroll horizontal (.card_produto_plp foi desenhado
+     pensando em 1 coluna). Vale pra /homem e /mulher (mesma página
+     Produtos.jsx). */
+  .grade_produtos{ grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .card_produto_plp_tag{ margin: 10px 10px 3px; font-size: 0.62rem; }
+  .card_produto_plp_nome{ margin: 0 10px 3px; font-size: 0.8rem; }
+  .card_produto_plp_preco{ margin: 0 10px 8px; font-size: 0.95rem; }
+  .card_produto_plp_cores{ margin: 0 10px; gap: 4px; }
+  .card_produto_plp_mais{ font-size: 0.68rem; }
   .bloco_editorial{ flex-direction: column; align-items: flex-start; padding: 28px; }
 
   /* FAVORITOS — 1 coluna */
@@ -375,7 +395,11 @@
 
   /* PRODUTOS — PLP: título do hero e grade mais compactos */
   .colecao_hero_escrito h1{ font-size: clamp(1.8rem, 9vw, 2.4rem); }
-  .grade_produtos{ gap: 16px; }
+  .grade_produtos{ gap: 10px; }
+  .card_produto_plp_tag{ margin: 8px 8px 2px; font-size: 0.58rem; }
+  .card_produto_plp_nome{ margin: 0 8px 2px; font-size: 0.75rem; }
+  .card_produto_plp_preco{ margin: 0 8px 6px; font-size: 0.9rem; }
+  .card_produto_plp_cores{ margin: 0 8px; }
   .filtro_tamanhos_grid{ gap: 6px; }
 }
 /* FIM RESPONSIVIDADE */
