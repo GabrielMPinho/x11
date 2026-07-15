@@ -220,8 +220,23 @@ o planejamento. **Manter atualizado** conforme novas instruções chegarem.
   leva o topo da logo ao topo do header; escala com `--u`, zera o preto em todos os
   viewports). A logo sobe 15px (cobre os 22px do hero em vez de 37).
 
-  Os dois ajustes acima foram **juntados numa instrução só** (nenhum executado
-  ainda): `sonnet/fazer/home-lancamento-bikefest-e-logo-header.md`.
+- **Produtos (PLP) — botão "EM DESTAQUE" cortado no mobile (2026-07-16):** no
+  bloco editorial ("Como escolher sua jaqueta?") das páginas `/homem` e `/mulher`,
+  o botão herda a regra global `button{width:14vw}` (=55px @390) e o texto (95px)
+  **corta** ("EM DESTA...") por causa do `overflow:hidden`. Desktop ok (202px).
+  Correção: incluir `.bloco_editorial .botao_cortado` na regra `≤1023` que já dá
+  `width:auto; white-space:nowrap` aos CTAs da Home. Só mobile; desktop intacto.
+
+- **Reveal no mobile — era só configuração do aparelho (2026-07-16):** o dono
+  reportou que no celular real os elementos não animavam (mas no emulador do PC
+  sim). Diagnóstico: era o **"Reduzir Movimento" ligado no aparelho** — o site
+  desliga animações + Lenis de propósito nesse caso (`prefers-reduced-motion`, ver
+  `App.jsx`). Desligou no celular → voltou a animar. **Sem alteração de código** (o
+  comportamento está correto). Fica registrado como pegadinha de conferência mobile.
+
+  Os **três** ajustes de layout acima (LANÇAMENTO Bike Fest, logo do header, botão
+  da PLP) foram **juntados numa instrução só** (nenhum executado ainda):
+  `sonnet/fazer/home-lancamento-bikefest-e-logo-header.md`.
 
 ## Ordem das fases (executada)
 As **fases 1–7 estão concluídas e commitadas** (Fundação/data-driven,

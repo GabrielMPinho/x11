@@ -100,9 +100,17 @@
   #escrito{ position: static; top: auto; left: auto; width: 100%; }
   #botoes{ position: static; top: auto; left: auto; width: auto; }
 
-  /* CTAs de Lançamento desconto/especial: largura por conteúdo, texto inteiro */
+  /* CTAs de Lançamento desconto/especial + botão "EM DESTAQUE" da PLP:
+     largura por conteúdo, texto inteiro. Fix 2026-07-16 (PLP mobile,
+     `.bloco_editorial .botao_cortado` adicionado à lista) — o botão
+     herdava a regra global `button{width:14vw}` (pensada pro Hero), que no
+     mobile (390px) dá só ~55px contra ~95px do texto "EM DESTAQUE"
+     (`.botao_cortado{overflow:hidden}` cortava pra "EM DESTA..."). Mesma
+     regra dos outros CTAs — não criar regra divergente. Desktop ≥1024
+     inalterado (esta regra é só ≤1023). */
   #texto button,
-  #container_texto button{
+  #container_texto button,
+  .bloco_editorial .botao_cortado{
     width: auto;
     height: 48px;
     padding: 0 30px 0 22px;

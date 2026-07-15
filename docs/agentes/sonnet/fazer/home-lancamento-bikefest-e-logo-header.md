@@ -1,17 +1,18 @@
-# Home — 2 ajustes: texto do LANÇAMENTO "Bike Fest" + logo cobrindo o header
+# Home + Produtos — 3 ajustes: texto do LANÇAMENTO "Bike Fest" + logo do header + botão da PLP no mobile
 
 > **Instrução ativa.** Leia `docs/agentes/sonnet/contexto/` antes de começar.
 > Ao terminar: atualize os docs indicados no fim e **NÃO commite**.
 >
-> Dois ajustes pequenos e independentes, ambos medidos no navegador pelo Opus.
+> Três ajustes pequenos e independentes, todos medidos no navegador pelo Opus.
 > **Só o que está descrito** — nada além.
 
 ## TABELA DE DIAGNÓSTICO (índice)
 
-| # | Onde | Problema (medido @1440×900) | Correção |
+| # | Onde | Problema (medido) | Correção |
 |---|---|---|---|
-| 1 | Home → LANÇAMENTO ESPECIAL "Bike Fest" (`.lancamento_desconto`) | `#texto` está **esticado**: `width:100%` ocupa os **823px** da coluna esquerda, `align-items:flex-start` → texto largo e à esquerda | `#texto` **estreito** (~520·--u) e **centralizado** na coluna |
-| 2 | Chrome → header (logo) | Logo (308×130) empurrada por `top: calc(26*--u)` → **15px de preto acima** dela; ela é mais alta (130) que o header (108) | Alinhar o **topo da logo ao topo do header** (`top: calc(11*--u)`) → o laranja cobre a altura preta inteira; largura/posição horizontal **não mudam** |
+| 1 | Home → LANÇAMENTO ESPECIAL "Bike Fest" (`.lancamento_desconto`) | @1440: `#texto{width:100%}` ocupa os **823px** da coluna esquerda, `align-items:flex-start` → texto **esticado** e à esquerda | `#texto` **estreito** (~520·--u) e **centralizado** na coluna |
+| 2 | Chrome → header (logo) | @1440: logo (308×130) empurrada por `top: calc(26*--u)` → **15px de preto acima**; ela é mais alta (130) que o header (108) | Alinhar o **topo da logo ao topo do header** (`top: calc(11*--u)`) → o laranja cobre a altura preta; largura/posição horizontal **não mudam** |
+| 3 | Produtos (PLP) → bloco editorial, botão "EM DESTAQUE", **no mobile** | @390: o botão herda a regra global `button{width:14vw}` = **55px**; o texto tem **95px** e `overflow:hidden` → **corta** ("EM DESTA..."). @1440 cabe (202px, ok) | Botão **por conteúdo** no mobile (`width:auto` + `white-space:nowrap`), igual os CTAs da Home |
 
 ---
 
@@ -82,6 +83,34 @@ mudam.**
 
 ---
 
+## ITEM 3 — Produtos (PLP): botão "EM DESTAQUE" cortado no mobile
+
+**Onde:** o botão do **bloco editorial** ("Como escolher sua jaqueta?") das páginas
+`/homem` e `/mulher` (`.bloco_editorial .botao_cortado`, `BlocoEditorial.jsx`).
+
+**Diagnóstico (medido @390×844):** o `BotaoCortado` renderiza um `<button>`, então
+herda a regra **global** `button{ width: 14vw }` (de `home.css`, pensada pro Hero).
+No mobile `14vw = ~55px`; o texto "EM DESTAQUE" (`.texto_botao`) tem **~95px** e o
+`.botao_cortado{ overflow:hidden }` **corta** o que passa → aparece "EM DESTA...".
+Medido: botão 55×62, texto 95×54 (2 linhas). No desktop (@1440) o botão dá 202px e
+cabe numa linha — **desktop está ok, não mexer**.
+
+**Correção:** dar ao botão **largura por conteúdo** no mobile, **exatamente como já
+foi feito para os CTAs de Lançamento da Home**. No `responsividade.css`, dentro do
+bloco **`@media (max-width: 1023px)`**, já existe a regra:
+
+```
+#texto button,
+#container_texto button{ width:auto; height:48px; padding:0 30px 0 22px; white-space:nowrap }
+```
+
+**Adicione `.bloco_editorial .botao_cortado` à MESMA lista de seletores** dessa
+regra (não crie outra regra divergente) — assim o botão passa a `width:auto` +
+`white-space:nowrap`, cabe "EM DESTAQUE" numa linha e o corte diagonal (clip-path,
+em %) acompanha. **Desktop ≥1024 não muda** (a regra é só ≤1023).
+
+---
+
 ## O QUE NÃO FAZER
 - ❌ Tocar na seção `.lancamento_especial` ("VALOR PARA AVENTURA").
 - ❌ Tocar na imagem/fundo do `.lancamento_desconto`, ou no conteúdo de texto.
@@ -95,13 +124,15 @@ mudam.**
      `text-align:center`, **sem** `left:0.5vw`; `#texto button` **sem** `right:0.5vw`.
    - `header img` com `top: calc(11 * var(--u))`; `width`/`left` intactos;
      `.header_minimalista img` intacto.
+   - `.bloco_editorial .botao_cortado` incluído na regra `≤1023` de `width:auto;
+     white-space:nowrap`; desktop (≥1024) do botão inalterado.
 3. Confirme que nenhum **conteúdo de texto** mudou e que `.lancamento_especial`
    não foi tocada.
 
 ## DOCS A ATUALIZAR (obrigatório)
-- `docs/agentes/alterações/CHANGELOG.md` — entrada nova **no topo** (os 2 ajustes
-  + o porquê; cite o cálculo do `11` do logo).
-- `docs/agentes/sonnet/contexto/estilos.md` — novo `#texto` (estreito/centralizado)
-  e o novo `top` do `header img`; **anotar a pegadinha das duas seções "LANÇAMENTO
-  ESPECIAL"** (`.lancamento_desconto` = Bike Fest fundo branco; `.lancamento_especial`
-  = Valor para Aventura fundo escuro).
+- `docs/agentes/alterações/CHANGELOG.md` — entrada nova **no topo** (os 3 ajustes
+  + o porquê; cite o cálculo do `11` do logo e o corte do botão da PLP no mobile).
+- `docs/agentes/sonnet/contexto/estilos.md` — novo `#texto` (estreito/centralizado),
+  o novo `top` do `header img`, e o botão da PLP por conteúdo no mobile; **anotar a
+  pegadinha das duas seções "LANÇAMENTO ESPECIAL"** (`.lancamento_desconto` = Bike
+  Fest fundo branco; `.lancamento_especial` = Valor para Aventura fundo escuro).

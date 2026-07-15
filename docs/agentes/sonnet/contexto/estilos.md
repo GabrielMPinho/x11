@@ -182,6 +182,21 @@ zera o preto acima em **qualquer viewport** (logo e header escalam juntos
 com `--u`). `width:calc(308*var(--u))`/`left:4vw` (tamanho/posição
 horizontal) **inalterados**; `.header_minimalista img` não foi tocado.
 
+**PLP mobile — botão "EM DESTAQUE" cortado (2026-07-16):**
+`.bloco_editorial .botao_cortado` (bloco editorial de `/homem`/`/mulher`)
+herdava a regra global `button{width:14vw}` (`home.css`, pensada pro Hero)
+— em ≤1023px isso encolhe demais (~55px @390) contra o texto "EM DESTAQUE"
+(~95px), e `.botao_cortado{overflow:hidden}` cortava. Fix: seletor
+adicionado à regra `≤1023px` já existente em `responsividade.css` que dá
+largura por conteúdo aos CTAs de Lançamento (`#texto button,
+#container_texto button{width:auto;height:48px;padding:0 30px 0
+22px;white-space:nowrap}`) — mesma regra, 3 seletores agora, não uma nova
+divergente. Desktop ≥1024 inalterado (regra só dentro do
+`@media(max-width:1023px)`). **Padrão a repetir:** se outro `<button>`
+customizado (via `BotaoCortado` ou não) aparecer cortado no mobile por
+herdar `button{width:14vw}` do Hero, a correção é a mesma — adicionar o
+seletor a essa lista, não inventar uma regra própria.
+
 ## Arquitetura do CSS — manifesto + parciais (split PASSE 1, 2026-07-14)
 `base.css` **deixou de ser um arquivo monolítico** (chegou a 2988 linhas —
 motivo do split, pedido do dono: "não estou gostando de ter um arquivo css

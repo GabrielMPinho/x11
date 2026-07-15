@@ -5,6 +5,49 @@
 
 ---
 
+## 2026-07-16 17:00 — PLP: botão "EM DESTAQUE" cortado no mobile (item 3 da instrução; itens 1 e 2 revistos)
+
+**Instrução:** `docs/agentes/sonnet/fazer/home-lancamento-bikefest-e-logo-header.md`
+(reemitida com um 3º item — os itens 1 e 2 são os mesmos da rodada anterior).
+
+**Item 3 — feito.** `.bloco_editorial .botao_cortado` (botão "EM DESTAQUE" do
+bloco editorial da PLP, `/homem` e `/mulher`) herdava a regra **global**
+`button{width:14vw}` (pensada pro Hero, `home.css`) — no mobile (390px)
+isso dá só **~55px** contra **~95px** do texto "EM DESTAQUE", e
+`.botao_cortado{overflow:hidden}` cortava pra "EM DESTA...". Desktop
+(@1440, 202px) cabia numa linha — não mexido. Fix:
+`.bloco_editorial .botao_cortado` adicionado à **mesma** regra
+`≤1023px` (`responsividade.css`) que já dá largura por conteúdo aos CTAs
+de Lançamento (`#texto button, #container_texto button{width:auto;
+height:48px; padding:0 30px 0 22px; white-space:nowrap}`) — não criei
+regra divergente. Desktop ≥1024 inalterado (regra só dentro do
+`@media(max-width:1023px)`).
+
+**Item 2 (logo do header) — já feito e commitado numa rodada anterior**
+(`header img{top:calc(11*var(--u))}`, commit `9bd27bd "Header"`) —
+conferido: continua correto, nada a fazer.
+
+**Item 1 (`#texto` do Bike Fest) — continua PULADO, mesmo motivo da rodada
+anterior.** A instrução (reemitida sem mudança neste ponto) ainda pede
+`width:calc(520*var(--u))` + `align-items:center` + `text-align:center` —
+mas o `#texto` já está **commitado** (commits `3582a74 "Ajustes"` e
+`9bd27bd "Header"`) no estado que o dono ajustou ao vivo: `width:calc(660*
+var(--u))`, texto alinhado à **esquerda** (pedido explícito dele, ver
+entrada de 2026-07-16 14:00). Aplicar a instrução desfaria uma decisão já
+commitada duas vezes. **Não sobrescrevi de novo.** Como esta é a 2ª vez
+que a mesma instrução chega com o item 1 desatualizado, sinalizando pro
+Opus: o item 1 de `home-lancamento-bikefest-e-logo-header.md` deveria ser
+removido/atualizado na origem para não reaparecer numa 3ª rodada.
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ✅. Por leitura:
+`.bloco_editorial .botao_cortado` incluído na regra `≤1023` de
+`width:auto;white-space:nowrap`; desktop do botão inalterado; `header img`
+com `top:calc(11*var(--u))` (já commitado); `#texto` do Bike Fest
+deliberadamente não tocado (ver acima); nenhum conteúdo de texto mudou;
+`.lancamento_especial` não foi tocada.
+
+---
+
 ## 2026-07-16 16:00 — Header: logo cobrindo todo o preto (item 1 da instrução pulado — ver nota)
 
 **Instrução:** `docs/agentes/sonnet/fazer/home-lancamento-bikefest-e-logo-header.md`
