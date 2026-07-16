@@ -73,6 +73,21 @@ Uma custom property = **"1px do desenho de 1440"**:
 > compartilhados) com o **corpo** ainda em layout tablet na faixa 1024–1280.
 > É intencional — não "consertar".
 
+## Débito descoberto (2026-07-16): fronteira dos carrosséis do Equipamento
+Ao conferir "os carrosséis no laptop" (pedido do dono), o Opus mediu ao vivo: a
+Home ("OS MAIS VENDIDOS") já vira **desktop em ≥1024** (o `useModoCarrossel` foi
+recuado no passo 1), mas os **2 carrosséis do Equipamento** (DESTAQUES + COMBINE
+SEU SETUP) ficaram com a fronteira **antiga, 1281px** — no `useCarrosselComSetas.js`
+e em 2 `@media` do `equipamento.css`. Efeito: em laptop **1024–1280px** eles rodam
+em **modo mobile** (autoplay andando sozinho + arraste, setas escondidas), enquanto
+a Home já está em desktop — inconsistente com a régua (desktop ≥1024).
+**Correção pontual** (o dono mandou resolver só isto agora, sem converter a página
+inteira): fronteira **1281 → 1024** nos 3 pontos. Seguro porque os cards já têm
+largura desktop (320/260px) em 1024–1280 (só viram mobile em ≤768px) — muda só o
+controle (autoplay→setas), não o layout. Instrução:
+`sonnet/fazer/carrossel-equipamento-fronteira-1024.md`. **O corpo** da página
+Equipamento (reflow `@media max-width:1280`) continua como frente futura (passo 4).
+
 ## Conferência (Opus)
 Screenshots em **390 / 768 / 1023 / 1024 / 1280 / 1440** + **1440×1080** (pra
 provar que o desktop parou de depender da altura da janela). Alvos em 1024:

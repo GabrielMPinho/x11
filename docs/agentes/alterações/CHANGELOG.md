@@ -5,6 +5,123 @@
 
 ---
 
+## 2026-07-16 18:40 — Carrosséis do Equipamento: fronteira desktop 1281 → 1024 (alinhada à Home)
+
+**Origem:** instrução `docs/agentes/sonnet/fazer/carrossel-equipamento-fronteira-1024.md`
+(Opus), executada pelo Sonnet. Build ✅ (`npx vite build`) / lint sem warnings
+novos (os 2 avisos `atrasoCard` de `Favoritos.jsx`/`Territorio.jsx` são
+pré-existentes das edições ao vivo do dono — ver entrada 18:00). **Não
+commitado** — aguarda sinal verde do dono.
+
+**Problema (medido ao vivo pelo Opus, ponteiro fino/laptop):** os dois
+carrosséis do Equipamento — **"DESTAQUES"** (`CarrosselDetalhes.jsx`) e
+**"COMBINE SEU SETUP"** (`CombineSetup.jsx`), ambos via `useCarrosselComSetas.js`
+— entravam em **modo mobile** (trilho com autoplay andando sozinho + arraste,
+lista de itens duplicada, setas `display:none`) num laptop de **1024–1280px**,
+enquanto a Home ("OS MAIS VENDIDOS"), na mesma largura, já estava em modo
+**desktop**. Em 1366/1440 o Equipamento ficava parado com setas visíveis — ou
+seja, a fronteira dele estava **mais alta** que a da Home.
+
+**Causa raiz:** a "Escala proporcional do desktop 1024→1440" (2026-07-14) recuou
+a régua do desktop de 1281 → **1024** e alinhou a Home (`useModoCarrossel` de
+`Destaques.jsx` usa `min-width:1024px`). Os carrosséis do Equipamento **não
+foram atualizados junto** — seguiam na fronteira antiga `min-width:1281px` (1
+ponto no JS + 2 no CSS).
+
+**Correção — fronteira `1281px` → `1024px` em 3 pontos** (só o número mudou; a
+parte `(pointer: fine)` da condição permaneceu idêntica):
+1. **`src/paginas/equipamento/useCarrosselComSetas.js`** — a `window.matchMedia(
+   "(pointer: fine) and (min-width: 1281px)")` que define `arrastavel`
+   (`setArrastavel(!consulta.matches)`) passou a `1024px`. Efeito em laptop
+   ≥1024: `arrastavel=false` → sem drag de mouse, **sem autoplay** (o
+   `useAutoplayCarrossel` recebe `ativo: arrastavel`, desliga junto), **sem**
+   lista duplicada — trilho anda **só pelas setas**. O comentário acima da
+   chamada (que afirmava seguir a Home em "1281px", **factualmente errado** —
+   a Home já usava 1024) foi reescrito para citar a régua **≥1024** e o porquê.
+2. **`src/paginas/equipamento/equipamento.css`** — a `@media (pointer: fine) and
+   (min-width: 1281px)` que mostra as setas do **DESTAQUES**
+   (`.destaques_pdp_carrossel_wrap .seta_carrossel_pdp { display: flex }`; default
+   `display:none`) passou a `1024px`; comentário atualizado.
+3. **`src/paginas/equipamento/equipamento.css`** — a `@media (pointer: fine) and
+   (min-width: 1281px)` que mostra as setas do **COMBINE SEU SETUP**
+   (`.combine_setup_setas { display: flex }`; default `display:none`) passou a
+   `1024px`; comentário atualizado.
+
+**Nota sobre os comentários:** a verificação da instrução pedia "não sobrou
+nenhum `1281`" nos dois arquivos — por isso os comentários explicam o porquê
+(alinhar à régua ≥1024, casar com a Home) **sem** repetir o literal "1281px";
+o antes→depois preciso fica registrado aqui.
+
+**Resultado esperado por faixa:**
+- **≤1023px** (responsivo/mobile) — **inalterado**: autoplay + arraste, sem setas.
+- **1024–1280px** (laptop) — **muda**: setas visíveis, trilho parado (anda só
+  pelas setas), sem autoplay, sem duplicação de cards. Passa a **combinar com a
+  Home**. Os cards nessa faixa já usavam a largura desktop fixa (320px no
+  DESTAQUES, 260px no COMBINE), então ligar as setas **não** altera
+  largura/quantidade de cards — só troca o controle.
+- **≥1281px** (desktop largo) — **inalterado**.
+
+**NÃO tocado (conforme instrução):** `@media (max-width: 1280px)` (reflow do
+corpo da PDP — hero/specs/features/avaliações, frente futura da escala) e
+`@media (max-width: 768px)` (larguras de card `78vw`/`62vw`) intactos; Home
+(`Destaques.jsx`/`useModoCarrossel`/`CarrosselArrastavel`) e
+`useAutoplayCarrossel.js` intactos.
+
+**Docs de contexto atualizados junto:** `componentes.md` (2 menções da fronteira
+dos carrosséis do Equipamento, 1281→1024) e `estilos.md` (1 menção — na verdade
+descrevia a **Home**, que já usava 1024 no código: **drift pré-existente**
+corrigido por coerência, não causado por esta tarefa). `convencoes.md` já citava
+1024 (com "1281px" como histórico) — mantido.
+
+## 2026-07-16 18:00 — Footer reestruturado + cards da Home subindo juntos (edições AO VIVO do dono — documentadas pelo Opus)
+
+**Origem:** dois commits do próprio dono (autor `Gabriel Pinho`), feitos ao vivo
+e já no `master` — o Opus apenas **analisou e documentou** (não editou código).
+Commits: **`5b0b017` "Footer ajustada"** (07-16 09:30) e **`6dacb94` "Cards
+subindo juntos e rodape footer"** (07-16 10:00, HEAD). Build ✅ / lint com 2
+avisos (ver nota no fim).
+
+**1 — Footer reestruturado (`5b0b017`)** — `src/padrao/componentes/Footer.jsx`
++ `src/padrao/estilos/footer.css`. Antes: as 3 colunas de links num `<Revela>`,
+e um 2º `<Revela id="rodape_footer">` embaixo agrupando **copyright + logo**
+(`space-between`), seguido de uma div vazia `#fim_footer` só de espaçamento.
+Agora:
+- A **logo** (`#logo_footer`) subiu para **dentro do bloco dos links** — o grid
+  do footer ganhou uma 4ª trilha: `grid-template-columns: repeat(3, max-content)`
+  → `repeat(3, max-content) 1fr`, e a logo é empurrada para a borda direita dessa
+  coluna elástica (`justify-self:end` + `align-items:center`→`flex-end`).
+- O **copyright** (`#rodape_footer`) virou um `<Revela>` **só dele**, agora
+  **barra centralizada** (`justify-content: space-between`→`center`), sem a logo.
+- A div espaçadora **`#fim_footer` foi removida** (JSX e CSS) — não tinha
+  conteúdo, só reservava altura.
+- **Desfeitos os `aspect-ratio` de escala do footer** (comentados, não apagados):
+  `.footer` `1296/495` e `#rodape_footer` `1440/162` — decisão do dono ao vivo:
+  o footer volta a **fluir por conteúdo** em vez de travar a altura na largura.
+  ⚠️ Isso é um **desvio pontual** da regra de escala-1440 (07-14) **só no footer**
+  — foi o próprio dono quem fez; registrado aqui para o próximo Opus não "corrigir"
+  de volta achando que é regressão.
+
+**2 — Cards da Home subindo juntos + rodapé (`6dacb94`)**
+- `src/paginas/home/Favoritos.jsx` e `Territorio.jsx`: removida a prop
+  `atraso={atrasoCard(index, …)}` dos cards. Sem `atraso`, o `useEstiloRevela`
+  usa o default `0` → **os cards dessas duas seções entram todos juntos**, sem o
+  stagger por índice (pedido do dono: "cards subindo juntos"). As **demais
+  grades seguem com `atrasoCard`** (Destaques, Categorias, Histórias, PLP,
+  institucional, equipamento) — mudança **só em Favoritos e Território**.
+- `#rodape_footer p`: `margin 4.4vw` → **`2.5vw`** (rodapé mais compacto).
+
+**Contexto sincronizado:** `sonnet/contexto/componentes.md` — descrição do
+`Footer` atualizada para refletir a logo na linha dos links + copyright como
+barra centralizada (não mais "rodapé (copyright + logo)").
+
+**Verificação:** `npx vite build` ✅ · `npm run lint` ⚠️ **2 avisos NOVOS** de
+`no-unused-vars`: `atrasoCard` importado mas não usado em `Favoritos.jsx:6` e
+`Territorio.jsx:5` (sobrou do import ao remover a prop). São **warnings**, não
+quebram o build. **Pendência de limpeza** (1 linha em cada arquivo) — pode entrar
+numa próxima instrução de Sonnet; não mexi porque o Opus não edita código.
+
+---
+
 ## 2026-07-16 17:00 — PLP: botão "EM DESTAQUE" cortado no mobile (item 3 da instrução; itens 1 e 2 revistos)
 
 **Instrução:** `docs/agentes/sonnet/fazer/home-lancamento-bikefest-e-logo-header.md`

@@ -660,7 +660,8 @@ aprovada pelo dono — ver `convencoes.md`). `src/paginas/home/Destaques.jsx` te
 **3 modos** (`hijack`/`arrastavel`/`estatico`, ver abaixo — eram 2 antes de
 2026-07-10), escolhidos em runtime (não só CSS) por um hook local,
 `useModoCarrossel()`: `window.matchMedia("(pointer: fine) and (min-width:
-1281px)")` + `useReducedMotion()`. Estado inicial (antes do `matchMedia`
+1024px)")` + `useReducedMotion()` (fronteira recuada de 1281→1024 na escala
+2026-07-14; doc corrigida 2026-07-16). Estado inicial (antes do `matchMedia`
 resolver) já nasce correto pro caso reduced-motion (síncrono) e cai em
 `"arrastavel"` nos demais — nunca invisível antes do JS medir.
 

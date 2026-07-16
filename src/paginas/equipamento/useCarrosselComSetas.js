@@ -16,9 +16,14 @@ import { EASE } from "@/padrao/lib/motion";
 // só faz sentido no mobile/tablet — no desktop o dono quer SÓ setas, sem
 // arraste de mouse. Mesmo critério do `useModoCarrossel` de `Destaques.jsx`
 // (Home) pra separar desktop de touch: `matchMedia("(pointer:fine) and
-// (min-width:1281px)")` — se bate, é desktop (`arrastavel=false`); senão,
-// toque/tablet (`arrastavel=true`). Reage a mudança (resize, troca de
-// dispositivo) via listener no matchMedia, igual ao padrão da Home.
+// (min-width:1024px)")` — se bate, é desktop (`arrastavel=false`); senão,
+// toque/tablet (`arrastavel=true`). Fronteira alinhada em 1024px
+// (2026-07-16) à régua "desktop ≥1024" da escala 1024→1440 (2026-07-14):
+// antes usava a fronteira desktop antiga (mais alta) e destoava da Home,
+// deixando o Equipamento em modo mobile (autoplay + arraste, setas
+// escondidas) num laptop de 1024–1280px enquanto a Home já estava em
+// desktop. Reage a mudança (resize, troca de dispositivo) via listener no
+// matchMedia, igual ao padrão da Home.
 export function useCarrosselComSetas() {
   const containerRef = useRef(null);
   const trilhoRef = useRef(null);
@@ -42,7 +47,7 @@ export function useCarrosselComSetas() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const consulta = window.matchMedia("(pointer: fine) and (min-width: 1281px)");
+    const consulta = window.matchMedia("(pointer: fine) and (min-width: 1024px)");
     const atualizar = () => setArrastavel(!consulta.matches);
     atualizar();
     consulta.addEventListener("change", atualizar);

@@ -23,7 +23,7 @@ própria seção mais adiante.)
 | `CarrosselArrastavel` | `.destaques_arrastavel` | `data/destaques.js` | `--background_cinza` | **Novo (2026-07-10), sub-componente de `Destaques` pro modo `arrastavel`** (touch/tablet/ponteiro grosso, sem reduced-motion — substitui o antigo fallback de swipe nativo, que o Lenis, Fase 5, quebrava no mobile). Trilho `motion.div` com **`drag="x"`** de verdade (não ligado a scroll), `dragConstraints` medido, `dragElastic`+`dragMomentum`. `data-lenis-prevent` no container pra não brigar com o Lenis; `touch-action:pan-y` no trilho pra separar o gesto horizontal (drag) do vertical (scroll da página). Ver `estilos.md`. |
 | `Historias` | `.historias` | `data/historias.js` | `--background_escuro` | 3 cards de histórias (imagem + título + texto + "LEIA MAIS"). "LEIA MAIS" **continua decorativo** (`href="#"`, sem página de blog ainda) — ganhou sublinhado animado no hover (2026-07-13), mesmo tratamento do `.cta_comprar` de Favoritos. |
 | `Banner` | `.banner` | — (estático) | `--background_cinza` | Frase única gigante centralizada, bordas superior/inferior. |
-| `Footer` | `.footer` | `data/footer.js` | `--background_escuro` | 3 colunas de links + rodapé (copyright + logo). |
+| `Footer` | `.footer` | `data/footer.js` | `--background_escuro` | 3 colunas de links **+ logo** na mesma linha (4ª trilha `1fr` do grid, empurrada à direita) + **rodapé só com o copyright**, barra centralizada (`#rodape_footer`). Reestruturado ao vivo pelo dono (2026-07-16, `5b0b017`): logo saiu do rodapé pra linha dos links; `#fim_footer` removido; `aspect-ratio` de escala do footer comentados (footer flui por conteúdo — desvio pontual da escala-1440, autorizado). |
 
 ## Componentes ainda estáticos (sem dados externos)
 `Hero_Home`, `Lancamento_desconto`, `Lancamento_especial` e `Banner` têm conteúdo
@@ -219,12 +219,14 @@ dessincronizados. Setas usam **tween com `EASE` do projeto (`duration:0.6`)**
 **Desktop = só setas, mobile = só arraste (fix 2026-07-14, coerência entre
 1ª e 2ª rodada):** hook expõe `arrastavel` (mesmo critério de `matchMedia`
 do `useModoCarrossel` de `Destaques.jsx`/Home — `(pointer:fine) and
-(min-width:1281px)` → desktop sem arraste) — no desktop o trilho só se move
+(min-width:1024px)` → desktop sem arraste; fronteira alinhada em 2026-07-16
+à régua "desktop ≥1024", era mais alta e destoava da Home) — no desktop o
+trilho só se move
 pelas setas (`drag={false}`, cursor padrão), sem drag de mouse; no
 toque/tablet, arraste normal (`drag="x"`, cursor `grab`/`grabbing` via
 classe `.trilho_pdp_arrastavel`). **As próprias setas** (`.destaques_pdp_setas`/
 `.combine_setup_setas`) ficam **escondidas fora do desktop** (`display:none`,
-só `flex` em `(pointer:fine) and (min-width:1281px)`, 2ª rodada) — setas e
+só `flex` em `(pointer:fine) and (min-width:1024px)`, alinhado 2026-07-16) — setas e
 arraste nunca coexistem na tela. Containers usam **`data-lenis-prevent-touch`**
 (não `-prevent` puro) — Lenis só é bloqueado no toque, a roda do mouse no
 desktop rola a página normalmente por cima do carrossel.

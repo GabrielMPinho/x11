@@ -461,7 +461,11 @@
    verticalmente centrada, DENTRO do respiro de `margin:0 6vw` do
    `.trilho_destaques_pdp_container` — não "passam" do início/fim do
    carrossel: ficam centralizadas nesse mesmo respiro de 6vw, sem sobrepor
-   nenhum card. Escondidas fora do desktop, mesmo critério de sempre. */
+   nenhum card. Escondidas fora do desktop — só aparecem em
+   `(pointer:fine) and (min-width:1024px)`, mesma fronteira do
+   `useCarrosselComSetas.js` e da régua "desktop ≥1024" da escala 1024→1440
+   (alinhada em 2026-07-16, recuada da fronteira desktop antiga que
+   destoava da Home). */
 .destaques_pdp_carrossel_wrap{
   position: relative;
 }
@@ -472,7 +476,7 @@
   transform: translateY(-50%);
   z-index: 2;
 }
-@media (pointer: fine) and (min-width: 1281px){
+@media (pointer: fine) and (min-width: 1024px){
   .destaques_pdp_carrossel_wrap .seta_carrossel_pdp{
     display: flex;
   }
@@ -639,13 +643,16 @@
 }
 .combine_setup_setas{
   /* Escondidas fora do desktop (fix 2026-07-14) — mesmo critério das setas
-     do DESTAQUES acima (aqui as 2 setas continuam agrupadas no
-     topo-direita, layout não alterado pelo pedido de reposicionamento do
-     DESTAQUES). */
+     do DESTAQUES acima: só aparecem em `(pointer:fine) and
+     (min-width:1024px)` (fronteira alinhada em 2026-07-16 à régua "desktop
+     ≥1024" e ao `useCarrosselComSetas.js`, recuada da fronteira desktop
+     antiga). Aqui as 2 setas
+     continuam agrupadas no topo-direita, layout não alterado pelo pedido de
+     reposicionamento do DESTAQUES. */
   display: none;
   gap: 10px;
 }
-@media (pointer: fine) and (min-width: 1281px){
+@media (pointer: fine) and (min-width: 1024px){
   .combine_setup_setas{
     display: flex;
   }
