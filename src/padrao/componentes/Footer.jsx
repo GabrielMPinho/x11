@@ -14,14 +14,13 @@ export default function Footer(){
                         ))}
                     </div>
                 ))}
-            </Revela>
-            <Revela as="div" id="rodape_footer" distancia={64}>
-                <p>Copyright © 2026 X11. Todos os direitos reservados.</p>
                 <div id="logo_footer">
                     <img src={logo} alt="logo X11" />
                 </div>
             </Revela>
-            <div id="fim_footer"></div>
+            <Revela as="div" id="rodape_footer" distancia={64}>
+                <p>Copyright © 2026 X11. Todos os direitos reservados.</p>
+            </Revela>
         </footer>
     )
 }

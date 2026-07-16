@@ -13,9 +13,9 @@
      era `height:55vh` (mudava com a ALTURA da janela). Medido no render
      1440×900: 90vw=1296px, 55vh=495px → aspect-ratio trava a altura na
      LARGURA (decisão #1), 1296/495 em vez de 55vh. */
-  aspect-ratio: 1296 / 495;
+  /* aspect-ratio: 1296 / 495; */
   display: grid;
-  grid-template-columns: repeat(3, max-content);
+  grid-template-columns: repeat(3, max-content) 1fr;
   gap: 6vw;
   padding-bottom: calc(60 * var(--u));
 }
@@ -48,14 +48,14 @@
   width: 100%;
   /* Escala do desktop (2026-07-14) — medido no render 1440×900: largura
      efetiva (full-bleed) 1440px, 18vh=162px → aspect-ratio 1440/162. */
-  aspect-ratio: 1440 / 162;
+  /* aspect-ratio: 1440 / 162; */
   margin: 0 auto;
   border-top: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.55);
   border-bottom: calc(1 * var(--u)) solid rgba(255, 255, 255, 0.55);
-  padding: calc(25 * var(--u)) 0;
+  /* padding: calc(25 * var(--u)) 0; */
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   background-color: var(--background_cinza);
 }
 
@@ -72,16 +72,13 @@
      13vh=117px → aspect-ratio 360/117. */
   aspect-ratio: 360 / 117;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  justify-self: end; /* empurra para a borda direita da coluna 1fr */
+
+  
 }
 
-#fim_footer{
-  width: 100%;
-  /* Escala do desktop (2026-07-14) — medido no render 1440×900: largura
-     efetiva (full-bleed) 1440px, 20vh=180px → aspect-ratio 1440/180. */
-  aspect-ratio: 1440 / 180;
-}
 
 
 /* FIM FOOTER */
