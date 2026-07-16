@@ -33,7 +33,6 @@ export default function Favoritos(){
                         className="card"
                         key={index}
                         progresso={progresso}
-                        atraso={atrasoCard(index, favoritos.length)}
                         larguraEntrada={LARGURA_ENTRADA_CARD}
                     >
                         <div className="zoom_imagem">

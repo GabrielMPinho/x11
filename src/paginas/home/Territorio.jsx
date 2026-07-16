@@ -24,7 +24,6 @@ export default function Territorio(){
                             className="card_territorio"
                             key={index}
                             progresso={progresso}
-                            atraso={atrasoCard(index, territorio.length)}
                             larguraEntrada={LARGURA_ENTRADA_CARD}
                         >
                             <div className="zoom_imagem">

@@ -57,12 +57,13 @@
   align-items: center;
   justify-content: center;
   background-color: var(--background_cinza);
+  /* aspect-ratio: 2000 / 10; */
 }
 
 #rodape_footer p{
   color: var(--branco);
   font-size: max(12px, calc(13 * var(--u)));
-  margin: 4.4vw;
+  margin: 2.5vw;
 
 }
 
